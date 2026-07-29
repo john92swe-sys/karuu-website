@@ -1,0 +1,2148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karuu AB - Your Gateway to Nordic Markets</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1A3A5C;
+            --secondary: #4A90A4;
+            --accent: #E8B849;
+            --dark: #0D1B2A;
+            --light: #F8FAFC;
+            --text: #2C3E50;
+            --text-light: #64748B;
+            --white: #FFFFFF;
+            --cat-tree: #6B5B95;
+            --bbq: #D35400;
+            --water: #27AE60;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            line-height: 1.6;
+            background: var(--white);
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--secondary);
+        }
+
+        .nav-cta {
+            background: var(--primary);
+            color: white !important;
+            padding: 0.6rem 1.5rem;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .nav-cta:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .mobile-toggle {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 50%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            padding: 120px 5% 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            color: white;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .hero-text h1 span {
+            color: var(--accent);
+        }
+
+        .hero-text p {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+            max-width: 540px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--dark);
+        }
+
+        .btn-primary:hover {
+            background: #f0c44a;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(232, 184, 73, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+        }
+
+        .hero-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            color: white;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-badge i {
+            color: var(--accent);
+        }
+
+        /* Stats */
+        .stats-section {
+            background: white;
+            padding: 4rem 5%;
+            margin-top: -60px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .stats-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            background: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Section Styles */
+        section {
+            padding: 100px 5%;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 4rem;
+        }
+
+        .section-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        /* About Section */
+        .about-section {
+            background: var(--light);
+        }
+
+        .about-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-content h3 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .about-content p {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .about-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .about-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .about-feature i {
+            color: var(--secondary);
+            font-size: 1.2rem;
+        }
+
+        .about-image {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 20px;
+            padding: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+        }
+
+        .about-image svg {
+            width: 100%;
+            max-width: 350px;
+        }
+
+        /* Team Section */
+        .team-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+        }
+
+        .team-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+        }
+
+        .team-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+        }
+
+        .team-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .team-card:nth-child(1) .team-avatar { background: linear-gradient(135deg, var(--primary), #2E5A8C); }
+        .team-card:nth-child(2) .team-avatar { background: linear-gradient(135deg, var(--secondary), #6BB3C9); }
+        .team-card:nth-child(3) .team-avatar { background: linear-gradient(135deg, var(--accent), #F0C44A); }
+        .team-card:nth-child(4) .team-avatar { background: linear-gradient(135deg, #8E44AD, #A569BD); }
+
+        .team-card h4 {
+            font-size: 1.2rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .team-card .role {
+            color: var(--secondary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .team-card .bio {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        /* Services Section */
+        .services-section {
+            background: var(--dark);
+            color: white;
+        }
+
+        .services-section .section-header h2 {
+            color: white;
+        }
+
+        .services-section .section-header p {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .services-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .service-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2.5rem;
+            transition: all 0.3s;
+        }
+
+        .service-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .service-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .service-card p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* Products Section */
+        .products-section {
+            background: var(--light);
+        }
+
+        .products-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.5rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-image {
+            height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card:nth-child(1) .product-image { background: linear-gradient(135deg, #E8E4F0, #D4C8E8); }
+        .product-card:nth-child(2) .product-image { background: linear-gradient(135deg, #FFE5D9, #FFD4C4); }
+        .product-card:nth-child(3) .product-image { background: linear-gradient(135deg, #D4F0E7, #B8E8D8); }
+
+        .product-image svg {
+            width: 180px;
+            height: 180px;
+            transition: transform 0.4s;
+        }
+
+        .product-card:hover .product-image svg {
+            transform: scale(1.1);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .product-card:nth-child(1) .product-badge { background: var(--cat-tree); color: white; }
+        .product-card:nth-child(2) .product-badge { background: var(--bbq); color: white; }
+        .product-card:nth-child(3) .product-badge { background: var(--water); color: white; }
+
+        .product-content {
+            padding: 2rem;
+        }
+
+        .product-content h3 {
+            font-size: 1.5rem;
+            color: var(--dark);
+            margin-bottom: 0.75rem;
+        }
+
+        .product-content p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .product-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .product-features span {
+            background: var(--light);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: var(--text);
+        }
+
+        .product-price {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .product-price span {
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        .product-price strong {
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+
+        .btn-product {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-product:hover {
+            background: var(--secondary);
+        }
+
+        /* Success Cases Section */
+        .cases-section {
+            background: white;
+        }
+
+        .cases-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .case-card {
+            background: var(--light);
+            border-radius: 16px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .case-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .case-card:nth-child(1)::before { background: var(--cat-tree); }
+        .case-card:nth-child(2)::before { background: var(--bbq); }
+        .case-card:nth-child(3)::before { background: var(--water); }
+
+        .case-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .case-card:nth-child(1) .case-icon { background: linear-gradient(135deg, var(--cat-tree), #8B7BB5); }
+        .case-card:nth-child(2) .case-icon { background: linear-gradient(135deg, var(--bbq), #E67E4D); }
+        .case-card:nth-child(3) .case-icon { background: linear-gradient(135deg, var(--water), #45B87A); }
+
+        .case-icon svg {
+            width: 40px;
+            height: 40px;
+        }
+
+        .case-card h3 {
+            font-size: 1.3rem;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .case-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .case-stats {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .case-stat {
+            text-align: center;
+        }
+
+        .case-stat strong {
+            display: block;
+            font-size: 1.5rem;
+            color: var(--primary);
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .case-stat span {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        /* Why Choose Us */
+        .why-section {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .why-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3z' fill='%23ffffff' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+
+        .why-section .section-header h2 {
+            color: white;
+        }
+
+        .why-section .section-header p {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .why-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .why-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .why-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .why-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+        }
+
+        .why-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .why-card p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* Cooperation Section */
+        .cooperation-section {
+            background: var(--light);
+        }
+
+        .coop-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+        }
+
+        .coop-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .coop-card:hover {
+            border-color: var(--secondary);
+            transform: translateY(-5px);
+        }
+
+        .coop-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .coop-card h3 {
+            font-size: 1.2rem;
+            color: var(--dark);
+            margin-bottom: 0.75rem;
+        }
+
+        .coop-card p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            background: white;
+        }
+
+        .contact-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 4rem;
+        }
+
+        .contact-info {
+            padding: 2rem;
+        }
+
+        .contact-info h3 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .contact-info > p {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            line-height: 1.7;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-item i {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .contact-item h4 {
+            font-size: 1rem;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .contact-item p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .contact-form {
+            background: var(--light);
+            border-radius: 20px;
+            padding: 3rem;
+        }
+
+        .contact-form h3 {
+            font-size: 1.5rem;
+            color: var(--dark);
+            margin-bottom: 2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 1rem;
+            border: 2px solid #E2E8F0;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 4px rgba(74, 144, 164, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .checkbox-item input {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--secondary);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.2rem 3rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(26, 58, 92, 0.3);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark);
+            color: white;
+            padding: 4rem 5% 2rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            padding-bottom: 3rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-brand p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 1rem;
+            line-height: 1.7;
+        }
+
+        .footer h4 {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .footer-social a {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .footer-social a:hover {
+            background: var(--secondary);
+            transform: translateY(-3px);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-text p {
+                margin: 0 auto 2rem;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero-visual {
+                order: -1;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .team-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .services-grid,
+            .products-grid,
+            .cases-grid,
+            .why-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .coop-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-toggle {
+                display: block;
+            }
+
+            .hero {
+                padding: 100px 5% 60px;
+            }
+
+            .hero-text h1 {
+                font-size: 2rem;
+            }
+
+            section {
+                padding: 60px 5%;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                padding: 1.5rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .section-header h2 {
+                font-size: 1.8rem;
+            }
+
+            .team-grid,
+            .services-grid,
+            .products-grid,
+            .cases-grid,
+            .why-grid,
+            .coop-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .about-features {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Scroll Animation */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease-out;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Nordic Advantage Banner */
+        .nordic-advantage {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 80px 5%;
+            border-top: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .nordic-advantage .section-header {
+            margin-bottom: 3rem;
+        }
+
+        .advantage-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+        }
+
+        .advantage-item {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .advantage-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .advantage-item h4 {
+            font-size: 1.1rem;
+            color: var(--dark);
+            margin-bottom: 0.75rem;
+        }
+
+        .advantage-item p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 1024px) {
+            .advantage-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .advantage-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon">K</div>
+            <span class="logo-text">Karuu AB</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#products">Products</a></li>
+            <li><a href="#cases">Cases</a></li>
+            <li><a href="#contact" class="nav-cta">Contact Us</a></li>
+        </ul>
+        <div class="mobile-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <div class="hero-text">
+                <div class="hero-badge">
+                    <i class="fas fa-check-circle"></i>
+                    Registered Swedish Trading Company
+                </div>
+                <h1>Your Gateway to <span>Nordic Markets</span></h1>
+                <p>As a registered Swedish company, Karuu AB bridges premium Chinese products with the European market. We provide end-to-end B2B solutions—sourcing, customs clearance, warehousing, and distribution.</p>
+                <div class="hero-buttons">
+                    <a href="#contact" class="btn btn-primary">
+                        <i class="fas fa-handshake"></i>
+                        Partner With Us
+                    </a>
+                    <a href="#products" class="btn btn-secondary">
+                        <i class="fas fa-box-open"></i>
+                        View Products
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <!-- Nordic Map SVG -->
+                <svg viewBox="0 0 400 300" width="400" height="300">
+                    <!-- Scandinavia Background -->
+                    <rect width="400" height="300" fill="url(#heroGradient)" rx="20"/>
+                    <!-- Nordic Countries -->
+                    <g fill="white" fill-opacity="0.15">
+                        <!-- Sweden -->
+                        <path d="M180 50 L220 50 L240 150 L200 250 L160 250 L140 180 L160 100 Z"/>
+                        <!-- Norway -->
+                        <path d="M240 50 L300 80 L320 180 L280 280 L220 250 L240 150 Z" fill-opacity="0.1"/>
+                        <!-- Denmark -->
+                        <path d="M140 260 L180 250 L200 270 L160 280 Z" fill-opacity="0.1"/>
+                    </g>
+                    <!-- Sweden Highlight -->
+                    <path d="M180 50 L220 50 L240 150 L200 250 L160 250 L140 180 L160 100 Z" fill="none" stroke="#E8B849" stroke-width="3"/>
+                    <!-- Connection Lines -->
+                    <g stroke="#E8B849" stroke-width="2" stroke-dasharray="5,5" fill="none">
+                        <line x1="50" y1="150" x2="140" y2="150"/>
+                        <line x1="200" y1="150" x2="350" y2="150"/>
+                    </g>
+                    <!-- China Label -->
+                    <circle cx="50" cy="150" r="20" fill="#D35400"/>
+                    <text x="50" y="155" text-anchor="middle" fill="white" font-size="14" font-weight="bold">CN</text>
+                    <!-- Sweden Label -->
+                    <circle cx="200" cy="150" r="25" fill="#1A3A5C"/>
+                    <text x="200" y="155" text-anchor="middle" fill="white" font-size="14" font-weight="bold">SE</text>
+                    <!-- Europe Label -->
+                    <circle cx="350" cy="150" r="20" fill="#4A90A4"/>
+                    <text x="350" y="155" text-anchor="middle" fill="white" font-size="14" font-weight="bold">EU</text>
+                    <!-- Arrows -->
+                    <path d="M75 145 L125 145 L125 140 L140 150 L125 160 L125 155 L75 155 Z" fill="#E8B849"/>
+                    <path d="M225 145 L325 145 L325 140 L340 150 L325 160 L325 155 L225 155 Z" fill="#E8B849"/>
+                    <!-- Labels -->
+                    <text x="50" y="190" text-anchor="middle" fill="white" font-size="12" opacity="0.8">China</text>
+                    <text x="200" y="200" text-anchor="middle" fill="#E8B849" font-size="14" font-weight="bold">KARUU AB</text>
+                    <text x="350" y="190" text-anchor="middle" fill="white" font-size="12" opacity="0.8">Europe</text>
+                    <defs>
+                        <linearGradient id="heroGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#1A3A5C"/>
+                            <stop offset="100%" style="stop-color:#4A90A4"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">4+</div>
+                <div class="stat-label">Years in Nordic Market</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">15,000m²</div>
+                <div class="stat-label">Swedish Warehouse</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">50+</div>
+                <div class="stat-label">B2B Partners</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">3</div>
+                <div class="stat-label">Product Categories</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Nordic Advantage Banner -->
+    <section class="nordic-advantage">
+        <div class="section-header">
+            <span class="section-tag">B2B Advantages</span>
+            <h2>Why European Partners Choose Karuu</h2>
+            <p>We understand the needs of Nordic B2B buyers. Our advantages go beyond product sourcing.</p>
+        </div>
+        <div class="advantage-grid">
+            <div class="advantage-item">
+                <div class="advantage-icon">
+                    <i class="fas fa-file-shield"></i>
+                </div>
+                <h4>EU Compliance</h4>
+                <p>Full CE, LFGB, EN1860 certification support. Complete documentation for customs clearance.</p>
+            </div>
+            <div class="advantage-item">
+                <div class="advantage-icon">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <h4>30-50% Savings</h4>
+                <p>Direct factory pricing. No middlemen. Maximize your profit margins with Chinese manufacturing.</p>
+            </div>
+            <div class="advantage-item">
+                <div class="advantage-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h4>Scalable Growth</h4>
+                <p>Start with small orders, scale as you grow. Flexible MOQ starting from 100 pieces.</p>
+            </div>
+            <div class="advantage-item">
+                <div class="advantage-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h4>Dedicated Support</h4>
+                <p>Swedish/English/Chinese speaking account managers. Real-time order tracking and updates.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section" id="about">
+        <div class="about-grid">
+            <div class="about-content">
+                <span class="section-tag">About Karuu</span>
+                <h2>Registered Swedish Trading Company</h2>
+                <h3>Your Reliable Bridge to Nordic Markets</h3>
+                <p>Karuu AB is a registered Swedish trading company (Reg. No. 559244-1892) headquartered in Halmstad, Sweden. We specialize in providing comprehensive B2B trade services between China and the Nordic region.</p>
+                <p>With our Swedish local team, warehousing facilities, and established distribution channels, we help European businesses access quality Chinese products at competitive prices while ensuring full compliance with EU regulations.</p>
+                <div class="about-features">
+                    <div class="about-feature">
+                        <i class="fas fa-check-circle"></i>
+                        Swedish Registered Company
+                    </div>
+                    <div class="about-feature">
+                        <i class="fas fa-check-circle"></i>
+                        15,000m² Swedish Warehouse
+                    </div>
+                    <div class="about-feature">
+                        <i class="fas fa-check-circle"></i>
+                        Nordic Local Team
+                    </div>
+                    <div class="about-feature">
+                        <i class="fas fa-check-circle"></i>
+                        EU Compliance Expert
+                    </div>
+                    <div class="about-feature">
+                        <i class="fas fa-check-circle"></i>
+                        Channel Distribution
+                    </div>
+                    <div class="about-feature">
+                        <i class="fas fa-check-circle"></i>
+                        Custom Clearance
+                    </div>
+                </div>
+            </div>
+            <div class="about-image">
+                <!-- Sweden Building SVG -->
+                <svg viewBox="0 0 350 400" width="350" height="400">
+                    <!-- Background -->
+                    <rect width="350" height="400" fill="white" rx="20"/>
+                    <!-- Building -->
+                    <rect x="50" y="100" width="250" height="250" fill="url(#buildingGrad)" rx="10"/>
+                    <!-- Windows -->
+                    <g fill="white" fill-opacity="0.3">
+                        <rect x="70" y="120" width="50" height="40" rx="4"/>
+                        <rect x="150" y="120" width="50" height="40" rx="4"/>
+                        <rect x="230" y="120" width="50" height="40" rx="4"/>
+                        <rect x="70" y="180" width="50" height="40" rx="4"/>
+                        <rect x="150" y="180" width="50" height="40" rx="4"/>
+                        <rect x="230" y="180" width="50" height="40" rx="4"/>
+                        <rect x="70" y="240" width="50" height="40" rx="4"/>
+                        <rect x="150" y="240" width="50" height="40" rx="4"/>
+                        <rect x="230" y="240" width="50" height="40" rx="4"/>
+                    </g>
+                    <!-- Swedish Flag -->
+                    <rect x="100" y="60" width="80" height="50" fill="#006AA7"/>
+                    <rect x="100" y="75" width="80" height="20" fill="#FECC00"/>
+                    <rect x="128" y="60" width="24" height="50" fill="#FECC00"/>
+                    <!-- Text -->
+                    <text x="175" y="390" text-anchor="middle" fill="#1A3A5C" font-size="14" font-weight="600">KARUU AB</text>
+                    <text x="175" y="410" text-anchor="middle" fill="#4A90A4" font-size="10">Halmstad, Sweden</text>
+                    <defs>
+                        <linearGradient id="buildingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#1A3A5C"/>
+                            <stop offset="100%" style="stop-color:#2E5A8C"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section style="background: var(--light);">
+        <div class="section-header">
+            <span class="section-tag">Our Team</span>
+            <h2>Leadership Team</h2>
+            <p>Experienced professionals bridging Chinese manufacturing with Nordic markets</p>
+        </div>
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="team-avatar">JJ</div>
+                <h4>John Jiang</h4>
+                <div class="role">Board Member</div>
+                <div class="bio">Strategic partnerships and Nordic market development</div>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar">EB</div>
+                <h4>Elin Bu (叶华)</h4>
+                <div class="role">Board Alternate</div>
+                <div class="bio">MBA, sourcing and business development</div>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar">JP</div>
+                <h4>Jörgen Persson</h4>
+                <div class="role">Brand Ambassador</div>
+                <div class="bio">Former Swedish table tennis champion</div>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar">LT</div>
+                <h4>Lu Tao</h4>
+                <div class="role">Greater China President</div>
+                <div class="bio">Overseeing China operations and supplier relations</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services-section" id="services">
+        <div class="section-header">
+            <span class="section-tag">Our Services</span>
+            <h2>End-to-End B2B Solutions</h2>
+            <p>From sourcing to delivery, we handle every step of your supply chain</p>
+        </div>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <h3>B2B Sourcing</h3>
+                <p>Connect with verified Chinese manufacturers. We handle supplier vetting, quality control, and competitive pricing for cat trees, BBQ grills, water bottles, and more.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-network-wired"></i>
+                </div>
+                <h3>Channel Distribution</h3>
+                <p>Leverage our established network across Sweden, Norway, Denmark, and Finland. We help you reach supermarkets, retailers, and e-commerce platforms.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-file-invoice"></i>
+                </div>
+                <h3>Custom Clearance</h3>
+                <p>Expert handling of EU customs documentation. We ensure smooth import processes with full regulatory compliance for all product categories.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-warehouse"></i>
+                </div>
+                <h3>Nordic Warehousing</h3>
+                <p>15,000m² warehouse in Halmstad, Sweden. Secure storage, inventory management, and flexible fulfillment solutions for B2B orders.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-truck-fast"></i>
+                </div>
+                <h3>Last-Mile Delivery</h3>
+                <p>Efficient distribution across the Nordic region. We partner with leading logistics providers to ensure timely delivery to your customers.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <h3>Market Entry</h3>
+                <p>Comprehensive market intelligence and entry strategies. We help you understand Nordic consumer preferences and regulatory requirements.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products-section" id="products">
+        <div class="section-header">
+            <span class="section-tag">Product Center</span>
+            <h2>Premium Products for Nordic Markets</h2>
+            <p>Quality Chinese products with EU certifications, ready for European distribution</p>
+        </div>
+        <div class="products-grid">
+            <!-- Cat Tree Product -->
+            <div class="product-card">
+                <div class="product-image">
+                    <svg viewBox="0 0 200 200">
+                        <!-- Cat Tree SVG -->
+                        <rect x="85" y="150" width="30" height="40" fill="#8B7355" rx="3"/>
+                        <rect x="75" y="180" width="50" height="10" fill="#6B5B95" rx="2"/>
+                        <rect x="70" y="100" width="60" height="50" fill="#9B8BB5" rx="8"/>
+                        <rect x="65" y="105" width="70" height="40" fill="#B8A8D0" rx="6"/>
+                        <ellipse cx="100" cy="100" rx="40" ry="25" fill="#C4B5D8"/>
+                        <circle cx="40" cy="130" r="25" fill="#8B7355"/>
+                        <circle cx="40" cy="130" r="18" fill="#A08060"/>
+                        <circle cx="160" cy="130" r="25" fill="#8B7355"/>
+                        <circle cx="160" cy="130" r="18" fill="#A08060"/>
+                        <rect x="30" y="155" width="20" height="30" fill="#8B7355"/>
+                        <rect x="150" y="155" width="20" height="30" fill="#8B7355"/>
+                        <circle cx="50" cy="70" r="15" fill="#C4B5D8"/>
+                        <circle cx="50" cy="65" r="10" fill="#D4C5E0"/>
+                        <circle cx="45" cy="62" r="2" fill="#333"/>
+                        <circle cx="55" cy="62" r="2" fill="#333"/>
+                        <ellipse cx="50" cy="67" rx="3" ry="2" fill="#FFB6C1"/>
+                        <path d="M40 58 L45 52 L50 58" stroke="#C4B5D8" stroke-width="2" fill="none"/>
+                        <path d="M50 58 L55 52 L60 58" stroke="#C4B5D8" stroke-width="2" fill="none"/>
+                    </svg>
+                    <span class="product-badge">Top Seller</span>
+                </div>
+                <div class="product-content">
+                    <h3>Cat Trees</h3>
+                    <p>Premium cat trees and furniture. Solid pine wood, sisal scratching posts, plush fabric. Multiple sizes for wall-mounted and floor-standing options.</p>
+                    <div class="product-features">
+                        <span>E1 Grade Wood</span>
+                        <span>CE/FDA</span>
+                        <span>Custom Logo</span>
+                    </div>
+                    <div class="product-price">
+                        <div>
+                            <span>From</span>
+                            <strong>¥46</strong>
+                        </div>
+                        <a href="#contact" class="btn-product">
+                            <i class="fas fa-envelope"></i> Request Catalog
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BBQ Grill Product -->
+            <div class="product-card">
+                <div class="product-image">
+                    <svg viewBox="0 0 200 200">
+                        <!-- BBQ Grill SVG -->
+                        <ellipse cx="100" cy="160" rx="80" ry="20" fill="#4A4A4A"/>
+                        <ellipse cx="100" cy="155" rx="75" ry="18" fill="#5A5A5A"/>
+                        <ellipse cx="100" cy="150" rx="70" ry="15" fill="#333"/>
+                        <rect x="25" y="145" width="150" height="15" fill="url(#grillGrad)" rx="3"/>
+                        <rect x="90" y="80" width="20" height="70" fill="#8B7355"/>
+                        <rect x="85" y="70" width="30" height="15" fill="#6B5B95" rx="3"/>
+                        <rect x="15" y="155" width="30" height="8" fill="#8B7355" rx="2"/>
+                        <rect x="155" y="155" width="30" height="8" fill="#8B7355" rx="2"/>
+                        <circle cx="20" cy="159" r="6" fill="#4A4A4A"/>
+                        <circle cx="180" cy="159" r="6" fill="#4A4A4A"/>
+                        <!-- Smoke -->
+                        <path d="M80 60 Q75 50 80 40 Q85 30 80 20" stroke="#CCC" stroke-width="3" fill="none" opacity="0.5"/>
+                        <path d="M100 55 Q95 45 100 35 Q105 25 100 15" stroke="#CCC" stroke-width="3" fill="none" opacity="0.5"/>
+                        <path d="M120 60 Q125 50 120 40 Q115 30 120 20" stroke="#CCC" stroke-width="3" fill="none" opacity="0.5"/>
+                        <defs>
+                            <linearGradient id="grillGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#888"/>
+                                <stop offset="100%" style="stop-color:#666"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="product-badge">Popular</span>
+                </div>
+                <div class="product-content">
+                    <h3>BBQ Grills</h3>
+                    <p>Professional-grade charcoal and gas grills. 25+ years manufacturing experience. CE, LFGB, EN1860 certified. Perfect for European outdoor cooking culture.</p>
+                    <div class="product-features">
+                        <span>CE/LFGB</span>
+                        <span>BSCI</span>
+                        <span>OEM/ODM</span>
+                    </div>
+                    <div class="product-price">
+                        <div>
+                            <span>From</span>
+                            <strong>¥246</strong>
+                        </div>
+                        <a href="#contact" class="btn-product">
+                            <i class="fas fa-envelope"></i> Request Catalog
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Water Bottle Product -->
+            <div class="product-card">
+                <div class="product-image">
+                    <svg viewBox="0 0 200 200">
+                        <!-- Water Bottle SVG -->
+                        <defs>
+                            <linearGradient id="bottleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#4A90A4"/>
+                                <stop offset="50%" style="stop-color:#5BA8B8"/>
+                                <stop offset="100%" style="stop-color:#4A90A4"/>
+                            </linearGradient>
+                            <linearGradient id="lidGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#333"/>
+                                <stop offset="100%" style="stop-color:#555"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Bottle Body -->
+                        <rect x="60" y="60" width="80" height="120" rx="15" fill="url(#bottleGrad)"/>
+                        <!-- Bottle Highlight -->
+                        <rect x="70" y="70" width="15" height="100" rx="7" fill="white" opacity="0.2"/>
+                        <!-- Lid -->
+                        <rect x="65" y="45" width="70" height="20" rx="5" fill="url(#lidGrad)"/>
+                        <rect x="75" y="35" width="50" height="15" rx="3" fill="#666"/>
+                        <rect x="85" y="30" width="30" height="8" rx="2" fill="#888"/>
+                        <!-- Logo Area -->
+                        <rect x="85" y="100" width="30" height="30" rx="5" fill="white" opacity="0.8"/>
+                        <text x="100" y="118" text-anchor="middle" fill="#1A3A5C" font-size="8" font-weight="bold">KARUU</text>
+                        <!-- Water Drop Icon -->
+                        <path d="M100 140 Q110 150 105 160 Q100 165 95 160 Q90 150 100 140" fill="white" opacity="0.5"/>
+                        <!-- Capacity Text -->
+                        <text x="100" y="175" text-anchor="middle" fill="white" font-size="10" opacity="0.9">500ml</text>
+                    </svg>
+                    <span class="product-badge">Fast Growing</span>
+                </div>
+                <div class="product-content">
+                    <h3>Water Bottles</h3>
+                    <p>Premium vacuum insulated bottles and tumblers. 304/316 stainless steel, BPA-free Tritan options. FDA, LFGB certified. Ideal for Nordic active lifestyle.</p>
+                    <div class="product-features">
+                        <span>304/316 Steel</span>
+                        <span>FDA/LFGB</span>
+                        <span>BSCI/ISO</span>
+                    </div>
+                    <div class="product-price">
+                        <div>
+                            <span>From</span>
+                            <strong>¥18</strong>
+                        </div>
+                        <a href="#contact" class="btn-product">
+                            <i class="fas fa-envelope"></i> Request Catalog
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Success Cases Section -->
+    <section class="cases-section" id="cases">
+        <div class="section-header">
+            <span class="section-tag">Success Stories</span>
+            <h2>Proven Track Record</h2>
+            <p>Real results from our B2B partnerships across the Nordic region</p>
+        </div>
+        <div class="cases-grid">
+            <div class="case-card">
+                <div class="case-icon">
+                    <svg viewBox="0 0 50 50" fill="white">
+                        <rect x="20" y="35" width="10" height="12" rx="2"/>
+                        <ellipse cx="25" cy="32" rx="15" ry="10"/>
+                        <circle cx="10" cy="25" r="8"/>
+                        <circle cx="40" cy="25" r="8"/>
+                    </svg>
+                </div>
+                <h3>Cat Tree Series</h3>
+                <p>Successfully entered Nordic offline supermarkets and online platforms. Products now distributed across Sweden, Norway, and Denmark through established retail channels.</p>
+                <div class="case-stats">
+                    <div class="case-stat">
+                        <strong>3+</strong>
+                        <span>Countries</span>
+                    </div>
+                    <div class="case-stat">
+                        <strong>10+</strong>
+                        <span>Retail Partners</span>
+                    </div>
+                    <div class="case-stat">
+                        <strong>5K+</strong>
+                        <span>Monthly Orders</span>
+                    </div>
+                </div>
+            </div>
+            <div class="case-card">
+                <div class="case-icon">
+                    <svg viewBox="0 0 50 50" fill="white">
+                        <ellipse cx="25" cy="35" rx="20" ry="8"/>
+                        <rect x="5" y="30" width="40" height="8" rx="2"/>
+                        <rect x="22" y="15" width="6" height="18"/>
+                    </svg>
+                </div>
+                <h3>BBQ Grill Series</h3>
+                <p>Completed Nordic customs clearance, warehousing, and distribution. Achieved stable bulk supply to European partners with full regulatory compliance.</p>
+                <div class="case-stats">
+                    <div class="case-stat">
+                        <strong>25+</strong>
+                        <span>SKUs</span>
+                    </div>
+                    <div class="case-stat">
+                        <strong>200+</strong>
+                        <span>MOQ</span>
+                    </div>
+                    <div class="case-stat">
+                        <strong>30-50%</strong>
+                        <span>Cost Savings</span>
+                    </div>
+                </div>
+            </div>
+            <div class="case-card">
+                <div class="case-icon">
+                    <svg viewBox="0 0 50 50" fill="white">
+                        <rect x="15" y="10" width="20" height="35" rx="5"/>
+                        <rect x="18" y="5" width="14" height="8" rx="2"/>
+                    </svg>
+                </div>
+                <h3>Water Bottle Series</h3>
+                <p>Through Karuu's localized operations, rapidly opened Nordic consumer market. Established stable distribution channels with repeat orders.</p>
+                <div class="case-stats">
+                    <div class="case-stat">
+                        <strong>4+</strong>
+                        <span>Platforms</span>
+                    </div>
+                    <div class="case-stat">
+                        <strong>1K+</strong>
+                        <span>Monthly Sales</span>
+                    </div>
+                    <div class="case-stat">
+                        <strong>45%</strong>
+                        <span>Repeat Rate</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us Section -->
+    <section class="why-section">
+        <div class="section-header">
+            <span class="section-tag">Our Advantages</span>
+            <h2>Why Choose Karuu AB</h2>
+            <p>We combine the best of both worlds—Chinese manufacturing efficiency and Nordic business reliability</p>
+        </div>
+        <div class="why-grid">
+            <div class="why-card">
+                <div class="why-icon">
+                    <i class="fas fa-industry"></i>
+                </div>
+                <h3>Chinese Manufacturing Resources</h3>
+                <p>Direct partnerships with 50+ verified factories. Competitive pricing, flexible MOQ, and comprehensive product development support.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon">
+                    <i class="fas fa-flag"></i>
+                </div>
+                <h3>Nordic Local Presence</h3>
+                <p>Registered Swedish company with local team. Native language support, cultural understanding, and established business relationships.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon">
+                    <i class="fas fa-warehouse"></i>
+                </div>
+                <h3>Dual Warehouse Network</h3>
+                <p>15,000m² Swedish warehouse + China consolidation center. Efficient inventory management and flexible fulfillment solutions.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon">
+                    <i class="fas fa-shipping-fast"></i>
+                </div>
+                <h3>Logistics Excellence</h3>
+                <p>Integrated logistics network across Europe. Competitive freight rates, real-time tracking, and reliable delivery schedules.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon">
+                    <i class="fas fa-file-contract"></i>
+                </div>
+                <h3>Compliance Guaranteed</h3>
+                <p>Full support for CE, LFGB, EN1860 certifications. Complete documentation for customs and regulatory compliance.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon">
+                    <i class="fas fa-hand-holding-usd"></i>
+                </div>
+                <h3>Business Model Flexibility</h3>
+                <p>Multiple cooperation models: bulk purchase, OEM/ODM, channel distribution, and long-term partnership agreements.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cooperation Section -->
+    <section class="cooperation-section">
+        <div class="section-header">
+            <span class="section-tag">Cooperation Models</span>
+            <h2>Flexible Partnership Options</h2>
+            <p>Choose the model that fits your business needs</p>
+        </div>
+        <div class="coop-grid">
+            <div class="coop-card">
+                <div class="coop-icon">
+                    <i class="fas fa-boxes-stacked"></i>
+                </div>
+                <h3>Bulk Purchase</h3>
+                <p>Direct factory pricing for large orders. Full container (FCL) and less than container (LCL) options available.</p>
+            </div>
+            <div class="coop-card">
+                <div class="coop-icon">
+                    <i class="fas fa-tags"></i>
+                </div>
+                <h3>OEM / Private Label</h3>
+                <p>Custom branding solutions. Logo printing, packaging design, and product customization to match your brand.</p>
+            </div>
+            <div class="coop-card">
+                <div class="coop-icon">
+                    <i class="fas fa-store"></i>
+                </div>
+                <h3>Channel Distribution</h3>
+                <p>Become our regional partner. Exclusive distribution rights, marketing support, and priority inventory allocation.</p>
+            </div>
+            <div class="coop-card">
+                <div class="coop-icon">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <h3>Long-term Supply</h3>
+                <p>Strategic partnership agreements. Stable supply, price protection, and dedicated account management.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section" id="contact">
+        <div class="contact-grid">
+            <div class="contact-info">
+                <h3>Let's Start a Conversation</h3>
+                <p>Whether you're looking for product sourcing, distribution partnership, or market entry support, we're here to help.</p>
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div>
+                        <h4>Headquarters</h4>
+                        <p>Vattugatan 2A, 1001<br>302 33 HALMSTAD, Sweden</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone-alt"></i>
+                    <div>
+                        <h4>Phone</h4>
+                        <p>+46 70 880 2017</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <div>
+                        <h4>Email</h4>
+                        <p>info@karuu.se</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <i class="fab fa-whatsapp"></i>
+                    <div>
+                        <h4>WhatsApp</h4>
+                        <p>+46 70 880 2017</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-globe"></i>
+                    <div>
+                        <h4>Website</h4>
+                        <p>www.karuu.se</p>
+                    </div>
+                </div>
+            </div>
+            <div class="contact-form">
+                <h3>Send Us a Message</h3>
+                <form id="contactForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="name">Full Name *</label>
+                            <input type="text" id="name" name="name" placeholder="Your name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="company">Company Name *</label>
+                            <input type="text" id="company" name="company" placeholder="Your company" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" name="email" placeholder="you@company.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" placeholder="+46 XX XXX XXXX">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="country">Country *</label>
+                            <select id="country" name="country" required>
+                                <option value="">Select your country</option>
+                                <option value="SE">Sweden</option>
+                                <option value="NO">Norway</option>
+                                <option value="DK">Denmark</option>
+                                <option value="FI">Finland</option>
+                                <option value="DE">Germany</option>
+                                <option value="UK">United Kingdom</option>
+                                <option value="FR">France</option>
+                                <option value="other">Other European Country</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Products of Interest *</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="products" value="cat-trees">
+                                    <span>Cat Trees</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="products" value="bbq-grills">
+                                    <span>BBQ Grills</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="products" value="water-bottles">
+                                    <span>Water Bottles</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="cooperation">Cooperation Model</label>
+                            <select id="cooperation" name="cooperation">
+                                <option value="">Select cooperation model</option>
+                                <option value="bulk">Bulk Purchase</option>
+                                <option value="oem">OEM / Private Label</option>
+                                <option value="distribution">Channel Distribution</option>
+                                <option value="long-term">Long-term Partnership</option>
+                                <option value="other">Other / Not Sure</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="message">Your Message</label>
+                            <textarea id="message" name="message" placeholder="Tell us about your requirements, estimated order quantity, delivery timeline, etc."></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i>
+                        Send Inquiry
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="logo">
+                    <div class="logo-icon">K</div>
+                    <span class="logo-text" style="color: white;">Karuu AB</span>
+                </div>
+                <p>Registered Swedish trading company (Reg. No. 559244-1892). Your reliable gateway to Nordic markets for quality Chinese products.</p>
+            </div>
+            <div>
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#products">Products</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Products</h4>
+                <ul class="footer-links">
+                    <li><a href="#products">Cat Trees</a></li>
+                    <li><a href="#products">BBQ Grills</a></li>
+                    <li><a href="#products">Water Bottles</li>
+                    <li><a href="#contact">Custom Orders</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Contact</h4>
+                <ul class="footer-links">
+                    <li><i class="fas fa-phone" style="margin-right: 8px; color: var(--accent);"></i> +46 70 880 2017</li>
+                    <li><i class="fas fa-envelope" style="margin-right: 8px; color: var(--accent);"></i> info@karuu.se</li>
+                    <li><i class="fas fa-map-marker-alt" style="margin-right: 8px; color: var(--accent);"></i> Halmstad, Sweden</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2024 Karuu AB. All rights reserved. | Registered in Sweden | Reg. No. 559244-1892</p>
+            <div class="footer-social">
+                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Mobile menu toggle
+        const mobileToggle = document.querySelector('.mobile-toggle');
+        const navLinks = document.querySelector('.nav-links');
+
+        mobileToggle.addEventListener('click', () => {
+            navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+        });
+
+        // Form submission (demo)
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Thank you for your inquiry! We will contact you within 24 hours.');
+            this.reset();
+        });
+
+        // Scroll animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>
