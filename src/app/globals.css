@@ -1,0 +1,100 @@
+@import "https://fonts.googleapis.cn/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap";
+
+@import "tailwindcss";
+
+@theme {
+  /* Nordic Minimalist Color Palette */
+  --color-primary: #1A3A5C;
+  --color-primary-light: #2A5A8C;
+  --color-primary-dark: #0F2540;
+  --color-primary-50: #F0F4F8;
+  --color-primary-100: #DCE6F0;
+
+  --color-secondary: #4A90A4;
+  --color-secondary-light: #6BABBF;
+  --color-secondary-50: #EBF4F7;
+
+  --color-accent: #E8B849;
+  --color-accent-light: #F0D080;
+  --color-accent-50: #FBF5E6;
+
+  --color-stone: #2C3E50;
+  --color-stone-light: #6B7C93;
+  --color-stone-lighter: #94A3B8;
+
+  --color-border: #E8ECF0;
+  --color-bg: #FFFFFF;
+  --color-bg-alt: #F5F7FA;
+
+  /* Typography */
+  --font-sans: 'Inter', 'Montserrat', system-ui, sans-serif;
+  --font-heading: 'Montserrat', 'Inter', system-ui, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+
+  /* Spacing */
+  --spacing-section: 90px;
+
+  /* Radius */
+  --radius-card: 12px;
+  --radius-sm: 6px;
+
+  /* Shadows */
+  --shadow-card: 0 4px 20px rgba(26,58,92,0.08);
+  --shadow-hover: 0 12px 40px rgba(26,58,92,0.15);
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-stone);
+    background: var(--color-bg);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--color-primary);
+    letter-spacing: -0.02em;
+  }
+  a {
+    transition: all 0.3s ease;
+  }
+}
+
+@layer utilities {
+  .font-heading {
+    font-family: var(--font-heading);
+  }
+  .font-serif-decor {
+    font-family: var(--font-serif);
+  }
+  .section-padding {
+    padding-top: var(--spacing-section);
+    padding-bottom: var(--spacing-section);
+  }
+  .max-w-container {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+  .card-shadow {
+    box-shadow: var(--shadow-card);
+  }
+  .card-shadow-hover {
+    box-shadow: var(--shadow-hover);
+  }
+}

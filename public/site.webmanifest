@@ -1,0 +1,16 @@
+{
+  "name": "KARUU — Premium Yoga Apparel",
+  "short_name": "KARUU",
+  "description": "Premium yoga apparel manufactured with Scandinavian design standards. OEKO-TEX certified, sustainable fabrics, wholesale & OEM/ODM services.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1A3A5C",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
