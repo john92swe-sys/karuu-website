@@ -5,8 +5,6 @@ import {
   Phone,
   Clock,
   MessageCircle,
-  Send,
-  CheckCircle,
   Package,
   Building,
   Headphones,

@@ -3,21 +3,21 @@ import {
   HeroSection,
   CoreAdvantagesSection,
   FeaturedCollectionSection,
-  OekotexSection,
+  DocumentationSection,
   PartnershipSection,
   HomeContactSection,
 } from '@/components/sections/home-sections';
 
 export const metadata: Metadata = {
-  title: 'KARUU | Premium Yoga Apparel — Scandinavian Design, OEKO-TEX Certified',
+  title: 'Swedish B2B Activewear Sourcing Partner',
   description:
-    'KARUU AB — Nordic premium yoga apparel manufacturer. OEKO-TEX certified fabrics, OEM/ODM services, and global wholesale distribution. Designed in Scandinavia, crafted for performance.',
+    'KARUU connects global activewear brands with selected manufacturing capabilities through sourcing, product development, OEM/ODM coordination, and international service.',
   keywords:
-    'yoga apparel, yoga leggings, sports bra, yoga wear manufacturer, OEKO-TEX yoga, wholesale yoga clothing, Nordic yoga brand, KARUU AB',
+    'activewear sourcing, yoga apparel wholesale, OEM ODM coordination, private label activewear, KARUU AB',
   openGraph: {
-    title: 'KARUU | Premium Yoga Apparel',
+    title: 'KARUU | Swedish B2B Activewear Sourcing Partner',
     description:
-      'Nordic premium yoga apparel manufacturer. OEKO-TEX certified fabrics with OEM/ODM services.',
+      'Sourcing, product development, OEM/ODM coordination, quality communication, and international service.',
     type: 'website',
     locale: 'en_US',
   },
@@ -32,7 +32,7 @@ export default function HomePage() {
       <HeroSection />
       <CoreAdvantagesSection />
       <FeaturedCollectionSection />
-      <OekotexSection />
+      <DocumentationSection />
       <PartnershipSection />
       <HomeContactSection />
     </>

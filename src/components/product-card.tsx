@@ -1,52 +1,73 @@
-import Link from 'next/link';
 import Image from 'next/image';
+import Link from 'next/link';
+import { ArrowRight, MessageSquareText } from 'lucide-react';
 import type { Product } from '@/lib/products';
-import { getProductImagePath } from '@/lib/products';
-import { ArrowRight } from 'lucide-react';
 
 interface ProductCardProps {
   product: Product;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const firstImage = getProductImagePath(product.sku, 1);
+  const mainImage = product.gallery[0];
+  const hoverImage = product.gallery[1];
+  const productUrl = `/products/${product.slug}`;
+
   return (
-    <div className="group bg-white border border-stone-200 rounded-2xl overflow-hidden hover:shadow-lg hover:border-stone-300 transition-all duration-300 hover:-translate-y-1">
-      <Link href={`/products/${product.slug}`} className="block">
-        <div className="relative aspect-[3/4] bg-stone-faint overflow-hidden">
+    <article className="group overflow-hidden rounded-2xl border border-stone-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-stone-300 hover:shadow-lg">
+      <Link href={productUrl} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2">
+        <div className="relative aspect-[3/4] overflow-hidden bg-stone-faint">
           <Image
-            src={firstImage}
-            alt={product.name}
+            src={mainImage.src}
+            alt={mainImage.alt}
             fill
             sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 25vw"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="object-cover transition-opacity duration-500 group-hover:opacity-0"
           />
-          <div className="absolute top-3 left-3">
-            <span className="inline-block px-3 py-1 text-xs font-semibold tracking-wide text-primary bg-white/90 backdrop-blur-sm rounded-full">
-              {product.sku}
-            </span>
-          </div>
-        </div>
-        <div className="p-5">
-          <div className="text-xs text-secondary font-medium tracking-wide uppercase mb-1.5">
-            {product.categoryLabel}
-          </div>
-          <h3 className="text-base font-semibold text-primary mb-2 leading-snug group-hover:text-secondary transition-colors">
-            {product.name}
-          </h3>
-          <p className="text-sm text-stone-500 line-clamp-2 mb-4">
-            {product.fabric}
-          </p>
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-primary/70">
-              {product.colors.length}+ colors
-            </span>
-            <span className="inline-flex items-center gap-1 text-sm font-semibold text-secondary group-hover:gap-2 transition-all">
-              View Details <ArrowRight className="w-4 h-4" />
-            </span>
-          </div>
+          {hoverImage && (
+            <Image
+              src={hoverImage.src}
+              alt={hoverImage.alt}
+              fill
+              sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 25vw"
+              className="hidden object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100 md:block"
+            />
+          )}
+          <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold tracking-wide text-primary shadow-sm">
+            {product.sku}
+          </span>
         </div>
       </Link>
-    </div>
+
+      <div className="p-5">
+        <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-secondary">
+          {product.categoryLabel}
+        </p>
+        <Link href={productUrl} className="rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary">
+          <h2 className="mb-2 text-base font-semibold leading-snug text-primary transition-colors hover:text-secondary">
+            {product.name}
+          </h2>
+        </Link>
+        <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-stone-500">
+          {product.shortDescription}
+        </p>
+
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Link
+            href={productUrl}
+            className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
+          >
+            View Product
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+          <Link
+            href={`${productUrl}#inquiry`}
+            className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary/20 px-4 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-stone-faint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
+          >
+            <MessageSquareText className="h-4 w-4" aria-hidden="true" />
+            Request Quote
+          </Link>
+        </div>
+      </div>
+    </article>
   );
 }

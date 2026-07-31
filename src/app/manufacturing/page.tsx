@@ -13,18 +13,18 @@ import {
 import { Breadcrumb } from '@/components/breadcrumb';
 
 export const metadata: Metadata = {
-  title: 'Manufacturing | KARUU Production Capabilities',
+  title: 'Production Coordination | KARUU',
   description:
-    'State-of-the-art manufacturing with 100+ skilled workers, advanced equipment, and strict quality control. OEKO-TEX certified yoga apparel production.',
+    'How KARUU coordinates activewear specifications, sampling, approved production, quality communication, packaging, and delivery planning.',
   alternates: { canonical: '/manufacturing' },
 };
 
 const steps = [
-  { icon: Scissors, title: 'Cutting', desc: 'Precision automatic cutting machines ensure accuracy and consistency across every piece.' },
-  { icon: Shirt, title: 'Sewing', desc: 'Skilled seamstresses with years of experience in activewear construction.' },
-  { icon: ShieldCheck, title: 'QC Inspection', desc: 'Multi-stage quality control — in-line, end-line, and final inspection.' },
-  { icon: Package, title: 'Packaging', desc: 'Custom packaging options with your branding — polybags, boxes, hang tags.' },
-  { icon: Truck, title: 'Shipping', desc: 'Flexible shipping options — air, sea, or express with tracking.' },
+  { icon: Scissors, title: 'Specifications', desc: 'Construction, dimensions, materials, and finish requirements are documented.' },
+  { icon: Shirt, title: 'Sampling', desc: 'A sample and approval plan is agreed for the selected product.' },
+  { icon: ShieldCheck, title: 'Quality Plan', desc: 'Inspection expectations and acceptance points are aligned before ordering.' },
+  { icon: Package, title: 'Packaging', desc: 'Packaging and label requirements are confirmed in the order specification.' },
+  { icon: Truck, title: 'Delivery', desc: 'Trade terms, destination, and required dates are reviewed before commitment.' },
 ];
 
 export default function ManufacturingPage() {
@@ -34,7 +34,7 @@ export default function ManufacturingPage() {
 
       <div className="mt-8 mb-16 max-w-3xl">
         <span className="text-accent font-semibold text-sm uppercase tracking-widest">
-          Our Factory
+          Production Coordination
         </span>
         <h1 className="text-3xl md:text-5xl font-bold text-primary mt-3 mb-6 leading-tight">
           Precision Manufacturing
@@ -42,9 +42,9 @@ export default function ManufacturingPage() {
           <span className="text-secondary">Meets Craftsmanship</span>
         </h1>
         <p className="text-lg text-stone-light leading-relaxed">
-          Our production facility combines advanced technology with skilled craftsmanship
-          to deliver premium yoga apparel at scale. Every step is managed in-house for
-          full quality control and faster lead times.
+          KARUU is the external B2B partner coordinating selected manufacturing
+          capabilities. We do not present KARUU as a large owned factory; each project is
+          reviewed against the product brief, supplier capability, and order requirements.
         </p>
       </div>
 
@@ -96,24 +96,24 @@ export default function ManufacturingPage() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <span className="text-accent font-semibold text-sm uppercase tracking-widest">
-              Equipment
+              Capability Review
             </span>
             <h2 className="text-3xl md:text-4xl font-bold text-primary mt-3 mb-6">
-              Advanced Production Technology
+              Verify the production fit before ordering
             </h2>
             <p className="text-stone-light leading-relaxed mb-6">
-              We invest in the latest machinery to ensure precision, consistency, and
-              efficiency. Our facility is equipped with automated cutting systems,
-              flatlock machines, and fabric testing equipment.
+              Required processes and equipment depend on the selected product. KARUU
+              coordinates a capability review and confirms relevant production and
+              inspection requirements before an order is accepted.
             </p>
             <ul className="space-y-3">
               {[
-                'Automatic fabric cutting machines',
-                'Flatlock & overlock sewing machines',
-                'Heat transfer & sublimation printing',
-                'Fabric testing lab (stretch, color fastness, pilling)',
-                'Laser cutting for clean edges',
-                'Quality inspection at every stage',
+                'Product construction and workmanship requirements',
+                'Material composition and available documentation',
+                'Logo, label, and packaging process requirements',
+                'Sample approval and change control',
+                'Inspection scope and acceptance criteria',
+                'Trade terms and delivery planning',
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
@@ -126,9 +126,9 @@ export default function ManufacturingPage() {
             <div className="text-center p-10">
               <Factory className="w-20 h-20 mx-auto text-secondary/50 mb-4" />
               <p className="text-stone-light text-sm">
-                Production facility image area
+                Production coordination
                 <br />
-                (placeholder — add real factory photos)
+                capability review per project
               </p>
             </div>
           </div>
@@ -149,7 +149,8 @@ export default function ManufacturingPage() {
             Ready to Start Production?
           </h2>
           <p className="text-white/70 mb-8">
-            Schedule a virtual factory tour or request a sample to see our quality firsthand.
+            Share your product brief to discuss specifications, sampling, quality
+            communication, and delivery planning.
           </p>
           <Link
             href="/contact"

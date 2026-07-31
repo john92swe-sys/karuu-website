@@ -32,18 +32,18 @@ export function HeroSection() {
         <div className="max-w-3xl">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm text-sm font-medium mb-6 border border-white/20">
             <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-            Nordic Premium Yoga Apparel Manufacturer
+            Swedish B2B Activewear Partner
           </div>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-            Elevate Your Yoga
+            Build Your Activewear Range
             <br />
-            <span className="text-accent">With KARUU</span>
+            <span className="text-accent">With Clear Coordination</span>
           </h1>
 
           <p className="text-lg md:text-xl text-white/80 mb-8 max-w-2xl leading-relaxed">
-            Premium yoga apparel designed in Scandinavia, crafted with OEKO-TEX certified
-            fabrics. From leggings to outerwear — we deliver quality that moves with you.
+            KARUU connects global brands with selected manufacturing capabilities through
+            sourcing, product development, OEM/ODM coordination, and international service.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
@@ -66,15 +66,15 @@ export function HeroSection() {
           <div className="flex flex-wrap items-center gap-6 mt-12 pt-8 border-t border-white/20">
             <div className="flex items-center gap-2 text-sm text-white/70">
               <ShieldCheck className="w-5 h-5 text-accent" />
-              <span>OEKO-TEX Certified</span>
+              <span>Selected Sourcing</span>
             </div>
             <div className="flex items-center gap-2 text-sm text-white/70">
               <Truck className="w-5 h-5 text-accent" />
-              <span>Global Shipping</span>
+              <span>Product Development</span>
             </div>
             <div className="flex items-center gap-2 text-sm text-white/70">
               <Award className="w-5 h-5 text-accent" />
-              <span>ISO 9001 Quality</span>
+              <span>International Service</span>
             </div>
           </div>
         </div>
@@ -94,23 +94,23 @@ export function CoreAdvantagesSection() {
   const advantages = [
     {
       icon: Gem,
-      title: 'Premium Fabric Technology',
-      desc: 'High-performance fabrics with 4-way stretch, moisture-wicking, and exceptional comfort.',
+      title: 'Selected Sourcing',
+      desc: 'Product options are reviewed against your brief, positioning, and target market.',
     },
     {
       icon: Leaf,
-      title: 'Sustainable Production',
-      desc: 'Material and production options designed to support more responsible sourcing choices.',
+      title: 'Product Development',
+      desc: 'Specifications, samples, and approval points are coordinated from brief to order.',
     },
     {
       icon: ShieldCheck,
-      title: 'OEKO-TEX Certified',
-      desc: 'Every product tested for harmful substances — safe for you and the environment.',
+      title: 'Quality Communication',
+      desc: 'Product requirements and inspection expectations are aligned before ordering.',
     },
     {
       icon: Factory,
-      title: 'Full OEM/ODM Service',
-      desc: 'From design to delivery — customize every detail of your yoga apparel line.',
+      title: 'International Service',
+      desc: 'A Swedish B2B contact point supports communication across markets and time zones.',
     },
   ];
 
@@ -122,11 +122,11 @@ export function CoreAdvantagesSection() {
             Why KARUU
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-primary mt-3 mb-4">
-            Built for Performance, Crafted for Life
+            A Clearer Path From Product Brief to Delivery
           </h2>
           <p className="text-stone-light">
-            We combine Scandinavian design aesthetics with advanced manufacturing technology
-            to deliver yoga wear that performs as good as it looks.
+            KARUU focuses on sourcing, product development, OEM/ODM coordination, quality
+            communication, and practical international support.
           </p>
         </div>
 
@@ -183,7 +183,7 @@ export function FeaturedCollectionSection() {
   );
 }
 
-export function OekotexSection() {
+export function DocumentationSection() {
   return (
     <section className="section-spacing bg-white">
       <div className="container mx-auto px-6">
@@ -195,43 +195,42 @@ export function OekotexSection() {
                 <div className="w-28 h-28 mx-auto rounded-full bg-white shadow-xl flex items-center justify-center mb-6">
                   <Award className="w-14 h-14 text-secondary" />
                 </div>
-                <h3 className="text-2xl font-bold text-primary mb-2">OEKO-TEX</h3>
-                <p className="text-stone-light text-sm">Standard 100 Certified</p>
+                <h3 className="text-2xl font-bold text-primary mb-2">Product Review</h3>
+                <p className="text-stone-light text-sm">Specifications and documentation</p>
               </div>
             </div>
 
             {/* Floating badges */}
             <div className="absolute -top-4 -right-4 bg-white rounded-xl shadow-xl p-4 border border-stone-lighter">
-              <div className="text-sm font-bold text-primary">Documentation</div>
-              <div className="text-xs text-stone-light">Available on request</div>
+              <div className="text-sm font-bold text-primary">Product files</div>
+              <div className="text-xs text-stone-light">Reviewed per inquiry</div>
             </div>
             <div className="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-xl p-4 border border-stone-lighter">
-              <div className="text-sm font-bold text-primary">Material details</div>
-              <div className="text-xs text-stone-light">Shared before ordering</div>
+              <div className="text-sm font-bold text-primary">Requirements</div>
+              <div className="text-xs text-stone-light">Confirmed before ordering</div>
             </div>
           </div>
 
           {/* Content */}
           <div>
             <span className="text-accent font-semibold text-sm uppercase tracking-widest">
-              Quality Assurance
+              Product Coordination
             </span>
             <h2 className="text-3xl md:text-4xl font-bold text-primary mt-3 mb-6">
-              OEKO-TEX Certified Fabrics
+              Clear Specification and Documentation Review
             </h2>
             <p className="text-stone-light leading-relaxed mb-6">
-              Every KARUU product is crafted with OEKO-TEX Standard 100 certified fabrics,
-              meaning every thread, button, and component has been rigorously tested for
-              harmful substances. You can trust that our yoga wear is safe for your skin
-              and the planet.
+              Product details are reviewed against available documentation and buyer
+              requirements. Material composition, sizing, customization, sampling, and
+              production terms are confirmed before an order is placed.
             </p>
 
             <ul className="space-y-4 mb-8">
               {[
-                'Free from harmful dyes and chemicals',
-                'pH-balanced for skin-friendly wear',
-                'Tested against 100+ restricted substances',
-                'Sustainable production chain verified',
+                'Document confirmed product specifications',
+                'Align buyer requirements before sampling',
+                'Record sample and approval decisions',
+                'Confirm order terms before production',
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <ShieldCheck className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
@@ -244,7 +243,7 @@ export function OekotexSection() {
               href="/quality-certifications"
               className="inline-flex items-center gap-2 text-primary font-semibold hover:text-secondary transition-colors group"
             >
-              Learn more about our certifications
+              Learn more about quality communication
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>

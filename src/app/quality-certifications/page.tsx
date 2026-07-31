@@ -1,207 +1,131 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
-  Award,
-  ShieldCheck,
-  Leaf,
-  ClipboardCheck,
   ArrowRight,
-  CheckCircle,
+  CheckCircle2,
+  ClipboardCheck,
+  FileSearch,
+  MessageSquareText,
+  PackageCheck,
+  Ruler,
 } from 'lucide-react';
 import { Breadcrumb } from '@/components/breadcrumb';
 
 export const metadata: Metadata = {
-  title: 'Quality & Certifications | KARUU Yoga Apparel',
+  title: 'Quality Process & Documentation',
   description:
-    'OEKO-TEX Standard 100, ISO 9001, BSCI, REACH compliant. Rigorous quality control ensures premium yoga apparel that meets global standards.',
+    'How KARUU coordinates product specifications, sample approval, quality requirements, documentation review, and pre-shipment communication.',
   alternates: { canonical: '/quality-certifications' },
 };
 
-const certs = [
+const reviewAreas = [
   {
-    icon: Award,
-    title: 'OEKO-TEX Standard 100',
-    desc: 'Every fabric tested for 100+ harmful substances — safe for skin and environment.',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'ISO 9001:2015',
-    desc: 'Quality management system certified for consistent product quality and process control.',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'BSCI Certified',
-    desc: 'Business Social Compliance Initiative — ethical manufacturing and fair labor practices.',
-  },
-  {
-    icon: Leaf,
-    title: 'REACH Compliant',
-    desc: 'Full EU REACH regulation compliance for all chemical substances used in production.',
+    icon: Ruler,
+    title: 'Product Specifications',
+    description: 'Materials, dimensions, construction, colors, sizing, and finish requirements are recorded.',
   },
   {
     icon: ClipboardCheck,
-    title: 'SGS Audited',
-    desc: 'Regular SGS third-party factory audits for quality and social compliance verification.',
+    title: 'Sample Approval',
+    description: 'Approved samples and requested changes provide the reference for the order.',
   },
   {
-    icon: Award,
-    title: 'GRS Certified',
-    desc: 'Global Recycled Standard — certified recycled polyester fabrics available.',
+    icon: FileSearch,
+    title: 'Document Review',
+    description: 'Available material, test, or compliance documents are reviewed without inventing claims.',
+  },
+  {
+    icon: CheckCircle2,
+    title: 'Inspection Alignment',
+    description: 'Inspection scope and acceptance expectations are discussed before production.',
+  },
+  {
+    icon: PackageCheck,
+    title: 'Packaging Check',
+    description: 'Label, packing, carton, and shipment requirements are confirmed for the order.',
+  },
+  {
+    icon: MessageSquareText,
+    title: 'Issue Communication',
+    description: 'Questions, changes, and corrective actions are communicated through clear approval points.',
   },
 ];
 
 export default function QualityPage() {
   return (
-    <div className="container mx-auto px-6 py-12">
-      <Breadcrumb items={[{ label: 'Quality & Certifications' }]} />
+    <main className="container mx-auto px-6 pb-20 pt-28">
+      <Breadcrumb items={[{ label: 'Quality Process' }]} />
 
-      <div className="mt-8 mb-16 max-w-3xl">
-        <span className="text-accent font-semibold text-sm uppercase tracking-widest">
-          Quality Assurance
-        </span>
-        <h1 className="text-3xl md:text-5xl font-bold text-primary mt-3 mb-6 leading-tight">
-          Quality That You
-          <br />
-          <span className="text-secondary">Can Trust</span>
-        </h1>
-        <p className="text-lg text-stone-light leading-relaxed">
-          At KARUU, quality is non-negotiable. From fabric selection to final inspection,
-          every product goes through rigorous quality control processes and holds
-          internationally recognized certifications.
+      <section className="mb-16 mt-8 max-w-3xl">
+        <p className="text-sm font-semibold uppercase tracking-widest text-accent">
+          Quality Communication
         </p>
-      </div>
-
-      {/* Certifications Grid */}
-      <section className="mb-20">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {certs.map((c, i) => (
-            <div
-              key={i}
-              className="p-8 rounded-xl bg-white border border-stone-lighter hover:border-secondary/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-            >
-              <div className="w-14 h-14 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center mb-5">
-                <c.icon className="w-7 h-7" />
-              </div>
-              <h3 className="text-lg font-semibold text-primary mb-2">{c.title}</h3>
-              <p className="text-stone-light text-sm leading-relaxed">{c.desc}</p>
-            </div>
-          ))}
-        </div>
+        <h1 className="mt-3 text-3xl font-bold leading-tight text-primary md:text-5xl">
+          Verify what matters before an order moves forward
+        </h1>
+        <p className="mt-6 text-lg leading-relaxed text-stone-light">
+          KARUU coordinates specifications, samples, documentation, and inspection
+          expectations for B2B activewear projects. Certifications are product- and
+          supplier-specific and are only communicated when supporting documents are available.
+        </p>
       </section>
 
-      {/* QC Process */}
-      <section className="mb-20">
-        <div className="text-center mb-12">
-          <span className="text-accent font-semibold text-sm uppercase tracking-widest">
-            Quality Control
-          </span>
-          <h2 className="text-3xl md:text-4xl font-bold text-primary mt-3">
-            Multi-Stage Quality Inspection
-          </h2>
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            {
-              step: '01',
-              title: 'Incoming Material',
-              items: ['Fabric composition test', 'Color fastness check', 'Weight & stretch verification'],
-            },
-            {
-              step: '02',
-              title: 'In-Line Production',
-              items: ['Sewing quality inspection', 'Seam strength test', 'Size measurement check'],
-            },
-            {
-              step: '03',
-              title: 'End-Line QC',
-              items: ['Full garment inspection', 'Defect classification', 'Repair & rework'],
-            },
-            {
-              step: '04',
-              title: 'Final AQL Test',
-              items: ['AQL 2.5 random sampling', 'Packaging verification', 'Full report before shipping'],
-            },
-          ].map((s, i) => (
-            <div key={i} className="p-6 rounded-xl bg-stone-faint">
-              <div className="text-2xl font-bold text-accent mb-2">{s.step}</div>
-              <h4 className="font-semibold text-primary mb-3">{s.title}</h4>
-              <ul className="space-y-2">
-                {s.items.map((item, j) => (
-                  <li key={j} className="flex items-start gap-2 text-sm text-stone-light">
-                    <CheckCircle className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
+      <section className="mb-20 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {reviewAreas.map((area) => (
+          <article
+            key={area.title}
+            className="rounded-xl border border-stone-lighter bg-white p-8 transition-all hover:border-secondary/30 hover:shadow-lg"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-secondary/10 text-secondary">
+              <area.icon className="h-6 w-6" aria-hidden="true" />
             </div>
-          ))}
-        </div>
+            <h2 className="mt-5 text-lg font-semibold text-primary">{area.title}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-stone-light">{area.description}</p>
+          </article>
+        ))}
       </section>
 
-      {/* Fabric Testing */}
-      <section className="mb-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <section className="mb-20 rounded-3xl bg-stone-faint p-7 md:p-12">
+        <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
-            <span className="text-accent font-semibold text-sm uppercase tracking-widest">
-              Testing Standards
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-primary mt-3 mb-6">
-              Comprehensive Fabric Testing
-            </h2>
-            <p className="text-stone-light leading-relaxed mb-6">
-              Every fabric batch undergoes thorough testing to ensure performance,
-              durability, and safety. Our in-house lab and third-party partners verify
-              all key properties.
+            <p className="text-sm font-semibold uppercase tracking-widest text-accent">
+              Typical Checkpoints
             </p>
-            <div className="grid sm:grid-cols-2 gap-3">
-              {[
-                'Color fastness (wash / light / sweat)',
-                'Tensile strength & tear resistance',
-                'Pilling resistance test',
-                'Stretch & recovery test',
-                'Shrinkage after washing',
-                'pH value testing',
-                'AZO dye screening',
-                'Heavy metal analysis',
-              ].map((item, i) => (
-                <div key={i} className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-secondary flex-shrink-0 mt-1" />
-                  <span className="text-sm text-stone">{item}</span>
-                </div>
-              ))}
-            </div>
+            <h2 className="mt-3 text-3xl font-bold text-primary">A documented approval path</h2>
           </div>
-          <div className="aspect-square max-w-md mx-auto rounded-2xl bg-gradient-to-br from-secondary/10 to-accent/10 flex items-center justify-center">
-            <div className="text-center p-10">
-              <ShieldCheck className="w-20 h-20 mx-auto text-secondary/50 mb-4" />
-              <p className="text-stone-light text-sm">
-                Testing lab image area
-                <br />
-                (placeholder)
-              </p>
-            </div>
-          </div>
+          <ol className="space-y-4">
+            {[
+              'Confirm the buyer brief and required evidence.',
+              'Review product specifications and available documentation.',
+              'Approve samples and record requested changes.',
+              'Align inspection, packaging, and delivery requirements.',
+              'Confirm final order terms before production commitment.',
+            ].map((step, index) => (
+              <li key={step} className="flex gap-4 rounded-xl bg-white p-5">
+                <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
+                  {index + 1}
+                </span>
+                <span className="pt-1 text-stone-700">{step}</span>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="bg-stone-faint rounded-2xl p-10 md:p-14 text-center">
-        <h2 className="text-2xl md:text-3xl font-bold text-primary mb-3">
-          Need Detailed Quality Reports?
-        </h2>
-        <p className="text-stone-light max-w-xl mx-auto mb-6">
-          Contact our team to receive full test reports and certification documents
-          for any of our products.
+      <section className="rounded-2xl bg-primary p-10 text-center text-white md:p-14">
+        <h2 className="text-2xl font-bold md:text-3xl">Need specific documents for your market?</h2>
+        <p className="mx-auto mt-3 max-w-xl text-white/70">
+          Tell us which product and documentation you need. Availability will be checked and
+          confirmed without unsupported certification claims.
         </p>
         <Link
           href="/contact"
-          className="inline-flex items-center gap-2 bg-primary text-white px-8 py-3.5 rounded-lg font-semibold hover:bg-primary-light transition-all hover:-translate-y-0.5"
+          className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-lg bg-accent px-8 py-3.5 font-semibold text-primary transition-colors hover:bg-accent-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
         >
-          Request Quality Documents
-          <ArrowRight className="w-4 h-4" />
+          Discuss Requirements
+          <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Link>
       </section>
-    </div>
+    </main>
   );
 }

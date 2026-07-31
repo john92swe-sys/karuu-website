@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { getAllProducts, getAllCategories } from '@/lib/products';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://karuu.se';
+  const baseUrl = 'https://karuu.net';
 
   const staticRoutes = [
     '',
@@ -19,7 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const categories = getAllCategories();
 
   const productRoutes = products.map((p) => `/products/${p.slug}`);
-  const categoryRoutes = categories.map((c) => `/products#${c.slug}`);
+  const categoryRoutes = categories.map((c) => `/products?category=${c.slug}`);
 
   const allRoutes = [...staticRoutes, ...productRoutes, ...categoryRoutes];
 

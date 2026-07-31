@@ -14,9 +14,9 @@ import {
 import { Breadcrumb } from '@/components/breadcrumb';
 
 export const metadata: Metadata = {
-  title: 'OEM / ODM Services | KARUU Custom Yoga Apparel',
+  title: 'OEM / ODM Coordination | KARUU Activewear',
   description:
-    'Custom yoga apparel manufacturing with OEM/ODM services. Low MOQ, custom designs, private labeling, and OEKO-TEX certified fabrics. Bring your brand to life with KARUU.',
+    'Discuss activewear product development, sourcing, sampling, branding, and packaging requirements with KARUU.',
   alternates: { canonical: '/oem-odm' },
 };
 
@@ -24,17 +24,17 @@ const services = [
   {
     icon: Palette,
     title: 'Custom Design',
-    desc: 'Work with our design team to create unique styles or bring your own design files.',
+    desc: 'Share reference products, technical files, or a development brief for review.',
   },
   {
     icon: Scissors,
     title: 'Pattern & Sample',
-    desc: 'Professional pattern making and sample development within 7-10 days.',
+    desc: 'Pattern and sampling requirements are assessed before timing is confirmed.',
   },
   {
     icon: Package,
     title: 'Private Label',
-    desc: 'Full private labeling — woven labels, hang tags, packaging with your brand.',
+    desc: 'Label, hang tag, and packaging requirements can be included in the product brief.',
   },
   {
     icon: Sparkles,
@@ -44,12 +44,12 @@ const services = [
   {
     icon: Factory,
     title: 'Bulk Production',
-    desc: 'Efficient production with strict QC. Lead time 25-45 days depending on quantity.',
+    desc: 'Production scope and quality checkpoints are confirmed after sample approval.',
   },
   {
     icon: Clock,
-    title: 'Fast Turnaround',
-    desc: 'Rush orders available. Expedited production and shipping for urgent needs.',
+    title: 'Delivery Planning',
+    desc: 'Required dates and logistics preferences are reviewed before a lead time is committed.',
   },
 ];
 
@@ -69,9 +69,9 @@ export default function OemOdmPage() {
           <span className="text-secondary">To Life</span>
         </h1>
         <p className="text-lg text-stone-light leading-relaxed">
-          From concept to delivery — KARUU offers full OEM and ODM services for yoga apparel
-          brands worldwide. Whether you need custom designs, private labeling, or complete
-          product development, we have you covered.
+          KARUU coordinates OEM and ODM discussions for activewear buyers. Share your design,
+          label, packaging, quantity, and delivery requirements so feasibility and next steps
+          can be reviewed without unsupported promises.
         </p>
       </div>
 
@@ -132,17 +132,17 @@ export default function OemOdmPage() {
               Why Partner With KARUU
             </h2>
             <p className="text-white/70 mb-6">
-              We combine Scandinavian design sensibility with expert manufacturing
-              to deliver exceptional quality and service.
+              We provide a Swedish B2B contact point for product development, sourcing,
+              approval coordination, and international communication.
             </p>
             <ul className="space-y-3 mb-8">
               {[
-                'MOQ starting at 100 pcs per style',
-                'Sample development in 7-10 days',
-                'OEKO-TEX certified materials',
-                'Dedicated account manager',
-                'Full transparency throughout production',
-                'Flexible payment terms for long-term partners',
+                'Product requirements reviewed before quotation',
+                'Sample scope and timing confirmed per project',
+                'Material documentation reviewed when available',
+                'Approval points recorded before production',
+                'Order terms confirmed before commitment',
+                'International communication through KARUU',
               ].map((s, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
@@ -176,13 +176,13 @@ export default function OemOdmPage() {
             </h2>
             <div className="space-y-4">
               {[
-                { label: 'Product Types', value: 'Leggings, bras, tops, shorts, outerwear, sets' },
-                { label: 'Fabric Options', value: 'Available fabrics + custom development' },
-                { label: 'Size Range', value: 'XS – 4XL (custom sizing available)' },
-                { label: 'MOQ', value: '100 pcs per style / color' },
-                { label: 'Sample Time', value: '7 – 10 business days' },
-                { label: 'Bulk Lead Time', value: '25 – 45 days' },
-                { label: 'Customization', value: 'Design, fabric, color, logo, packaging' },
+                { label: 'Product Scope', value: 'Confirmed against the buyer brief' },
+                { label: 'Material', value: 'Reviewed from available options and documents' },
+                { label: 'Sizing', value: 'Confirmed for each selected style' },
+                { label: 'MOQ', value: 'Confirmed per product, color, and customization scope' },
+                { label: 'Sample Time', value: 'Confirmed after requirements review' },
+                { label: 'Bulk Lead Time', value: 'Confirmed after sample and order approval' },
+                { label: 'Customization', value: 'Reviewed for design, color, logo, label, and packaging' },
               ].map((item, i) => (
                 <div key={i} className="flex gap-4 pb-4 border-b border-stone-lighter last:border-0 last:pb-0">
                   <div className="font-semibold text-primary text-sm w-32 flex-shrink-0">

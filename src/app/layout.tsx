@@ -3,22 +3,21 @@ import './globals.css';
 import { SiteLayout } from '@/components/site-layout';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://karuu.se'),
+  metadataBase: new URL('https://karuu.net'),
   title: {
-    default: 'KARUU Yoga Apparel | Premium Yoga Wear Wholesaler — Nordic Design',
-    template: '%s | KARUU Yoga Apparel',
+    default: 'KARUU | Swedish B2B Activewear Sourcing Partner',
+    template: '%s | KARUU',
   },
   description:
-    'KARUU AB — premium yoga apparel manufacturer and wholesaler. OEKO-TEX certified leggings, sports bras, tops and outerwear. Nordic design, bulk supply, OEM/ODM service.',
+    'KARUU is a Swedish B2B activewear sourcing and manufacturing partner connecting global brands with selected manufacturing capabilities.',
   keywords: [
     'yoga wear wholesale',
-    'yoga apparel manufacturer',
-    'yoga leggings bulk',
-    'sports bra OEM',
+    'activewear sourcing',
+    'yoga apparel wholesale',
+    'private label activewear',
     'activewear supplier',
-    'nordic yoga brand',
-    'eco friendly activewear',
-    'OEKO-TEX yoga wear',
+    'product development',
+    'OEM ODM coordination',
     'KARUU AB',
   ],
   authors: [{ name: 'KARUU AB' }],
@@ -41,26 +40,17 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://karuu.se',
-    siteName: 'KARUU Yoga Apparel',
-    title: 'KARUU Yoga Apparel | Premium Yoga Wear Wholesaler',
+    url: 'https://karuu.net',
+    siteName: 'KARUU',
+    title: 'KARUU | Swedish B2B Activewear Sourcing Partner',
     description:
-      'Premium yoga apparel manufacturer and wholesaler. OEKO-TEX certified leggings, sports bras, tops and outerwear.',
-    images: [
-      {
-        url: '/images/og-default.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'KARUU Yoga Apparel',
-      },
-    ],
+      'Activewear sourcing, product development, OEM/ODM coordination, quality communication, and international service.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'KARUU Yoga Apparel | Premium Yoga Wear Wholesaler',
+    title: 'KARUU | Swedish B2B Activewear Sourcing Partner',
     description:
-      'Premium yoga apparel manufacturer and wholesaler. OEKO-TEX certified.',
-    images: ['/images/og-default.jpg'],
+      'Activewear sourcing, product development, OEM/ODM coordination, and international service.',
   },
   alternates: {
     canonical: '/',

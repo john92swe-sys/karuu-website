@@ -13,8 +13,8 @@ const companyLinks = [
   ['About KARUU', '/about'],
   ['OEM / ODM Service', '/oem-odm'],
   ['Manufacturing', '/manufacturing'],
-  ['Quality & Certifications', '/quality-certifications'],
-  ['Sustainability', '/sustainability'],
+  ['Quality Process', '/quality-certifications'],
+  ['Responsible Sourcing', '/sustainability'],
 ];
 
 function FooterLinks({ title, links }: { title: string; links: string[][] }) {
@@ -52,8 +52,8 @@ export function Footer() {
               </span>
             </div>
             <p className="text-sm text-white/60 mb-4 leading-relaxed">
-              Premium yoga apparel manufacturer and wholesaler. Nordic design philosophy meets
-              Chinese manufacturing excellence.
+              Swedish B2B activewear sourcing and manufacturing partner connecting global
+              brands with selected manufacturing capabilities.
             </p>
             <div className="space-y-2 text-sm">
               <div className="flex items-start gap-2.5">

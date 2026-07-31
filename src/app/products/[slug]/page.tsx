@@ -1,73 +1,148 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { MessageCircle, ArrowRight, Award, CheckCircle, Factory, Leaf, ShieldCheck } from 'lucide-react';
+import {
+  ArrowRight,
+  CheckCircle2,
+  ClipboardCheck,
+  Globe2,
+  MessageCircle,
+  Palette,
+  SearchCheck,
+} from 'lucide-react';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { ProductGallery } from '@/components/product-gallery';
-import {
-  getProductBySlug,
-  getAllProducts,
-  getProductImagePaths,
-  type Product,
-} from '@/lib/products';
+import { ProductInquiryForm } from '@/components/product-inquiry-form';
+import { getAllProducts, getProductBySlug, type Product } from '@/lib/products';
 
 interface PageProps {
   params: { slug: string };
 }
 
+const siteUrl = 'https://karuu.net';
+
 export function generateStaticParams() {
-  const products = getAllProducts();
-  return products.map((p) => ({ slug: p.slug }));
+  return getAllProducts().map((product) => ({ slug: product.slug }));
 }
 
 export function generateMetadata({ params }: PageProps): Metadata {
   const product = getProductBySlug(params.slug);
   if (!product) return { title: 'Product Not Found | KARUU' };
 
-  const ogImages = getProductImagePaths(product.sku, product.imageCount).slice(0, 1).map((url) => ({
-    url,
-    width: 1200,
-    height: 1600,
-    alt: product.name,
-  }));
+  const mainImage = product.gallery[0];
 
   return {
-    title: `${product.name} | ${product.sku} | KARUU Yoga Apparel`,
-    description: `${product.shortDescription} OEKO-TEX certified premium yoga wear.`,
-    alternates: { canonical: `/products/${product.slug}` },
+    title: product.seo.title,
+    description: product.seo.description,
+    alternates: { canonical: product.seo.canonical },
     openGraph: {
-      title: `${product.name} | KARUU`,
-      description: product.shortDescription,
-      images: ogImages,
+      title: product.seo.title,
+      description: product.seo.description,
+      url: product.seo.canonical,
       type: 'website',
+      images: [
+        {
+          url: mainImage.src,
+          width: mainImage.width,
+          height: mainImage.height,
+          alt: mainImage.alt,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: product.seo.title,
+      description: product.seo.description,
+      images: [mainImage.src],
     },
   };
 }
 
-// Schema.org Product structured data
-function ProductJsonLd({ product }: { product: Product }) {
-  const images = getProductImagePaths(product.sku, product.imageCount);
-  const data = {
-    '@context': 'https://schema.org/',
+function StructuredData({ product }: { product: Product }) {
+  const productData = {
+    '@context': 'https://schema.org',
     '@type': 'Product',
+    '@id': `${siteUrl}/products/${product.slug}#product`,
     name: product.name,
     sku: product.sku,
+    model: product.factoryStyleNumber,
+    url: `${siteUrl}/products/${product.slug}`,
     description: product.shortDescription,
-    image: images,
+    image: product.gallery.map((image) => `${siteUrl}${image.src}`),
     brand: { '@type': 'Brand', name: 'KARUU' },
-    material: product.fabric,
-    offers: {
-      '@type': 'Offer',
-      priceCurrency: 'USD',
-      availability: 'https://schema.org/InStock',
-      itemCondition: 'https://schema.org/NewCondition',
-    },
+    category: product.categoryPath.join(' > '),
+    material: product.material,
+    color: product.colors.map((color) => color.name).join(', '),
+    size: product.sizes.join(', '),
   };
+
+  const breadcrumbData = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: siteUrl,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Products',
+        item: `${siteUrl}/products`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: product.name,
+        item: `${siteUrl}/products/${product.slug}`,
+      },
+    ],
+  };
+
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productData) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbData) }}
+      />
+    </>
+  );
+}
+
+function ProductDetails({ product }: { product: Product }) {
+  const details = [
+    ['Material', product.material],
+    ['Fit', product.fit],
+    ['Neckline', product.neckline],
+    ['Sleeve', product.sleeve],
+    ['Sizes', product.sizes.join(' / ')],
+    ['MOQ', product.moq],
+    ['Packaging', product.packaging],
+    ['Sample time', product.sampleTime],
+    ['Lead time', product.leadTime],
+  ].filter((entry): entry is [string, string] => Boolean(entry[1]));
+
+  return (
+    <dl className="overflow-hidden rounded-2xl border border-stone-200 bg-white">
+      {details.map(([label, value], index) => (
+        <div
+          key={label}
+          className={`grid gap-1 px-5 py-4 sm:grid-cols-[180px_1fr] sm:gap-6 ${
+            index < details.length - 1 ? 'border-b border-stone-200' : ''
+          }`}
+        >
+          <dt className="font-semibold text-primary">{label}</dt>
+          <dd className="text-stone-600">{value}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }
 
@@ -75,207 +150,264 @@ export default function ProductDetailPage({ params }: PageProps) {
   const product = getProductBySlug(params.slug);
   if (!product) notFound();
 
-  const imagePaths = getProductImagePaths(product.sku, product.imageCount);
+  const whatsappMessage = encodeURIComponent(
+    `Hello KARUU, I would like to inquire about ${product.name} (${product.sku}, factory style ${product.factoryStyleNumber}).`
+  );
+  const whatsappUrl = `https://wa.me/46708802017?text=${whatsappMessage}`;
 
   return (
-    <div className="container mx-auto px-6 py-12">
-      <ProductJsonLd product={product} />
+    <main className="overflow-x-clip pb-20 pt-28">
+      <StructuredData product={product} />
 
-      {/* Breadcrumb */}
-      <Breadcrumb
-        items={[
-          { label: 'Products', href: '/products' },
-          { label: product.categoryLabel, href: '/products' },
-          { label: product.name },
-        ]}
-      />
+      <div className="container mx-auto max-w-7xl px-5 sm:px-6">
+        <Breadcrumb
+          items={[
+            { label: 'Products', href: '/products' },
+            { label: product.shortName },
+          ]}
+        />
 
-      {/* Main Product Section */}
-      <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 mt-8 mb-20">
-        {/* Gallery */}
-        <div>
-          <ProductGallery images={imagePaths} alt={product.name} />
-        </div>
+        <section className="mt-8 grid gap-10 lg:grid-cols-2 lg:gap-16">
+          <ProductGallery images={product.gallery} colors={product.colors} />
 
-        {/* Info */}
-        <div>
-          <div className="text-xs text-stone-lighter font-mono mb-2">
-            {product.sku}
-          </div>
-          <span className="text-accent text-sm font-semibold uppercase tracking-wider">
-            {product.categoryLabel}
-          </span>
-          <h1 className="text-2xl md:text-3xl font-bold text-primary mt-2 mb-4">
-            {product.name}
-          </h1>
-          <p className="text-stone-light mb-6">{product.description}</p>
+          <div className="min-w-0 lg:sticky lg:top-28 lg:self-start">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-secondary">
+              {product.categoryPath.join(' / ')}
+            </p>
+            <h1 className="mt-3 text-3xl font-bold leading-tight text-primary sm:text-4xl">
+              {product.name}
+            </h1>
 
-          {/* Quick badges */}
-          <div className="flex flex-wrap gap-3 mb-8">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-secondary/10 text-secondary rounded-full text-xs font-semibold">
-              <Award className="w-3.5 h-3.5" />
-              OEKO-TEX Certified
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-stone-faint text-stone rounded-full text-xs font-semibold">
-              <Leaf className="w-3.5 h-3.5" />
-              Eco-Friendly
-            </div>
-            {product.featured && (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent/20 text-primary rounded-full text-xs font-bold">
-                BEST SELLER
+            <dl className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+              <div className="flex gap-2">
+                <dt className="text-stone-500">KARUU SKU</dt>
+                <dd className="font-mono font-semibold text-primary">{product.sku}</dd>
               </div>
-            )}
-          </div>
+              <div className="flex gap-2">
+                <dt className="text-stone-500">Factory Style No.</dt>
+                <dd className="font-mono text-stone-600">{product.factoryStyleNumber}</dd>
+              </div>
+            </dl>
 
-          {/* Fabric Table */}
-          <div className="mb-8">
-            <h2 className="text-lg font-semibold text-primary mb-4">Fabric Specifications</h2>
-            <div className="border border-stone-lighter rounded-xl overflow-hidden">
-              <table className="w-full text-sm">
-                <tbody>
-                  <tr className="border-b border-stone-lighter">
-                    <td className="px-4 py-3 bg-stone-faint font-semibold text-primary w-1/3">
-                      Fabric
-                    </td>
-                    <td className="px-4 py-3 text-stone">{product.fabric}</td>
-                  </tr>
-                  <tr className="border-b border-stone-lighter">
-                    <td className="px-4 py-3 bg-stone-faint font-semibold text-primary">
-                      Composition
-                    </td>
-                    <td className="px-4 py-3 text-stone">{product.composition}</td>
-                  </tr>
-                  <tr className="border-b border-stone-lighter">
-                    <td className="px-4 py-3 bg-stone-faint font-semibold text-primary">
-                      Weight
-                    </td>
-                    <td className="px-4 py-3 text-stone">{product.weight}</td>
-                  </tr>
-                  <tr className="border-b border-stone-lighter">
-                    <td className="px-4 py-3 bg-stone-faint font-semibold text-primary">
-                      Sizes
-                    </td>
-                    <td className="px-4 py-3 text-stone">{product.sizes.join(' / ')}</td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-3 bg-stone-faint font-semibold text-primary">
-                      Available Colors
-                    </td>
-                    <td className="px-4 py-3 text-stone">
-                      {product.colors.map((c) => c.name).join(', ')}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <p className="mt-6 text-base leading-7 text-stone-600">{product.shortDescription}</p>
+
+            <div className="mt-7 grid grid-cols-2 gap-3">
+              {[
+                ['Material', product.material],
+                ['Sizes', product.sizes.join('–')],
+                ['Fit', product.fit],
+                ['MOQ', product.moq],
+              ]
+                .filter((entry): entry is [string, string] => Boolean(entry[1]))
+                .map(([label, value]) => (
+                  <div key={label} className="rounded-xl border border-stone-200 p-4">
+                    <div className="text-xs uppercase tracking-wide text-stone-500">{label}</div>
+                    <div className="mt-1 text-sm font-semibold text-primary">{value}</div>
+                  </div>
+                ))}
+            </div>
+
+            <div className="mt-8 rounded-2xl bg-stone-faint p-5">
+              <p className="font-semibold text-primary">
+                Pricing tailored to your quantity and customization requirements.
+              </p>
+              <p className="mt-1 text-sm leading-relaxed text-stone-600">
+                Share your target quantity, color mix, sizing, and branding requirements for
+                review.
+              </p>
+            </div>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <a
+                href="#inquiry"
+                className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-7 py-3.5 font-semibold text-white transition-colors hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
+              >
+                Request a Quote
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </a>
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-[#168a45] px-7 py-3.5 font-semibold text-white transition-colors hover:bg-[#12763b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
+              >
+                <MessageCircle className="h-5 w-5" aria-hidden="true" />
+                WhatsApp
+              </a>
             </div>
           </div>
+        </section>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 mb-8">
-            <a
-              href="https://wa.me/46708802017"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 bg-[#25D366] text-white px-8 py-3.5 rounded-lg font-semibold hover:bg-[#20ba57] transition-all hover:-translate-y-0.5 flex-1"
-            >
-              <MessageCircle className="w-5 h-5" />
-              Inquire on WhatsApp
-            </a>
-            <Link
-              href="/contact"
-              className="inline-flex items-center justify-center gap-2 bg-primary text-white px-8 py-3.5 rounded-lg font-semibold hover:bg-primary-light transition-all hover:-translate-y-0.5 flex-1"
-            >
-              Request Quote
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+        <section className="section-spacing border-t border-stone-200">
+          <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent">
+                Product Overview
+              </p>
+              <h2 className="mt-3 text-3xl font-bold text-primary">{product.shortName}</h2>
+            </div>
+            <p className="text-lg leading-8 text-stone-600">{product.description}</p>
+          </div>
+        </section>
+
+        <section className="section-spacing bg-stone-faint px-5 sm:rounded-3xl sm:px-8 lg:px-12">
+          <div className="max-w-2xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent">
+              Key Features
+            </p>
+            <h2 className="mt-3 text-3xl font-bold text-primary">Confirmed product details</h2>
+          </div>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {product.features.map((feature) => (
+              <div key={feature} className="flex gap-3 rounded-xl bg-white p-5">
+                <CheckCircle2 className="mt-0.5 h-5 w-5 flex-none text-secondary" aria-hidden="true" />
+                <p className="font-medium leading-relaxed text-stone-700">{feature}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="section-spacing grid gap-10 lg:grid-cols-2 lg:gap-16">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent">
+              Product Details
+            </p>
+            <h2 className="mt-3 text-3xl font-bold text-primary">Specification summary</h2>
+            <p className="mt-4 leading-7 text-stone-600">
+              Only fields confirmed in the supplied product materials are shown. Sampling,
+              production timing, and trade-term pricing are confirmed during inquiry review.
+            </p>
+          </div>
+          <ProductDetails product={product} />
+        </section>
+
+        {product.sizeChart && (
+          <section className="section-spacing border-y border-stone-200">
+            <div className="grid items-center gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent">
+                  Size Guide
+                </p>
+                <h2 className="mt-3 text-3xl font-bold text-primary">
+                  {product.sku} size chart
+                </h2>
+                <p className="mt-4 leading-7 text-stone-600">
+                  The original source chart is retained without rewriting uncertain
+                  measurements. Click the chart to open the full image.
+                </p>
+              </div>
+              <a
+                href={product.sizeChart.image}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block overflow-hidden rounded-2xl border border-stone-200 bg-white p-4 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+                aria-label="Open full size chart in a new tab"
+              >
+                <Image
+                  src={product.sizeChart.image}
+                  alt={product.sizeChart.alt}
+                  width={product.sizeChart.width}
+                  height={product.sizeChart.height}
+                  className="h-auto w-full"
+                />
+                <span className="mt-3 block text-center text-sm font-semibold text-secondary">
+                  Open full size chart
+                </span>
+              </a>
+            </div>
+          </section>
+        )}
+
+        <section className="section-spacing grid gap-8 lg:grid-cols-2">
+          <div className="rounded-2xl border border-stone-200 p-7 sm:p-8">
+            <Palette className="h-8 w-8 text-secondary" aria-hidden="true" />
+            <h2 className="mt-5 text-2xl font-bold text-primary">Customization review</h2>
+            <p className="mt-3 leading-7 text-stone-600">
+              KARUU can coordinate a review of product-development and private-label
+              requirements. Availability, cost, and MOQ impact are confirmed only after your
+              brief is assessed.
+            </p>
+            <ul className="mt-5 space-y-3">
+              {product.customization.map((item) => (
+                <li key={item} className="flex gap-3 text-stone-700">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 flex-none text-secondary" aria-hidden="true" />
+                  {item}
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <p className="text-xs text-stone-lighter text-center">
-            MOQ {product.moq} · Custom designs available · Sample on request
-          </p>
-        </div>
+          <div className="rounded-2xl bg-primary p-7 text-white sm:p-8">
+            <h2 className="text-2xl font-bold">Suitable for</h2>
+            <div className="mt-5 flex flex-wrap gap-3">
+              {product.applications.map((application) => (
+                <span
+                  key={application}
+                  className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium"
+                >
+                  {application}
+                </span>
+              ))}
+            </div>
+            <p className="mt-6 leading-7 text-white/75">
+              Intended use is based on the supplied product description. Buyers should validate
+              final specifications and samples for their market and application.
+            </p>
+          </div>
+        </section>
+
+        <section className="section-spacing border-t border-stone-200">
+          <div className="text-center">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent">
+              Why Work With KARUU
+            </p>
+            <h2 className="mt-3 text-3xl font-bold text-primary">
+              Clear coordination for international B2B sourcing
+            </h2>
+          </div>
+          <div className="mt-9 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              [SearchCheck, 'Selected sourcing', 'Product options are reviewed against your brief and target market.'],
+              [ClipboardCheck, 'Product development', 'Specifications, samples, and approval points are kept clear.'],
+              [CheckCircle2, 'Quality communication', 'Requirements and inspection expectations are aligned before ordering.'],
+              [Globe2, 'International service', 'KARUU provides a Swedish B2B contact point for global buyers.'],
+            ].map(([Icon, title, description]) => {
+              const ItemIcon = Icon as typeof CheckCircle2;
+              return (
+                <div key={title as string} className="rounded-2xl border border-stone-200 p-6">
+                  <ItemIcon className="h-7 w-7 text-secondary" aria-hidden="true" />
+                  <h3 className="mt-4 font-semibold text-primary">{title as string}</h3>
+                  <p className="mt-2 text-sm leading-6 text-stone-600">{description as string}</p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        <section id="inquiry" className="scroll-mt-28 rounded-3xl bg-stone-faint p-5 sm:p-8 lg:p-12">
+          <div className="grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-14">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent">
+                Inquiry
+              </p>
+              <h2 className="mt-3 text-3xl font-bold text-primary">Request a tailored quote</h2>
+              <p className="mt-4 leading-7 text-stone-600">
+                Provide your quantity, color, size, branding, trade-term, and delivery
+                requirements. Pricing is prepared after review and is never generated on this
+                website.
+              </p>
+              <Link
+                href="/contact"
+                className="mt-6 inline-flex items-center gap-2 font-semibold text-secondary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+              >
+                Prefer a general inquiry?
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </div>
+            <ProductInquiryForm product={product} />
+          </div>
+        </section>
       </div>
-
-      {/* Features */}
-      <section className="mb-20">
-        <div className="text-center mb-10">
-          <span className="text-accent font-semibold text-sm uppercase tracking-widest">
-            Why This Product
-          </span>
-          <h2 className="text-2xl md:text-3xl font-bold text-primary mt-3">
-            Key Features
-          </h2>
-        </div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {product.features.map((feature: string, i: number) => (
-            <div
-              key={i}
-              className="p-6 rounded-xl bg-white border border-stone-lighter hover:border-secondary/30 hover:shadow-lg transition-all"
-            >
-              <div className="w-10 h-10 rounded-lg bg-secondary/10 text-secondary flex items-center justify-center mb-4">
-                <CheckCircle className="w-5 h-5" />
-              </div>
-              <p className="text-stone font-medium">{feature}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* OEM + Certifications */}
-      <section className="grid md:grid-cols-2 gap-6 mb-20">
-        <div className="bg-stone-faint rounded-2xl p-8">
-          <div className="w-12 h-12 rounded-xl bg-white text-secondary flex items-center justify-center shadow-sm mb-4">
-            <Factory className="w-6 h-6" />
-          </div>
-          <h3 className="text-xl font-bold text-primary mb-3">OEM / ODM Available</h3>
-          <p className="text-stone-light mb-4">
-            Fully customize this product with your brand logo, custom colors,
-            modified designs, and private labeling. Low MOQ starting from 100 pcs.
-          </p>
-          <ul className="space-y-2 mb-6">
-            {product.oemOptions.map((s, i) => (
-              <li key={i} className="flex items-center gap-2 text-sm text-stone">
-                <CheckCircle className="w-4 h-4 text-secondary flex-shrink-0" />
-                {s}
-              </li>
-            ))}
-          </ul>
-          <Link
-            href="/oem-odm"
-            className="inline-flex items-center gap-2 text-primary font-semibold hover:text-secondary transition-colors group"
-          >
-            Learn more about OEM/ODM
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </div>
-
-        <div className="bg-primary rounded-2xl p-8 text-white">
-          <div className="w-12 h-12 rounded-xl bg-white/10 text-accent flex items-center justify-center mb-4">
-            <ShieldCheck className="w-6 h-6" />
-          </div>
-          <h3 className="text-xl font-bold text-white mb-3">Certified Quality</h3>
-          <p className="text-white/70 mb-4">
-            Every product is tested against international standards to ensure safety,
-            durability, and compliance with EU regulations.
-          </p>
-          <ul className="space-y-2 mb-6">
-            {product.certifications.map((s, i) => (
-              <li key={i} className="flex items-center gap-2 text-sm text-white/80">
-                <CheckCircle className="w-4 h-4 text-accent flex-shrink-0" />
-                {s}
-              </li>
-            ))}
-          </ul>
-          <Link
-            href="/quality-certifications"
-            className="inline-flex items-center gap-2 text-accent font-semibold hover:text-accent-light transition-colors group"
-          >
-            View all certifications
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </div>
-      </section>
-    </div>
+    </main>
   );
 }

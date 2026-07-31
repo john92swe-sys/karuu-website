@@ -11,10 +11,10 @@ import { ProductCard } from '@/components/product-card';
 import { Breadcrumb } from '@/components/breadcrumb';
 
 export const metadata: Metadata = {
-  title: 'Products — KARUU Yoga Activewear',
+  title: 'B2B Activewear Products',
   description:
-    'Explore our full range of premium yoga activewear: leggings, sports bras, shorts, tops, and outerwear. OEKO-TEX certified fabrics, wholesale for Nordic and EU markets.',
-  keywords: 'yoga leggings, sports bra, yoga shorts, yoga tops, activewear wholesale, OEKO-TEX',
+    'Explore published KARUU activewear products for international B2B sourcing, product development, and quote requests.',
+  keywords: 'activewear sourcing, yoga tops wholesale, B2B activewear, KARUU products',
   alternates: { canonical: '/products' },
 };
 
@@ -43,8 +43,7 @@ export default function ProductsPage({
       <div className="container mx-auto px-6 max-w-7xl">
         <Breadcrumb
           items={[
-            { label: 'Home', href: '/' },
-            { label: categoryLabel, href: '/products', isCurrent: !selectedCategory },
+            { label: 'Products', href: '/products', isCurrent: !selectedCategory },
             ...(selectedCategory
               ? [{ label: categoryLabel, href: `/products?category=${selectedCategory}`, isCurrent: true }]
               : []),
@@ -57,7 +56,8 @@ export default function ProductsPage({
               {categoryLabel}
             </h1>
             <p className="text-stone-500 max-w-xl">
-              Premium yoga activewear crafted with OEKO-TEX certified fabrics. Designed for performance, comfort, and sustainability.
+              Published products available for B2B sourcing discussions, specification review,
+              and tailored quotation.
             </p>
           </div>
           <div className="text-sm text-stone-500">
@@ -109,7 +109,8 @@ export default function ProductsPage({
         <div className="mt-20 p-10 md:p-14 bg-primary text-white rounded-3xl text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Interested in Bulk Orders?</h2>
           <p className="text-white/70 max-w-lg mx-auto mb-6">
-            Contact our team for wholesale pricing, MOQ details, and custom OEM/ODM solutions.
+            Share your quantity, size, color, branding, and delivery requirements for a
+            scope-based quotation.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link

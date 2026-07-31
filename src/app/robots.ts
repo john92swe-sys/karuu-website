@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/api/'],
     },
-    sitemap: 'https://karuu.se/sitemap.xml',
+    sitemap: 'https://karuu.net/sitemap.xml',
   };
 }

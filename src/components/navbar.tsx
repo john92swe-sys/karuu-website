@@ -11,7 +11,7 @@ const navItems = [
   { href: '/products', label: 'Products' },
   { href: '/oem-odm', label: 'OEM / ODM' },
   { href: '/manufacturing', label: 'Manufacturing' },
-  { href: '/quality-certifications', label: 'Quality & Certifications' },
+  { href: '/quality-certifications', label: 'Quality Process' },
   { href: '/about', label: 'About KARUU' },
   { href: '/contact', label: 'Contact', cta: true },
 ];

@@ -1,194 +1,126 @@
-'use client';
-
-import { useState } from 'react';
-import { Send, CheckCircle, Loader2 } from 'lucide-react';
-
-type FormStatus = 'idle' | 'submitting' | 'success' | 'error';
+const inputClassName =
+  'mt-1.5 min-h-12 w-full rounded-lg border border-stone-lighter bg-white px-4 py-3 text-sm text-stone outline-none transition-colors placeholder:text-stone-400 focus:border-secondary focus:ring-2 focus:ring-secondary/20';
 
 export default function ContactForm() {
-  const [status, setStatus] = useState<FormStatus>('idle');
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    company: '',
-    country: '',
-    phone: '',
-    product: '',
-    quantity: '',
-    message: '',
-  });
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setStatus('submitting');
-    // Simulated submission
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-    setStatus('success');
-    setFormData({
-      name: '',
-      email: '',
-      company: '',
-      country: '',
-      phone: '',
-      product: '',
-      quantity: '',
-      message: '',
-    });
-    setTimeout(() => setStatus('idle'), 5000);
-  };
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      <div className="grid md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-stone mb-1.5">
-            Name <span className="text-accent">*</span>
-          </label>
+    <form action="/api/inquiry-mailto" method="post" className="space-y-5">
+      <input type="hidden" name="formType" value="general-inquiry" />
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <label className="text-sm font-medium text-stone">
+          Contact Name <span className="text-accent">*</span>
           <input
+            className={inputClassName}
             type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
+            name="contactName"
             required
-            className="w-full px-4 py-3 rounded-lg border border-stone-lighter bg-white text-stone text-sm focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-colors"
+            autoComplete="name"
             placeholder="Your full name"
           />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-stone mb-1.5">
-            Email <span className="text-accent">*</span>
-          </label>
+        </label>
+        <label className="text-sm font-medium text-stone">
+          Business Email <span className="text-accent">*</span>
           <input
+            className={inputClassName}
             type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
+            name="businessEmail"
             required
-            className="w-full px-4 py-3 rounded-lg border border-stone-lighter bg-white text-stone text-sm focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-colors"
-            placeholder="your@company.com"
+            autoComplete="email"
+            placeholder="you@company.com"
           />
-        </div>
+        </label>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-stone mb-1.5">Company</label>
+      <div className="grid gap-4 md:grid-cols-2">
+        <label className="text-sm font-medium text-stone">
+          Company Name
           <input
+            className={inputClassName}
             type="text"
-            name="company"
-            value={formData.company}
-            onChange={handleChange}
-            className="w-full px-4 py-3 rounded-lg border border-stone-lighter bg-white text-stone text-sm focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-colors"
-            placeholder="Your company name"
+            name="companyName"
+            autoComplete="organization"
+            placeholder="Your company"
           />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-stone mb-1.5">Country</label>
+        </label>
+        <label className="text-sm font-medium text-stone">
+          Country / Region
           <input
+            className={inputClassName}
             type="text"
-            name="country"
-            value={formData.country}
-            onChange={handleChange}
-            className="w-full px-4 py-3 rounded-lg border border-stone-lighter bg-white text-stone text-sm focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-colors"
-            placeholder="Your country"
+            name="countryRegion"
+            autoComplete="country-name"
+            placeholder="Your market"
           />
-        </div>
+        </label>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-stone mb-1.5">Phone / WhatsApp</label>
+      <div className="grid gap-4 md:grid-cols-2">
+        <label className="text-sm font-medium text-stone">
+          WhatsApp / Phone
           <input
+            className={inputClassName}
             type="tel"
             name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            className="w-full px-4 py-3 rounded-lg border border-stone-lighter bg-white text-stone text-sm focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-colors"
-            placeholder="+1 234 567 8900"
+            autoComplete="tel"
+            placeholder="+46 ..."
           />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-stone mb-1.5">Product Interest</label>
-          <select
-            name="product"
-            value={formData.product}
-            onChange={handleChange}
-            className="w-full px-4 py-3 rounded-lg border border-stone-lighter bg-white text-stone text-sm focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-colors"
-          >
-            <option value="">Select a category</option>
-            <option value="yoga-leggings">Yoga Leggings</option>
-            <option value="sports-bra">Sports Bra</option>
-            <option value="yoga-shorts">Yoga Shorts</option>
-            <option value="yoga-tops">Yoga Tops</option>
-            <option value="outerwear">Outerwear & Jackets</option>
-            <option value="full-collection">Full Collection</option>
-          </select>
-        </div>
+        </label>
+        <label className="text-sm font-medium text-stone">
+          Estimated Quantity
+          <input
+            className={inputClassName}
+            type="text"
+            name="estimatedQuantity"
+            inputMode="numeric"
+            placeholder="Your estimated order volume"
+          />
+        </label>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-stone mb-1.5">Estimated Quantity</label>
+      <label className="block text-sm font-medium text-stone">
+        Product or Service Interest
         <input
+          className={inputClassName}
           type="text"
-          name="quantity"
-          value={formData.quantity}
-          onChange={handleChange}
-          className="w-full px-4 py-3 rounded-lg border border-stone-lighter bg-white text-stone text-sm focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-colors"
-          placeholder="e.g. 500 pieces, 1000+ units"
+          name="productName"
+          placeholder="e.g. KR01-0001, sourcing, or product development"
         />
-      </div>
+      </label>
 
-      <div>
-        <label className="block text-sm font-medium text-stone mb-1.5">Message</label>
+      <label className="block text-sm font-medium text-stone">
+        Message <span className="text-accent">*</span>
         <textarea
+          className={`${inputClassName} min-h-32 resize-y`}
           name="message"
-          value={formData.message}
-          onChange={handleChange}
-          rows={4}
-          className="w-full px-4 py-3 rounded-lg border border-stone-lighter bg-white text-stone text-sm focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-colors resize-y"
-          placeholder="Tell us about your project, requirements, timeline..."
+          required
+          placeholder="Tell us about your target product, market, requirements, and timing."
         />
-      </div>
+      </label>
+
+      <label className="flex items-start gap-3 text-sm leading-relaxed text-stone-600">
+        <input
+          type="checkbox"
+          name="privacyConsent"
+          value="Agreed"
+          required
+          className="mt-1 h-4 w-4 rounded border-stone-300 text-secondary focus:ring-secondary"
+        />
+        <span>
+          I agree that KARUU may use this information to respond to my business inquiry.
+          <span className="text-accent"> *</span>
+        </span>
+      </label>
 
       <button
         type="submit"
-        disabled={status === 'submitting'}
-        className="w-full md:w-auto inline-flex items-center justify-center gap-2 bg-primary text-white px-8 py-3.5 rounded-lg font-semibold hover:bg-primary-light transition-all hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+        className="inline-flex min-h-12 w-full items-center justify-center rounded-lg bg-primary px-8 py-3.5 font-semibold text-white transition-colors hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 md:w-auto"
       >
-        {status === 'submitting' ? (
-          <>
-            <Loader2 className="w-4 h-4 animate-spin" />
-            Sending...
-          </>
-        ) : status === 'success' ? (
-          <>
-            <CheckCircle className="w-4 h-4" />
-            Message Sent!
-          </>
-        ) : (
-          <>
-            <Send className="w-4 h-4" />
-            Send Inquiry
-          </>
-        )}
+        Prepare Inquiry Email
       </button>
-
-      {status === 'success' && (
-        <div className="mt-4 p-4 rounded-lg bg-secondary/10 text-secondary text-sm flex items-start gap-2">
-          <CheckCircle className="w-5 h-5 flex-shrink-0" />
-          <span>
-            Thank you for your inquiry! Our team will review your message and get back to
-            you within 24 hours.
-          </span>
-        </div>
-      )}
+      <p className="text-xs leading-relaxed text-stone-500">
+        This opens an email draft for you to review and send. The website does not claim that
+        your inquiry has been delivered before you send it.
+      </p>
     </form>
   );
 }

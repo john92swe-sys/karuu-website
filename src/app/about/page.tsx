@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import {
   MapPin,
-  Phone,
-  Mail,
   Globe,
   Building,
   Award,
@@ -13,9 +11,9 @@ import {
 import { Breadcrumb } from '@/components/breadcrumb';
 
 export const metadata: Metadata = {
-  title: 'About KARUU | Premium Yoga Apparel Company',
+  title: 'About KARUU | Swedish B2B Activewear Partner',
   description:
-    'KARUU AB — Swedish-based premium yoga apparel manufacturer. Scandinavian design, OEKO-TEX certified fabrics, and global wholesale distribution.',
+    'KARUU is a Swedish B2B activewear sourcing and manufacturing partner connecting global brands with selected manufacturing capabilities.',
   alternates: { canonical: '/about' },
 };
 
@@ -34,10 +32,9 @@ export default function AboutPage() {
           <span className="text-secondary">Crafted for the World.</span>
         </h1>
         <p className="text-lg text-stone-light leading-relaxed">
-          KARUU AB is a Swedish-based premium yoga apparel company dedicated to creating
-          high-quality, sustainable activewear that inspires movement and well-being.
-          Founded with a vision to bridge Scandinavian design with expert manufacturing,
-          we serve brands and retailers across Europe, North America, and Australia.
+          KARUU AB is a Swedish B2B activewear sourcing and manufacturing partner. We
+          coordinate product sourcing, development, OEM/ODM requirements, quality
+          communication, and international service for brands and professional buyers.
         </p>
       </div>
 
@@ -63,19 +60,17 @@ export default function AboutPage() {
           <div className="bg-primary text-white rounded-2xl p-10">
             <h2 className="text-2xl font-bold mb-4 text-accent">Our Mission</h2>
             <p className="text-white/80 leading-relaxed">
-              To empower active lifestyles through premium, sustainable yoga apparel
-              that performs beautifully and respects the planet. We strive to be the
-              most trusted partner for yoga brands worldwide — delivering quality,
-              innovation, and exceptional service.
+              To help activewear buyers move from product brief to an informed sourcing
+              decision through clear specifications, practical coordination, and
+              responsive international service.
             </p>
           </div>
           <div className="bg-stone-faint rounded-2xl p-10">
             <h2 className="text-2xl font-bold text-primary mb-4">Our Vision</h2>
             <p className="text-stone-light leading-relaxed">
-              To become the leading Nordic yoga apparel brand known for uncompromising
-              quality, sustainable practices, and authentic connection with our community.
-              We envision a world where everyone can access premium activewear that&apos;s
-              both good for them and good for the planet.
+              To build durable B2B relationships by keeping product requirements,
+              approvals, documentation, and commercial next steps clear throughout the
+              sourcing process.
             </p>
           </div>
         </div>
@@ -93,10 +88,10 @@ export default function AboutPage() {
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { title: 'Quality First', desc: 'Uncompromising attention to detail in every stitch.' },
-            { title: 'Sustainability', desc: 'Minimizing impact at every stage of production.' },
+            { title: 'Clarity', desc: 'Keep specifications, decisions, and next steps visible.' },
+            { title: 'Verification', desc: 'Use available product evidence before making claims.' },
             { title: 'Integrity', desc: 'Honest, transparent partnerships with every client.' },
-            { title: 'Innovation', desc: 'Constantly evolving fabrics, fits, and processes.' },
+            { title: 'Service', desc: 'Provide responsive communication for international buyers.' },
           ].map((v, i) => (
             <div key={i} className="p-8 rounded-xl bg-white border border-stone-lighter text-center hover:shadow-lg transition-shadow">
               <div className="w-12 h-12 rounded-full bg-secondary/10 text-secondary flex items-center justify-center mx-auto mb-4">
@@ -124,8 +119,8 @@ export default function AboutPage() {
                 { icon: Building, label: 'Company Name', value: 'KARUU AB' },
                 { icon: Award, label: 'Registration No.', value: '559244-1892 (Bolagsverket)' },
                 { icon: MapPin, label: 'Headquarters', value: 'Vattugatan 2A, 302 33 Halmstad, Sweden' },
-                { icon: Users, label: 'Team Size', value: '100+ employees across Sweden and Asia' },
-                { icon: Globe, label: 'Markets', value: 'EU, North America, Australia, Asia Pacific' },
+                { icon: Users, label: 'Business Model', value: 'B2B sourcing and product coordination' },
+                { icon: Globe, label: 'Service', value: 'International buyer communication' },
                 { icon: Clock, label: 'Founded', value: 'February 2020' },
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-4 pb-4 border-b border-stone-lighter last:border-0">
