@@ -9,8 +9,8 @@ import {
   Gem,
   Factory,
   ArrowRight,
-  Star,
-  Quote,
+  Palette,
+  PackageCheck,
 } from 'lucide-react';
 
 export function HeroSection() {
@@ -28,7 +28,7 @@ export function HeroSection() {
         }}
       />
 
-      <div className="relative z-10 container mx-auto px-6 py-24 md:py-32">
+      <div className="relative z-10 container mx-auto px-5 py-16 sm:px-6 md:py-24">
         <div className="max-w-3xl">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm text-sm font-medium mb-6 border border-white/20">
             <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
@@ -46,17 +46,17 @@ export function HeroSection() {
             fabrics. From leggings to outerwear — we deliver quality that moves with you.
           </p>
 
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <Link
               href="/products"
-              className="inline-flex items-center gap-2 bg-accent text-primary px-8 py-3.5 rounded-lg font-semibold hover:bg-accent-light transition-all hover:-translate-y-0.5 hover:shadow-lg"
+              className="inline-flex min-h-12 items-center justify-center gap-2 bg-accent text-primary px-7 py-3.5 rounded-lg font-semibold hover:bg-accent-light transition-all hover:-translate-y-0.5 hover:shadow-lg"
             >
               Explore Collection
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 border-2 border-white/30 text-white px-8 py-3.5 rounded-lg font-semibold hover:bg-white/10 transition-all hover:-translate-y-0.5"
+              className="inline-flex min-h-12 items-center justify-center gap-2 border-2 border-white/30 text-white px-7 py-3.5 rounded-lg font-semibold hover:bg-white/10 transition-all hover:-translate-y-0.5"
             >
               Request Quote
             </Link>
@@ -100,7 +100,7 @@ export function CoreAdvantagesSection() {
     {
       icon: Leaf,
       title: 'Sustainable Production',
-      desc: 'Eco-friendly materials, recycled polyester, and carbon-neutral manufacturing practices.',
+      desc: 'Material and production options designed to support more responsible sourcing choices.',
     },
     {
       icon: ShieldCheck,
@@ -115,9 +115,9 @@ export function CoreAdvantagesSection() {
   ];
 
   return (
-    <section className="py-20 md:py-28 bg-white">
+    <section className="section-spacing bg-white">
       <div className="container mx-auto px-6">
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-10 md:mb-12">
           <span className="text-accent font-semibold text-sm uppercase tracking-widest">
             Why KARUU
           </span>
@@ -153,7 +153,7 @@ export function FeaturedCollectionSection() {
   const products = getFeaturedProducts(4);
 
   return (
-    <section className="py-20 md:py-28 bg-stone-faint">
+    <section className="section-spacing bg-stone-faint">
       <div className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12 gap-4">
           <div>
@@ -161,7 +161,7 @@ export function FeaturedCollectionSection() {
               Featured Collection
             </span>
             <h2 className="text-3xl md:text-4xl font-bold text-primary mt-3">
-              Our Best-Selling Yoga Wear
+              Featured Yoga Wear
             </h2>
           </div>
           <Link
@@ -173,7 +173,7 @@ export function FeaturedCollectionSection() {
           </Link>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {products.map((product) => (
             <ProductCard key={product.sku} product={product} />
           ))}
@@ -185,7 +185,7 @@ export function FeaturedCollectionSection() {
 
 export function OekotexSection() {
   return (
-    <section className="py-20 md:py-28 bg-white">
+    <section className="section-spacing bg-white">
       <div className="container mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Visual */}
@@ -202,12 +202,12 @@ export function OekotexSection() {
 
             {/* Floating badges */}
             <div className="absolute -top-4 -right-4 bg-white rounded-xl shadow-xl p-4 border border-stone-lighter">
-              <div className="text-2xl font-bold text-primary">100+</div>
-              <div className="text-xs text-stone-light">Tests passed</div>
+              <div className="text-sm font-bold text-primary">Documentation</div>
+              <div className="text-xs text-stone-light">Available on request</div>
             </div>
             <div className="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-xl p-4 border border-stone-lighter">
-              <div className="text-2xl font-bold text-primary">100%</div>
-              <div className="text-xs text-stone-light">Safe materials</div>
+              <div className="text-sm font-bold text-primary">Material details</div>
+              <div className="text-xs text-stone-light">Shared before ordering</div>
             </div>
           </div>
 
@@ -254,70 +254,55 @@ export function OekotexSection() {
   );
 }
 
-export function TestimonialsSection() {
-  const testimonials = [
+export function PartnershipSection() {
+  const steps = [
     {
-      name: 'Emma Lindqvist',
-      role: 'Studio Owner, Stockholm',
-      content:
-        'KARUU is our go-to supplier for studio-branded yoga wear. The quality is outstanding and the Scandinavian design aesthetic perfectly matches our brand.',
-      rating: 5,
+      icon: Palette,
+      title: 'Define Your Product',
+      content: 'Share your target styles, colors, sizing, branding, and order requirements.',
     },
     {
-      name: 'Michael Brown',
-      role: 'Retail Buyer, Toronto',
-      content:
-        'We have been working with KARUU for two years. Their OEM service is seamless — from sample to delivery, everything is on time and exceeds expectations.',
-      rating: 5,
+      icon: Factory,
+      title: 'Develop & Sample',
+      content: 'Review materials and specifications, then validate the product with samples.',
     },
     {
-      name: 'Anna Müller',
-      role: 'E-commerce Founder, Berlin',
-      content:
-        'The fabric quality is exceptional. Our customers love the buttery-soft feel and the fit is consistently perfect. Highly recommend for any yoga brand.',
-      rating: 5,
+      icon: PackageCheck,
+      title: 'Approve & Produce',
+      content: 'Confirm the approved sample, production details, quality checks, and delivery plan.',
     },
   ];
 
   return (
-    <section className="py-20 md:py-28 bg-stone-faint">
+    <section className="section-spacing bg-stone-faint">
       <div className="container mx-auto px-6">
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-10 md:mb-12">
           <span className="text-accent font-semibold text-sm uppercase tracking-widest">
-            Client Stories
+            How We Work
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-primary mt-3 mb-4">
-            Trusted by Brands Worldwide
+            A Clear Path From Brief to Production
           </h2>
           <p className="text-stone-light">
-            From boutique studios to global retailers — partners across Europe,
-            North America, and Australia choose KARUU.
+            Our team keeps product decisions, approvals, and next steps visible throughout
+            the OEM/ODM process.
           </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
-          {testimonials.map((t, i) => (
+          {steps.map((step, i) => (
             <div
               key={i}
-              className="bg-white rounded-xl p-8 border border-stone-lighter hover:shadow-xl transition-shadow relative"
+              className="bg-white rounded-xl p-7 border border-stone-lighter hover:shadow-xl transition-shadow"
             >
-              <Quote className="w-10 h-10 text-secondary/20 absolute top-6 right-6" />
-
-              {/* Rating */}
-              <div className="flex gap-1 mb-4">
-                {Array.from({ length: t.rating }).map((_, j) => (
-                  <Star key={j} className="w-4 h-4 fill-accent text-accent" />
-                ))}
+              <div className="flex items-center justify-between mb-5">
+                <div className="w-12 h-12 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center">
+                  <step.icon className="w-6 h-6" />
+                </div>
+                <span className="text-sm font-semibold text-stone-lighter">0{i + 1}</span>
               </div>
-
-              <p className="text-stone-light leading-relaxed mb-6 italic">
-                &ldquo;{t.content}&rdquo;
-              </p>
-
-              <div className="pt-4 border-t border-stone-lighter">
-                <div className="font-semibold text-primary">{t.name}</div>
-                <div className="text-sm text-stone-lighter">{t.role}</div>
-              </div>
+              <h3 className="text-lg font-semibold text-primary mb-2">{step.title}</h3>
+              <p className="text-sm text-stone-light leading-relaxed">{step.content}</p>
             </div>
           ))}
         </div>
@@ -328,7 +313,7 @@ export function TestimonialsSection() {
 
 export function HomeContactSection() {
   return (
-    <section className="py-20 md:py-28 bg-primary text-white relative overflow-hidden">
+    <section className="section-spacing bg-primary text-white relative overflow-hidden">
       <div className="absolute inset-0 opacity-5">
         <div
           className="w-full h-full"
@@ -348,14 +333,13 @@ export function HomeContactSection() {
             Ready to Elevate Your Yoga Brand?
           </h2>
           <p className="text-white/70 mb-8 text-lg">
-            Contact our team today for a free consultation and sample quote.
-            We respond to all inquiries within 24 hours.
+            Contact our team to discuss your product brief, sampling needs, and quote requirements.
           </p>
 
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-accent text-primary px-8 py-3.5 rounded-lg font-semibold hover:bg-accent-light transition-all hover:-translate-y-0.5 hover:shadow-lg"
+              className="inline-flex min-h-12 items-center justify-center gap-2 bg-accent text-primary px-7 py-3.5 rounded-lg font-semibold hover:bg-accent-light transition-all hover:-translate-y-0.5 hover:shadow-lg"
             >
               Contact Us Now
               <ArrowRight className="w-4 h-4" />
@@ -364,28 +348,24 @@ export function HomeContactSection() {
               href="https://wa.me/46708802017"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 border-2 border-white/30 text-white px-8 py-3.5 rounded-lg font-semibold hover:bg-white/10 transition-all hover:-translate-y-0.5"
+              className="inline-flex min-h-12 items-center justify-center gap-2 border-2 border-white/30 text-white px-7 py-3.5 rounded-lg font-semibold hover:bg-white/10 transition-all hover:-translate-y-0.5"
             >
               Chat on WhatsApp
             </a>
           </div>
 
-          <div className="mt-12 pt-8 border-t border-white/20 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="mt-10 pt-8 border-t border-white/20 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
             <div>
-              <div className="text-2xl font-bold text-accent">24h</div>
-              <div className="text-sm text-white/60">Response Time</div>
+              <div className="text-base font-bold text-accent">Product Consultation</div>
+              <div className="text-sm text-white/60">Discuss styles and specifications</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-accent">50+</div>
-              <div className="text-sm text-white/60">Global Clients</div>
+              <div className="text-base font-bold text-accent">OEM / ODM Support</div>
+              <div className="text-sm text-white/60">Develop your private-label range</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-accent">10K+</div>
-              <div className="text-sm text-white/60">Monthly Units</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-accent">5★</div>
-              <div className="text-sm text-white/60">Client Rating</div>
+              <div className="text-base font-bold text-accent">Quote Request</div>
+              <div className="text-sm text-white/60">Receive a scope-based proposal</div>
             </div>
           </div>
         </div>

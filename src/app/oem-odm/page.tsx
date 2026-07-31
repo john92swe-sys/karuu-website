@@ -39,7 +39,7 @@ const services = [
   {
     icon: Sparkles,
     title: 'Fabric Customization',
-    desc: 'Choose from 50+ fabrics or develop custom fabric blends and colors.',
+    desc: 'Review available fabrics or discuss custom fabric blends and colors.',
   },
   {
     icon: Factory,
@@ -177,7 +177,7 @@ export default function OemOdmPage() {
             <div className="space-y-4">
               {[
                 { label: 'Product Types', value: 'Leggings, bras, tops, shorts, outerwear, sets' },
-                { label: 'Fabric Options', value: '50+ stock fabrics + custom development' },
+                { label: 'Fabric Options', value: 'Available fabrics + custom development' },
                 { label: 'Size Range', value: 'XS – 4XL (custom sizing available)' },
                 { label: 'MOQ', value: '100 pcs per style / color' },
                 { label: 'Sample Time', value: '7 – 10 business days' },

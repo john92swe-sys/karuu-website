@@ -1,6 +1,5 @@
-'use client';
-
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Product } from '@/lib/products';
 import { getProductImagePath } from '@/lib/products';
 import { ArrowRight } from 'lucide-react';
@@ -11,20 +10,15 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const firstImage = getProductImagePath(product.sku, 1);
-  const placeholder = '/images/placeholder-product.svg';
-
   return (
     <div className="group bg-white border border-stone-200 rounded-2xl overflow-hidden hover:shadow-lg hover:border-stone-300 transition-all duration-300 hover:-translate-y-1">
       <Link href={`/products/${product.slug}`} className="block">
         <div className="relative aspect-[3/4] bg-stone-faint overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={firstImage}
             alt={product.name}
-            loading="lazy"
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = placeholder;
-            }}
+            fill
+            sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 25vw"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
           <div className="absolute top-3 left-3">

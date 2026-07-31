@@ -12,7 +12,6 @@ const navItems = [
   { href: '/oem-odm', label: 'OEM / ODM' },
   { href: '/manufacturing', label: 'Manufacturing' },
   { href: '/quality-certifications', label: 'Quality & Certifications' },
-  { href: '/sustainability', label: 'Sustainability' },
   { href: '/about', label: 'About KARUU' },
   { href: '/contact', label: 'Contact', cta: true },
 ];
@@ -50,12 +49,11 @@ export function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 h-16 md:h-[72px] transition-all duration-300 ${
         scrolled
           ? 'bg-white/97 backdrop-blur-md shadow-sm border-b border-border'
-          : 'bg-white/80 backdrop-blur-sm border-b border-transparent'
+          : 'bg-white/90 backdrop-blur-sm border-b border-transparent'
       }`}
-      style={{ height: '72px' }}
     >
       <div className="max-w-container h-full flex items-center justify-between">
         {/* Logo */}
@@ -69,8 +67,8 @@ export function Navbar() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden lg:flex items-center gap-1">
-          {navItems.slice(0, 7).map((item) => {
+        <nav className="hidden lg:flex items-center gap-1" aria-label="Primary navigation">
+          {navItems.slice(0, -1).map((item) => {
             if (item.href === '/products') {
               return (
                 <div
@@ -130,9 +128,12 @@ export function Navbar() {
 
         {/* Mobile Toggle */}
         <button
-          className="lg:hidden p-2 text-primary"
+          type="button"
+          className="lg:hidden inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-primary hover:bg-primary-50"
           onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle menu"
+          aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-navigation"
         >
           {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
@@ -140,9 +141,9 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b border-border shadow-lg max-h-[calc(100vh-72px)] overflow-y-auto">
-          <nav className="flex flex-col py-4 px-4 gap-1">
-            {navItems.slice(0, 7).map((item) => (
+        <div id="mobile-navigation" className="lg:hidden absolute top-full left-0 right-0 bg-white border-b border-border shadow-lg max-h-[calc(100dvh-64px)] overflow-y-auto">
+          <nav className="flex flex-col py-3 px-4 gap-1">
+            {navItems.slice(0, -1).map((item) => (
               <Link
                 key={item.href}
                 href={item.href}

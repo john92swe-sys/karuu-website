@@ -41,14 +41,13 @@ export default function AboutPage() {
         </p>
       </div>
 
-      {/* Stats */}
+      {/* Company overview */}
       <section className="mb-20">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
-            { num: '2020', label: 'Founded in Sweden' },
-            { num: '50+', label: 'Global Brand Partners' },
-            { num: '200K+', label: 'Units Produced Yearly' },
-            { num: '15,000㎡', label: 'Warehouse Space' },
+            { num: 'Sweden', label: 'KARUU AB headquarters' },
+            { num: 'B2B', label: 'Wholesale and private label' },
+            { num: 'OEM / ODM', label: 'Product development support' },
           ].map((s, i) => (
             <div key={i} className="p-6 rounded-xl bg-stone-faint text-center">
               <div className="text-3xl md:text-4xl font-bold text-primary mb-1">{s.num}</div>

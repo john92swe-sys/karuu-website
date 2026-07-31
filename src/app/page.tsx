@@ -4,7 +4,7 @@ import {
   CoreAdvantagesSection,
   FeaturedCollectionSection,
   OekotexSection,
-  TestimonialsSection,
+  PartnershipSection,
   HomeContactSection,
 } from '@/components/sections/home-sections';
 
@@ -33,7 +33,7 @@ export default function HomePage() {
       <CoreAdvantagesSection />
       <FeaturedCollectionSection />
       <OekotexSection />
-      <TestimonialsSection />
+      <PartnershipSection />
       <HomeContactSection />
     </>
   );

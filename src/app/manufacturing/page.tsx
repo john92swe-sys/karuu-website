@@ -48,14 +48,13 @@ export default function ManufacturingPage() {
         </p>
       </div>
 
-      {/* Stats */}
+      {/* Capabilities */}
       <section className="mb-20">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
-            { num: '100+', label: 'Skilled Workers' },
-            { num: '50,000+', label: 'Units / Month' },
-            { num: '50+', label: 'Sewing Machines' },
-            { num: '15,000㎡', label: 'Warehouse Space' },
+            { num: 'Sampling', label: 'Specification and sample review' },
+            { num: 'Production', label: 'Approved-order manufacturing' },
+            { num: 'Quality Control', label: 'Checks before shipment' },
           ].map((s, i) => (
             <div key={i} className="p-6 rounded-xl bg-stone-faint text-center">
               <div className="text-3xl md:text-4xl font-bold text-primary mb-1">{s.num}</div>
