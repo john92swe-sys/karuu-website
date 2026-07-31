@@ -218,13 +218,13 @@ export default function ProductDetailPage({ params }: PageProps) {
             </div>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <a
-                href="#inquiry"
+              <Link
+                href={`/rfq?product=${encodeURIComponent(product.slug)}`}
                 className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-7 py-3.5 font-semibold text-white transition-colors hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
               >
                 Request a Quote
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </a>
+              </Link>
               <a
                 href={whatsappUrl}
                 target="_blank"

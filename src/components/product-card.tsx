@@ -11,6 +11,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const mainImage = product.gallery[0];
   const hoverImage = product.gallery[1];
   const productUrl = `/products/${product.slug}`;
+  const quoteUrl = `/rfq?product=${encodeURIComponent(product.slug)}`;
 
   return (
     <article className="group overflow-hidden rounded-2xl border border-stone-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-stone-300 hover:shadow-lg">
@@ -56,11 +57,11 @@ export function ProductCard({ product }: ProductCardProps) {
             href={productUrl}
             className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
           >
-            View Product
+            View Details
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
           <Link
-            href={`${productUrl}#inquiry`}
+            href={quoteUrl}
             className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary/20 px-4 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-stone-faint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
           >
             <MessageSquareText className="h-4 w-4" aria-hidden="true" />
