@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
 
-const fallbackInquiryEmail = 'info@karuu.se';
+const inquiryEmail = 'john@karuu.net';
 
 const fieldLabels: Record<string, string> = {
   productSku: 'Product SKU',
@@ -64,7 +64,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'No inquiry details were provided.' }, { status: 400 });
   }
 
-  const recipient = process.env.KARUU_INQUIRY_EMAIL || fallbackInquiryEmail;
   const body = [
     'Hello KARUU team,',
     '',
@@ -74,7 +73,7 @@ export async function POST(request: Request) {
     '',
     'Please review these requirements and contact me to discuss the next steps.',
   ].join('\n');
-  const mailto = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const mailto = `mailto:${inquiryEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   const safeMailto = escapeHtml(mailto);
 
   return new NextResponse(
