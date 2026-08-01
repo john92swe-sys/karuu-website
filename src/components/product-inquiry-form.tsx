@@ -5,20 +5,25 @@ interface ProductInquiryFormProps {
 }
 
 const inputClassName =
-  'mt-1.5 min-h-12 w-full rounded-lg border border-stone-200 bg-white px-4 py-3 text-sm text-stone outline-none transition-colors placeholder:text-stone-400 focus:border-secondary focus:ring-2 focus:ring-secondary/20';
+  'mt-2 min-h-12 w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-base text-stone outline-none transition-colors placeholder:text-stone-400 focus:border-secondary focus:ring-2 focus:ring-secondary/20';
 
 export function ProductInquiryForm({ product }: ProductInquiryFormProps) {
   return (
-    <form action="/api/inquiry-mailto" method="post" className="space-y-6">
-      <div className="rounded-xl border border-secondary/20 bg-secondary/5 p-4">
-        <dl className="grid gap-3 text-sm sm:grid-cols-2">
+    <form action="/api/inquiry-mailto" method="post" className="space-y-7">
+      <div className="rounded-2xl border border-secondary/20 bg-white p-5 shadow-sm">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-secondary">
+          Your selected product
+        </p>
+        <dl className="mt-3 grid gap-4 text-sm sm:grid-cols-2">
           <div>
-            <dt className="text-stone-500">Product SKU</dt>
-            <dd className="font-semibold text-primary">{product.sku}</dd>
+            <dt className="text-stone-600">Product</dt>
+            <dd className="mt-1 font-semibold text-primary">{product.shortName}</dd>
           </div>
           <div>
-            <dt className="text-stone-500">Factory Style</dt>
-            <dd className="font-semibold text-primary">{product.factoryStyleNumber}</dd>
+            <dt className="text-stone-600">KARUU SKU / Factory Style</dt>
+            <dd className="mt-1 font-semibold text-primary">
+              {product.sku} / {product.factoryStyleNumber}
+            </dd>
           </div>
         </dl>
       </div>
@@ -28,119 +33,152 @@ export function ProductInquiryForm({ product }: ProductInquiryFormProps) {
       <input type="hidden" name="productName" value={product.name} />
       <input type="hidden" name="factoryStyle" value={product.factoryStyleNumber} />
 
-      <label className="block text-sm font-medium text-primary">
-        Inquiry Type <span className="text-accent">*</span>
-        <select className={inputClassName} name="inquiryType" defaultValue="" required>
-          <option value="" disabled>
-            Select your inquiry type
-          </option>
-          <option>Wholesale bulk order</option>
-          <option>OEM / ODM development</option>
-          <option>Sample request</option>
-          <option>General product inquiry</option>
-        </select>
-      </label>
+      <fieldset>
+        <legend className="text-lg font-semibold text-primary">1. Contact and order overview</legend>
+        <p className="mt-1 text-sm leading-6 text-stone-600">
+          Start with the essentials. Detailed customization fields are optional below.
+        </p>
 
-      <div className="grid gap-5 md:grid-cols-2">
-        <label className="text-sm font-medium text-primary">
-          Company Name <span className="text-accent">*</span>
-          <input className={inputClassName} name="companyName" required autoComplete="organization" />
-        </label>
-        <label className="text-sm font-medium text-primary">
-          Contact Name <span className="text-accent">*</span>
-          <input className={inputClassName} name="contactName" required autoComplete="name" />
-        </label>
-        <label className="text-sm font-medium text-primary">
-          Business Email <span className="text-accent">*</span>
-          <input
-            className={inputClassName}
-            type="email"
-            name="businessEmail"
+        <div className="mt-5 grid gap-5 md:grid-cols-2">
+          <label className="text-sm font-semibold text-primary md:col-span-2">
+            Inquiry Type <span className="text-accent">*</span>
+            <select className={inputClassName} name="inquiryType" defaultValue="" required>
+              <option value="" disabled>
+                Select your inquiry type
+              </option>
+              <option>Wholesale bulk order</option>
+              <option>OEM / ODM development</option>
+              <option>Sample request</option>
+              <option>General product inquiry</option>
+            </select>
+          </label>
+
+          <label className="text-sm font-semibold text-primary">
+            Company Name <span className="text-accent">*</span>
+            <input className={inputClassName} name="companyName" required autoComplete="organization" />
+          </label>
+          <label className="text-sm font-semibold text-primary">
+            Contact Name <span className="text-accent">*</span>
+            <input className={inputClassName} name="contactName" required autoComplete="name" />
+          </label>
+          <label className="text-sm font-semibold text-primary">
+            Business Email <span className="text-accent">*</span>
+            <input
+              className={inputClassName}
+              type="email"
+              name="businessEmail"
+              required
+              autoComplete="email"
+            />
+          </label>
+          <label className="text-sm font-semibold text-primary">
+            Country / Region <span className="text-accent">*</span>
+            <input className={inputClassName} name="countryRegion" required autoComplete="country-name" />
+          </label>
+          <label className="text-sm font-semibold text-primary">
+            Estimated Quantity <span className="text-accent">*</span>
+            <input
+              className={inputClassName}
+              name="estimatedQuantity"
+              inputMode="numeric"
+              required
+              placeholder="Your estimated order volume"
+            />
+          </label>
+          <label className="text-sm font-semibold text-primary">
+            WhatsApp / Phone
+            <input className={inputClassName} name="phone" type="tel" autoComplete="tel" />
+          </label>
+        </div>
+
+        <label className="mt-5 block text-sm font-semibold text-primary">
+          Message <span className="text-accent">*</span>
+          <textarea
+            className={`${inputClassName} min-h-32 resize-y`}
+            name="message"
             required
-            autoComplete="email"
+            placeholder="Share your target market, intended use, branding needs, or questions."
           />
         </label>
-        <label className="text-sm font-medium text-primary">
-          Country / Region <span className="text-accent">*</span>
-          <input className={inputClassName} name="countryRegion" required autoComplete="country-name" />
-        </label>
-        <label className="text-sm font-medium text-primary">
-          WhatsApp / Phone
-          <input className={inputClassName} name="phone" type="tel" autoComplete="tel" />
-        </label>
-        <label className="text-sm font-medium text-primary">
-          Estimated Quantity
-          <input className={inputClassName} name="estimatedQuantity" inputMode="numeric" />
-        </label>
-        <label className="text-sm font-medium text-primary">
-          Selected Color
-          <select className={inputClassName} name="selectedColor" defaultValue="">
-            <option value="">To discuss</option>
-            {product.colors.map((color) => (
-              <option key={color.name} value={color.name}>
-                {color.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="text-sm font-medium text-primary">
-          Number of Colors
-          <input className={inputClassName} name="numberOfColors" inputMode="numeric" />
-        </label>
-        <label className="text-sm font-medium text-primary">
-          Size Requirements
-          <input className={inputClassName} name="sizeRequirements" placeholder="e.g. S–XL size split" />
-        </label>
-        <label className="text-sm font-medium text-primary">
-          Custom Logo
-          <select className={inputClassName} name="customLogo" defaultValue="To discuss">
-            <option>No</option>
-            <option>Yes</option>
-            <option>To discuss</option>
-          </select>
-        </label>
-        <label className="text-sm font-medium text-primary">
-          Custom Label
-          <select className={inputClassName} name="customLabel" defaultValue="To discuss">
-            <option>No</option>
-            <option>Yes</option>
-            <option>To discuss</option>
-          </select>
-        </label>
-        <label className="text-sm font-medium text-primary">
-          Custom Packaging
-          <select className={inputClassName} name="customPackaging" defaultValue="To discuss">
-            <option>No</option>
-            <option>Yes</option>
-            <option>To discuss</option>
-          </select>
-        </label>
-        <label className="text-sm font-medium text-primary">
-          Preferred Trade Term
-          <select className={inputClassName} name="preferredTradeTerm" defaultValue="To discuss">
-            <option>To discuss</option>
-            <option>EXW</option>
-            <option>FOB</option>
-            <option>CIF</option>
-            <option>DDP</option>
-          </select>
-        </label>
-        <label className="text-sm font-medium text-primary md:col-span-2">
-          Required Delivery Date
-          <input className={inputClassName} name="requiredDeliveryDate" type="date" />
-        </label>
-      </div>
+      </fieldset>
 
-      <label className="block text-sm font-medium text-primary">
-        Message
-        <textarea
-          className={`${inputClassName} min-h-32 resize-y`}
-          name="message"
-          placeholder="Share your target market, branding requirements, or other product questions."
-        />
-      </label>
+      <details className="group rounded-2xl border border-stone-200 bg-white p-5 open:shadow-sm">
+        <summary className="cursor-pointer list-none text-base font-semibold text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary">
+          <span className="flex items-center justify-between gap-4">
+            2. Add detailed product requirements
+            <span className="text-sm font-medium text-secondary group-open:hidden">Optional +</span>
+            <span className="hidden text-sm font-medium text-secondary group-open:inline">Hide −</span>
+          </span>
+        </summary>
+        <p className="mt-2 text-sm leading-6 text-stone-600">
+          Add only the details already known. All commercial terms remain subject to project
+          review.
+        </p>
 
-      <label className="flex items-start gap-3 text-sm leading-relaxed text-stone-600">
+        <div className="mt-5 grid gap-5 md:grid-cols-2">
+          {product.colors.length > 0 && (
+            <label className="text-sm font-semibold text-primary">
+              Selected Color
+              <select className={inputClassName} name="selectedColor" defaultValue="">
+                <option value="">To discuss</option>
+                {product.colors.map((color) => (
+                  <option key={color.name} value={color.name}>
+                    {color.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          <label className="text-sm font-semibold text-primary">
+            Number of Colors
+            <input className={inputClassName} name="numberOfColors" inputMode="numeric" />
+          </label>
+          <label className="text-sm font-semibold text-primary">
+            Size Requirements
+            <input className={inputClassName} name="sizeRequirements" placeholder="e.g. S–XL size split" />
+          </label>
+          <label className="text-sm font-semibold text-primary">
+            Custom Logo
+            <select className={inputClassName} name="customLogo" defaultValue="To discuss">
+              <option>No</option>
+              <option>Yes</option>
+              <option>To discuss</option>
+            </select>
+          </label>
+          <label className="text-sm font-semibold text-primary">
+            Custom Label
+            <select className={inputClassName} name="customLabel" defaultValue="To discuss">
+              <option>No</option>
+              <option>Yes</option>
+              <option>To discuss</option>
+            </select>
+          </label>
+          <label className="text-sm font-semibold text-primary">
+            Custom Packaging
+            <select className={inputClassName} name="customPackaging" defaultValue="To discuss">
+              <option>No</option>
+              <option>Yes</option>
+              <option>To discuss</option>
+            </select>
+          </label>
+          <label className="text-sm font-semibold text-primary">
+            Preferred Trade Term
+            <select className={inputClassName} name="preferredTradeTerm" defaultValue="To discuss">
+              <option>To discuss</option>
+              <option>EXW</option>
+              <option>FOB</option>
+              <option>CIF</option>
+              <option>DDP</option>
+            </select>
+          </label>
+          <label className="text-sm font-semibold text-primary md:col-span-2">
+            Required Delivery Date
+            <input className={inputClassName} name="requiredDeliveryDate" type="date" />
+          </label>
+        </div>
+      </details>
+
+      <label className="flex items-start gap-3 text-sm leading-relaxed text-stone-700">
         <input
           type="checkbox"
           name="privacyConsent"
@@ -157,13 +195,13 @@ export function ProductInquiryForm({ product }: ProductInquiryFormProps) {
       <div>
         <button
           type="submit"
-          className="inline-flex min-h-12 w-full items-center justify-center rounded-lg bg-primary px-8 py-3.5 font-semibold text-white transition-colors hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 sm:w-auto"
+          className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-primary px-8 py-3.5 font-semibold text-white transition-colors hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 sm:w-auto"
         >
           Prepare Quote Request
         </button>
-        <p className="mt-3 text-xs leading-relaxed text-stone-500">
-          This prepares an email draft in your email application. Review and send the draft to
-          complete your inquiry. No price is generated automatically.
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-stone-600">
+          This prepares an email draft addressed to KARUU for your review and sending. No price
+          is generated automatically, and no inquiry is recorded until you send the email.
         </p>
       </div>
     </form>
