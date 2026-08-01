@@ -60,7 +60,7 @@ export function ProductGallery({ images, colors }: ProductGalleryProps) {
   return (
     <div className="min-w-0">
       <div
-        className="group relative aspect-[3/4] touch-pan-y overflow-hidden rounded-2xl bg-[#f2f1ee]"
+        className="group relative aspect-[4/5] touch-pan-y overflow-hidden rounded-3xl border border-stone-200 bg-[#f2f1ee]"
         onTouchStart={(event) => {
           touchStartX.current = event.touches[0].clientX;
         }}
@@ -72,7 +72,7 @@ export function ProductGallery({ images, colors }: ProductGalleryProps) {
           alt={activeImage.alt}
           fill
           priority={activeIndex === 0}
-          sizes="(max-width: 1023px) 100vw, 50vw"
+          sizes="(max-width: 1023px) 100vw, 58vw"
           className="object-contain"
         />
 
@@ -106,7 +106,7 @@ export function ProductGallery({ images, colors }: ProductGalleryProps) {
           </>
         )}
 
-        <div className="absolute bottom-3 right-3 rounded-full bg-primary/80 px-3 py-1 text-xs font-medium text-white">
+        <div className="absolute bottom-3 right-3 rounded-full bg-primary/85 px-3 py-1 text-xs font-medium text-white">
           {activeIndex + 1} / {images.length}
         </div>
       </div>
@@ -117,7 +117,7 @@ export function ProductGallery({ images, colors }: ProductGalleryProps) {
             type="button"
             key={image.src}
             onClick={() => setActiveIndex(index)}
-            className={`relative aspect-[3/4] w-20 flex-none overflow-hidden rounded-lg border-2 bg-stone-faint transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${
+            className={`relative aspect-[4/5] w-20 flex-none overflow-hidden rounded-lg border-2 bg-stone-faint transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${
               index === activeIndex
                 ? 'border-secondary ring-2 ring-secondary/20'
                 : 'border-transparent hover:border-stone-300'
@@ -130,34 +130,36 @@ export function ProductGallery({ images, colors }: ProductGalleryProps) {
         ))}
       </div>
 
-      <fieldset className="mt-5">
-        <legend className="mb-3 text-sm font-semibold text-primary">Available colors</legend>
-        <div className="flex flex-wrap gap-2">
-          {colors.map((color) => {
-            const selected = activeImage.color === color.name;
-            return (
-              <button
-                type="button"
-                key={color.name}
-                onClick={() => setActiveIndex(color.imageIndex)}
-                className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${
-                  selected
-                    ? 'border-primary bg-primary text-white'
-                    : 'border-stone-200 bg-white text-stone hover:border-secondary'
-                }`}
-                aria-pressed={selected}
-              >
-                <span
-                  className="h-4 w-4 rounded-full border border-black/15"
-                  style={{ backgroundColor: color.hex }}
-                  aria-hidden="true"
-                />
-                {color.name}
-              </button>
-            );
-          })}
-        </div>
-      </fieldset>
+      {colors.length > 0 && (
+        <fieldset className="mt-5 rounded-2xl border border-stone-200 bg-white p-4">
+          <legend className="px-2 text-sm font-semibold text-primary">Available colors</legend>
+          <div className="flex flex-wrap gap-2">
+            {colors.map((color) => {
+              const selected = activeImage.color === color.name;
+              return (
+                <button
+                  type="button"
+                  key={color.name}
+                  onClick={() => setActiveIndex(color.imageIndex)}
+                  className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${
+                    selected
+                      ? 'border-primary bg-primary text-white'
+                      : 'border-stone-200 bg-white text-stone hover:border-secondary'
+                  }`}
+                  aria-pressed={selected}
+                >
+                  <span
+                    className="h-4 w-4 rounded-full border border-black/15"
+                    style={{ backgroundColor: color.hex }}
+                    aria-hidden="true"
+                  />
+                  {color.name}
+                </button>
+              );
+            })}
+          </div>
+        </fieldset>
+      )}
 
       {lightboxOpen && (
         <div
