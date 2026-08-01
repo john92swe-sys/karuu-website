@@ -13,6 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/sustainability',
     '/about',
     '/contact',
+    '/rfq',
   ];
 
   const products = getAllProducts();
