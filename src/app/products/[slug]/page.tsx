@@ -130,16 +130,16 @@ function ProductDetails({ product }: { product: Product }) {
   ].filter((entry): entry is [string, string] => Boolean(entry[1]));
 
   return (
-    <dl className="overflow-hidden rounded-2xl border border-stone-200 bg-white">
+    <dl className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
       {details.map(([label, value], index) => (
         <div
           key={label}
-          className={`grid gap-1 px-5 py-4 sm:grid-cols-[180px_1fr] sm:gap-6 ${
+          className={`grid gap-1 px-5 py-4 sm:grid-cols-[160px_1fr] sm:gap-6 ${
             index < details.length - 1 ? 'border-b border-stone-200' : ''
           }`}
         >
           <dt className="font-semibold text-primary">{label}</dt>
-          <dd className="text-stone-600">{value}</dd>
+          <dd className="leading-7 text-stone-700">{value}</dd>
         </div>
       ))}
     </dl>
@@ -154,12 +154,20 @@ export default function ProductDetailPage({ params }: PageProps) {
     `Hello KARUU, I would like to inquire about ${product.name} (${product.sku}, factory style ${product.factoryStyleNumber}).`
   );
   const whatsappUrl = `https://wa.me/46708802017?text=${whatsappMessage}`;
+  const procurementSummary = [
+    ['Material', product.material],
+    ['Sizes', product.sizes.join(' / ')],
+    ['MOQ', product.moq],
+    ['Packaging', product.packaging],
+    ['Fit', product.fit],
+    ['Customization', product.customization[0] || 'Project-based review'],
+  ].filter((entry): entry is [string, string] => Boolean(entry[1]));
 
   return (
-    <main className="overflow-x-clip pb-20 pt-28">
+    <main className="overflow-x-clip pb-24 pt-20 md:pt-24">
       <StructuredData product={product} />
 
-      <div className="container mx-auto max-w-7xl px-5 sm:px-6">
+      <div className="container mx-auto max-w-[1320px] px-5 sm:px-6 lg:px-8">
         <Breadcrumb
           items={[
             { label: 'Products', href: '/products' },
@@ -167,60 +175,53 @@ export default function ProductDetailPage({ params }: PageProps) {
           ]}
         />
 
-        <section className="mt-8 grid gap-10 lg:grid-cols-2 lg:gap-16">
+        <section className="mt-8 grid items-start gap-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(360px,0.75fr)] lg:gap-14">
           <ProductGallery images={product.gallery} colors={product.colors} />
 
-          <div className="min-w-0 lg:sticky lg:top-28 lg:self-start">
+          <div className="min-w-0 lg:sticky lg:top-24 lg:self-start">
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-secondary">
               {product.categoryPath.join(' / ')}
             </p>
-            <h1 className="mt-3 text-3xl font-bold leading-tight text-primary sm:text-4xl">
+            <h1 className="mt-3 text-4xl font-bold leading-tight text-primary lg:text-[2.75rem]">
               {product.name}
             </h1>
 
-            <dl className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm">
-              <div className="flex gap-2">
-                <dt className="text-stone-500">KARUU SKU</dt>
-                <dd className="font-mono font-semibold text-primary">{product.sku}</dd>
-              </div>
-              <div className="flex gap-2">
-                <dt className="text-stone-500">Factory Style No.</dt>
-                <dd className="font-mono text-stone-600">{product.factoryStyleNumber}</dd>
-              </div>
-            </dl>
+            <div className="mt-5 flex flex-wrap gap-2 text-sm">
+              <span className="rounded-full bg-primary-50 px-3 py-1.5 font-semibold text-primary">
+                SKU {product.sku}
+              </span>
+              <span className="rounded-full border border-stone-200 bg-white px-3 py-1.5 font-medium text-stone-700">
+                Factory Style {product.factoryStyleNumber}
+              </span>
+            </div>
 
-            <p className="mt-6 text-base leading-7 text-stone-600">{product.shortDescription}</p>
+            <p className="mt-6 text-[17px] leading-8 text-stone-700">{product.shortDescription}</p>
 
-            <div className="mt-7 grid grid-cols-2 gap-3">
-              {[
-                ['Material', product.material],
-                ['Sizes', product.sizes.join('–')],
-                ['Fit', product.fit],
-                ['MOQ', product.moq],
-              ]
-                .filter((entry): entry is [string, string] => Boolean(entry[1]))
-                .map(([label, value]) => (
-                  <div key={label} className="rounded-xl border border-stone-200 p-4">
-                    <div className="text-xs uppercase tracking-wide text-stone-500">{label}</div>
-                    <div className="mt-1 text-sm font-semibold text-primary">{value}</div>
+            <div className="mt-7 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-secondary">
+                Buyer specification snapshot
+              </p>
+              <dl className="mt-4 grid gap-x-5 gap-y-4 sm:grid-cols-2">
+                {procurementSummary.map(([label, value]) => (
+                  <div key={label}>
+                    <dt className="text-xs font-medium uppercase tracking-wide text-stone-500">
+                      {label}
+                    </dt>
+                    <dd className="mt-1 text-sm font-semibold leading-6 text-primary">{value}</dd>
                   </div>
                 ))}
+              </dl>
             </div>
 
-            <div className="mt-8 rounded-2xl bg-stone-faint p-5">
-              <p className="font-semibold text-primary">
-                Pricing tailored to your quantity and customization requirements.
-              </p>
-              <p className="mt-1 text-sm leading-relaxed text-stone-600">
-                Share your target quantity, color mix, sizing, and branding requirements for
-                review.
-              </p>
-            </div>
+            <p className="mt-5 rounded-xl bg-stone-faint px-4 py-3 text-sm leading-6 text-stone-700">
+              Commercial terms, samples, and production arrangements are confirmed based on the
+              individual product and project.
+            </p>
 
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
               <a
                 href="#inquiry"
-                className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-7 py-3.5 font-semibold text-white transition-colors hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 font-semibold text-white transition-colors hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
               >
                 Request a Quote
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -229,7 +230,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-[#168a45] px-7 py-3.5 font-semibold text-white transition-colors hover:bg-[#12763b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[#168a45]/25 bg-white px-6 py-3.5 font-semibold text-[#126f39] transition-colors hover:bg-[#168a45]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
               >
                 <MessageCircle className="h-5 w-5" aria-hidden="true" />
                 WhatsApp
@@ -238,7 +239,27 @@ export default function ProductDetailPage({ params }: PageProps) {
           </div>
         </section>
 
-        <section className="section-spacing border-t border-stone-200">
+        <nav
+          className="mt-12 flex flex-wrap gap-2 border-y border-stone-200 py-4"
+          aria-label="Product page sections"
+        >
+          <a href="#overview" className="rounded-full px-4 py-2 text-sm font-semibold text-primary hover:bg-primary-50">
+            Overview
+          </a>
+          <a href="#specifications" className="rounded-full px-4 py-2 text-sm font-semibold text-primary hover:bg-primary-50">
+            Specifications
+          </a>
+          {product.sizeChart && (
+            <a href="#size-guide" className="rounded-full px-4 py-2 text-sm font-semibold text-primary hover:bg-primary-50">
+              Size Guide
+            </a>
+          )}
+          <a href="#inquiry" className="rounded-full px-4 py-2 text-sm font-semibold text-primary hover:bg-primary-50">
+            Request Quote
+          </a>
+        </nav>
+
+        <section id="overview" className="scroll-mt-24 py-16 md:py-20">
           <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent">
@@ -246,44 +267,80 @@ export default function ProductDetailPage({ params }: PageProps) {
               </p>
               <h2 className="mt-3 text-3xl font-bold text-primary">{product.shortName}</h2>
             </div>
-            <p className="text-lg leading-8 text-stone-600">{product.description}</p>
-          </div>
-        </section>
-
-        <section className="section-spacing bg-stone-faint px-5 sm:rounded-3xl sm:px-8 lg:px-12">
-          <div className="max-w-2xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent">
-              Key Features
-            </p>
-            <h2 className="mt-3 text-3xl font-bold text-primary">Confirmed product details</h2>
-          </div>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {product.features.map((feature) => (
-              <div key={feature} className="flex gap-3 rounded-xl bg-white p-5">
-                <CheckCircle2 className="mt-0.5 h-5 w-5 flex-none text-secondary" aria-hidden="true" />
-                <p className="font-medium leading-relaxed text-stone-700">{feature}</p>
+            <div>
+              <p className="text-lg leading-8 text-stone-700">{product.description}</p>
+              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                {product.features.map((feature) => (
+                  <div key={feature} className="flex gap-3 rounded-xl bg-stone-faint p-4">
+                    <CheckCircle2
+                      className="mt-0.5 h-5 w-5 flex-none text-secondary"
+                      aria-hidden="true"
+                    />
+                    <p className="font-medium leading-7 text-stone-700">{feature}</p>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </section>
 
-        <section className="section-spacing grid gap-10 lg:grid-cols-2 lg:gap-16">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent">
-              Product Details
-            </p>
-            <h2 className="mt-3 text-3xl font-bold text-primary">Specification summary</h2>
-            <p className="mt-4 leading-7 text-stone-600">
-              Only fields confirmed in the supplied product materials are shown. Sampling,
-              production timing, and trade-term pricing are confirmed during inquiry review.
-            </p>
+        <section
+          id="specifications"
+          className="scroll-mt-24 rounded-3xl bg-stone-faint px-5 py-12 sm:px-8 lg:px-12"
+        >
+          <div className="grid gap-10 lg:grid-cols-2 lg:gap-14">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent">
+                Verified Specifications
+              </p>
+              <h2 className="mt-3 text-3xl font-bold text-primary">Buyer-ready product summary</h2>
+              <p className="mt-4 text-base leading-7 text-stone-700">
+                Only fields confirmed in the supplied product materials are shown. Pricing,
+                sampling, production timing, and final trade terms are confirmed during inquiry
+                review.
+              </p>
+
+              {product.customization.length > 0 && (
+                <div className="mt-8 rounded-2xl border border-stone-200 bg-white p-6">
+                  <Palette className="h-7 w-7 text-secondary" aria-hidden="true" />
+                  <h3 className="mt-4 text-xl font-bold text-primary">Customization review</h3>
+                  <ul className="mt-4 space-y-3">
+                    {product.customization.map((item) => (
+                      <li key={item} className="flex gap-3 text-stone-700">
+                        <CheckCircle2
+                          className="mt-0.5 h-5 w-5 flex-none text-secondary"
+                          aria-hidden="true"
+                        />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <ProductDetails product={product} />
+              <div className="mt-6 rounded-2xl bg-primary p-6 text-white">
+                <h3 className="text-xl font-bold text-white">Suitable applications</h3>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {product.applications.map((application) => (
+                    <span
+                      key={application}
+                      className="rounded-full border border-white/20 bg-white/10 px-3.5 py-2 text-sm font-medium"
+                    >
+                      {application}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
-          <ProductDetails product={product} />
         </section>
 
         {product.sizeChart && (
-          <section className="section-spacing border-y border-stone-200">
-            <div className="grid items-center gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+          <section id="size-guide" className="scroll-mt-24 py-16 md:py-20">
+            <div className="grid items-center gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:gap-16">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent">
                   Size Guide
@@ -291,9 +348,9 @@ export default function ProductDetailPage({ params }: PageProps) {
                 <h2 className="mt-3 text-3xl font-bold text-primary">
                   {product.sku} size chart
                 </h2>
-                <p className="mt-4 leading-7 text-stone-600">
-                  The original source chart is retained without rewriting uncertain
-                  measurements. Click the chart to open the full image.
+                <p className="mt-4 text-base leading-7 text-stone-700">
+                  The source chart is retained without rewriting uncertain measurements. Open
+                  the full image when preparing your size breakdown.
                 </p>
               </div>
               <a
@@ -318,45 +375,7 @@ export default function ProductDetailPage({ params }: PageProps) {
           </section>
         )}
 
-        <section className="section-spacing grid gap-8 lg:grid-cols-2">
-          <div className="rounded-2xl border border-stone-200 p-7 sm:p-8">
-            <Palette className="h-8 w-8 text-secondary" aria-hidden="true" />
-            <h2 className="mt-5 text-2xl font-bold text-primary">Customization review</h2>
-            <p className="mt-3 leading-7 text-stone-600">
-              KARUU can coordinate a review of product-development and private-label
-              requirements. Availability, cost, and MOQ impact are confirmed only after your
-              brief is assessed.
-            </p>
-            <ul className="mt-5 space-y-3">
-              {product.customization.map((item) => (
-                <li key={item} className="flex gap-3 text-stone-700">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 flex-none text-secondary" aria-hidden="true" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="rounded-2xl bg-primary p-7 text-white sm:p-8">
-            <h2 className="text-2xl font-bold">Suitable for</h2>
-            <div className="mt-5 flex flex-wrap gap-3">
-              {product.applications.map((application) => (
-                <span
-                  key={application}
-                  className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium"
-                >
-                  {application}
-                </span>
-              ))}
-            </div>
-            <p className="mt-6 leading-7 text-white/75">
-              Intended use is based on the supplied product description. Buyers should validate
-              final specifications and samples for their market and application.
-            </p>
-          </div>
-        </section>
-
-        <section className="section-spacing border-t border-stone-200">
+        <section className="border-t border-stone-200 py-16 md:py-20">
           <div className="text-center">
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent">
               Why Work With KARUU
@@ -365,36 +384,37 @@ export default function ProductDetailPage({ params }: PageProps) {
               Clear coordination for international B2B sourcing
             </h2>
           </div>
-          <div className="mt-9 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-9 grid gap-5 md:grid-cols-3">
             {[
               [SearchCheck, 'Selected sourcing', 'Product options are reviewed against your brief and target market.'],
-              [ClipboardCheck, 'Product development', 'Specifications, samples, and approval points are kept clear.'],
-              [CheckCircle2, 'Quality communication', 'Requirements and inspection expectations are aligned before ordering.'],
-              [Globe2, 'International service', 'KARUU provides a Swedish B2B contact point for global buyers.'],
+              [ClipboardCheck, 'Clear development steps', 'Specifications, samples, and approval points are kept visible.'],
+              [Globe2, 'Swedish B2B contact point', 'KARUU supports international communication and project coordination.'],
             ].map(([Icon, title, description]) => {
               const ItemIcon = Icon as typeof CheckCircle2;
               return (
-                <div key={title as string} className="rounded-2xl border border-stone-200 p-6">
+                <div key={title as string} className="rounded-2xl border border-stone-200 bg-white p-6">
                   <ItemIcon className="h-7 w-7 text-secondary" aria-hidden="true" />
-                  <h3 className="mt-4 font-semibold text-primary">{title as string}</h3>
-                  <p className="mt-2 text-sm leading-6 text-stone-600">{description as string}</p>
+                  <h3 className="mt-4 text-lg font-semibold text-primary">{title as string}</h3>
+                  <p className="mt-2 text-sm leading-6 text-stone-700">{description as string}</p>
                 </div>
               );
             })}
           </div>
         </section>
 
-        <section id="inquiry" className="scroll-mt-28 rounded-3xl bg-stone-faint p-5 sm:p-8 lg:p-12">
-          <div className="grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-14">
+        <section
+          id="inquiry"
+          className="scroll-mt-24 rounded-3xl border border-stone-200 bg-stone-faint p-5 sm:p-8 lg:p-12"
+        >
+          <div className="grid gap-10 lg:grid-cols-[0.65fr_1.35fr] lg:gap-14">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent">
-                Inquiry
+                Product Inquiry
               </p>
               <h2 className="mt-3 text-3xl font-bold text-primary">Request a tailored quote</h2>
-              <p className="mt-4 leading-7 text-stone-600">
-                Provide your quantity, color, size, branding, trade-term, and delivery
-                requirements. Pricing is prepared after review and is never generated on this
-                website.
+              <p className="mt-4 text-base leading-7 text-stone-700">
+                Start with your company, market, quantity, and key requirements. Optional product
+                details can be added only when they are already known.
               </p>
               <Link
                 href="/contact"
