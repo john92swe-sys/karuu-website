@@ -57,7 +57,7 @@ export default function ContactPage() {
               </p>
               <p className="flex items-center gap-2">
                 <Mail className="w-4 h-4 flex-shrink-0 text-secondary" />
-                info@karuu.se
+                john@karuu.net
               </p>
               <p className="flex items-center gap-2">
                 <Phone className="w-4 h-4 flex-shrink-0 text-secondary" />
@@ -80,7 +80,7 @@ export default function ContactPage() {
             <div className="space-y-2 text-sm text-stone-light">
               <p className="flex items-center gap-2">
                 <Mail className="w-4 h-4 flex-shrink-0 text-secondary" />
-                sales@karuu.se
+                john@karuu.net
               </p>
               <p className="flex items-center gap-2">
                 <MessageCircle className="w-4 h-4 flex-shrink-0 text-secondary" />
