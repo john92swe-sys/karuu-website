@@ -49,25 +49,23 @@ export function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 h-16 md:h-[72px] transition-all duration-300 ${
+      className={`fixed inset-x-0 top-0 z-50 h-16 transition-all duration-300 ${
         scrolled
-          ? 'bg-white/97 backdrop-blur-md shadow-sm border-b border-border'
-          : 'bg-white/90 backdrop-blur-sm border-b border-transparent'
+          ? 'border-b border-border bg-white/95 shadow-sm backdrop-blur-md'
+          : 'border-b border-transparent bg-white/88 backdrop-blur-sm'
       }`}
     >
-      <div className="max-w-container h-full flex items-center justify-between">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-lg font-heading">
+      <div className="max-w-container flex h-full items-center justify-between">
+        <Link href="/" className="group flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary text-base font-bold text-white font-heading">
             K
           </div>
-          <span className="font-heading font-bold text-lg text-primary tracking-tight">
+          <span className="text-base font-bold tracking-tight text-primary font-heading sm:text-lg">
             KARUU <span className="font-light text-secondary">AB</span>
           </span>
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden lg:flex items-center gap-1" aria-label="Primary navigation">
+        <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Primary navigation">
           {navItems.slice(0, -1).map((item) => {
             if (item.href === '/products') {
               return (
@@ -79,24 +77,24 @@ export function Navbar() {
                 >
                   <Link
                     href={item.href}
-                    className={`inline-flex items-center gap-1 px-3.5 py-2 text-sm font-medium rounded-md transition-colors ${
+                    className={`inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                       isActive(item.href)
-                        ? 'text-primary bg-primary-50'
-                        : 'text-stone hover:text-primary hover:bg-bg-alt'
+                        ? 'bg-primary-50 text-primary'
+                        : 'text-stone hover:bg-bg-alt hover:text-primary'
                     }`}
                   >
                     {item.label}
-                    <ChevronDown className="w-3.5 h-3.5" strokeWidth={2.5} />
+                    <ChevronDown className="h-3.5 w-3.5" strokeWidth={2.5} />
                   </Link>
                   {productMenuOpen && (
-                    <div className="absolute top-full left-0 mt-1 w-56 bg-white rounded-lg border border-border shadow-lg py-2 animate-fade-in">
-                      {productCategories.map((cat) => (
+                    <div className="absolute left-0 top-full mt-1 w-56 rounded-lg border border-border bg-white py-2 shadow-lg animate-fade-in">
+                      {productCategories.map((category) => (
                         <Link
-                          key={cat.slug}
-                          href={`/products?category=${cat.slug}`}
-                          className="block px-4 py-2 text-sm text-stone hover:text-primary hover:bg-bg-alt transition-colors"
+                          key={category.slug}
+                          href={`/products?category=${category.slug}`}
+                          className="block px-4 py-2 text-sm text-stone transition-colors hover:bg-bg-alt hover:text-primary"
                         >
-                          {cat.label}
+                          {category.label}
                         </Link>
                       ))}
                     </div>
@@ -104,14 +102,15 @@ export function Navbar() {
                 </div>
               );
             }
+
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-3.5 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                   isActive(item.href)
-                    ? 'text-primary bg-primary-50'
-                    : 'text-stone hover:text-primary hover:bg-bg-alt'
+                    ? 'bg-primary-50 text-primary'
+                    : 'text-stone hover:bg-bg-alt hover:text-primary'
                 }`}
               >
                 {item.label}
@@ -120,57 +119,58 @@ export function Navbar() {
           })}
           <Link
             href="/contact"
-            className="ml-2 px-5 py-2.5 text-sm font-semibold text-white bg-primary rounded-md hover:bg-primary-light transition-all hover:-translate-y-0.5 shadow-sm hover:shadow-md"
+            className="ml-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-light"
           >
             Contact
           </Link>
         </nav>
 
-        {/* Mobile Toggle */}
         <button
           type="button"
-          className="lg:hidden inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-primary hover:bg-primary-50"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-primary hover:bg-primary-50 lg:hidden"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
           aria-expanded={mobileOpen}
           aria-controls="mobile-navigation"
         >
-          {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 
-      {/* Mobile Menu */}
       {mobileOpen && (
-        <div id="mobile-navigation" className="lg:hidden absolute top-full left-0 right-0 bg-white border-b border-border shadow-lg max-h-[calc(100dvh-64px)] overflow-y-auto">
-          <nav className="flex flex-col py-3 px-4 gap-1">
+        <div
+          id="mobile-navigation"
+          className="absolute left-0 right-0 top-full max-h-[calc(100dvh-64px)] overflow-y-auto border-b border-border bg-white shadow-lg lg:hidden"
+        >
+          <nav className="flex flex-col gap-1 px-4 py-3">
             {navItems.slice(0, -1).map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-4 py-3 text-sm font-medium rounded-md ${
+                className={`rounded-md px-4 py-3 text-sm font-medium ${
                   isActive(item.href)
-                    ? 'text-primary bg-primary-50'
+                    ? 'bg-primary-50 text-primary'
                     : 'text-stone hover:bg-bg-alt'
                 }`}
               >
                 {item.label}
               </Link>
             ))}
-            <div className="px-4 pt-2 pb-1 text-xs font-semibold text-stone-light uppercase tracking-wider">
+            <div className="px-4 pb-1 pt-2 text-xs font-semibold uppercase tracking-wider text-stone-light">
               Product Categories
             </div>
-            {productCategories.map((cat) => (
+            {productCategories.map((category) => (
               <Link
-                key={cat.slug}
-                href={`/products?category=${cat.slug}`}
-                className="px-8 py-2.5 text-sm text-stone-light hover:text-primary hover:bg-bg-alt rounded-md"
+                key={category.slug}
+                href={`/products?category=${category.slug}`}
+                className="rounded-md px-8 py-2.5 text-sm text-stone-light hover:bg-bg-alt hover:text-primary"
               >
-                {cat.label}
+                {category.label}
               </Link>
             ))}
             <Link
               href="/contact"
-              className="mx-4 mt-4 py-3 text-center text-sm font-semibold text-white bg-primary rounded-md"
+              className="mx-4 mt-4 rounded-md bg-primary py-3 text-center text-sm font-semibold text-white"
             >
               Contact Us
             </Link>
