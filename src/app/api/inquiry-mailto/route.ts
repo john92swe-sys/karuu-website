@@ -8,6 +8,7 @@ const fieldLabels: Record<string, string> = {
   productSku: 'Product SKU',
   productName: 'Product Name',
   factoryStyle: 'Factory Style',
+  inquiryType: 'Inquiry Type',
   companyName: 'Company Name',
   contactName: 'Contact Name',
   businessEmail: 'Business Email',
@@ -44,9 +45,13 @@ export async function POST(request: Request) {
   const formData = await request.formData();
   const productSku = readField(formData, 'productSku');
   const productName = readField(formData, 'productName');
-  const subject = productSku
-    ? `KARUU quote request — ${productSku}`
-    : 'KARUU business inquiry';
+  const inquiryType = readField(formData, 'inquiryType');
+  const subjectParts = ['KARUU inquiry'];
+
+  if (inquiryType) subjectParts.push(inquiryType);
+  if (productSku) subjectParts.push(productSku);
+
+  const subject = subjectParts.join(' — ');
 
   const lines = Object.entries(fieldLabels)
     .map(([key, label]) => {

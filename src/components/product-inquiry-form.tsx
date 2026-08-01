@@ -28,6 +28,19 @@ export function ProductInquiryForm({ product }: ProductInquiryFormProps) {
       <input type="hidden" name="productName" value={product.name} />
       <input type="hidden" name="factoryStyle" value={product.factoryStyleNumber} />
 
+      <label className="block text-sm font-medium text-primary">
+        Inquiry Type <span className="text-accent">*</span>
+        <select className={inputClassName} name="inquiryType" defaultValue="" required>
+          <option value="" disabled>
+            Select your inquiry type
+          </option>
+          <option>Wholesale bulk order</option>
+          <option>OEM / ODM development</option>
+          <option>Sample request</option>
+          <option>General product inquiry</option>
+        </select>
+      </label>
+
       <div className="grid gap-5 md:grid-cols-2">
         <label className="text-sm font-medium text-primary">
           Company Name <span className="text-accent">*</span>
