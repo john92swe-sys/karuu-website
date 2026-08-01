@@ -108,5 +108,5 @@ export const kr010010: Product = {
   },
   relatedProducts: ['kr01-0009', 'kr01-0008'],
   featured: false,
-  published: false,
+  published: true,
 };
