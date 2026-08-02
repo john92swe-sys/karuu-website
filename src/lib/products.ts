@@ -34,12 +34,12 @@ function hasPublicSafePath(image: ProductImage): boolean {
 }
 
 function toPublicProduct(product: Product): Product {
-  const verifiedHeroImage = product.gallery.find(hasPublicSafePath);
+  const publicGallery = product.gallery.filter(hasPublicSafePath);
 
   return {
     ...product,
     colors: [],
-    gallery: verifiedHeroImage ? [verifiedHeroImage] : [],
+    gallery: publicGallery,
     sizeChart: undefined,
   };
 }
