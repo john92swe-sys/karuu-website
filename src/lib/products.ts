@@ -3,6 +3,7 @@ import {
   products,
   type Product,
   type ProductCategory,
+  type ProductImage,
 } from '@/data/products';
 
 export { categoryLabels } from '@/data/products';
@@ -18,8 +19,62 @@ export type {
   ProductSizeChart,
 } from '@/data/products';
 
+const supplierReferencePattern = /\bfactory\s+(?:style|model)(?:\s+(?:number|no\.?))?\s*[:#-]?\s*[a-z0-9-]+\b[,.]?\s*/gi;
+const hanCharacterPattern = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/u;
+
+function removeSupplierReferences(value: string | undefined): string | undefined {
+  if (!value) return value;
+
+  return value
+    .replace(supplierReferencePattern, '')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/^\s*is\s+/i, '')
+    .trim();
+}
+
+function hasPublicSafePath(image: ProductImage): boolean {
+  let decodedPath = image.src;
+
+  try {
+    decodedPath = decodeURIComponent(image.src);
+  } catch {
+    // Keep the original path when decoding fails; the checks below still apply.
+  }
+
+  return !hanCharacterPattern.test(decodedPath);
+}
+
+function toPublicProduct(product: Product): Product {
+  const verifiedHeroImage = product.gallery.find(hasPublicSafePath);
+  const gallery = verifiedHeroImage
+    ? [
+        {
+          ...verifiedHeroImage,
+          alt: removeSupplierReferences(verifiedHeroImage.alt) || product.name,
+        },
+      ]
+    : [];
+
+  return {
+    ...product,
+    factoryCode: '',
+    factoryStyleNumber: '',
+    shortDescription: removeSupplierReferences(product.shortDescription) || product.shortDescription,
+    description: removeSupplierReferences(product.description) || product.description,
+    gallery,
+    sizeChart: undefined,
+    seo: {
+      ...product.seo,
+      description: removeSupplierReferences(product.seo.description) || product.seo.description,
+    },
+  };
+}
+
 export function getAllProducts(): Product[] {
-  return products.filter((product) => product.published);
+  return products
+    .filter((product) => product.published)
+    .map(toPublicProduct)
+    .filter((product) => product.gallery.length > 0);
 }
 
 export function getProductBySlug(slug: string): Product | undefined {
