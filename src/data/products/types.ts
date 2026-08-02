@@ -52,8 +52,6 @@ export interface ProductSeo {
 export interface Product {
   slug: string;
   sku: string;
-  factoryCode: string;
-  factoryStyleNumber: string;
   name: string;
   shortName: string;
   category: ProductCategory;
