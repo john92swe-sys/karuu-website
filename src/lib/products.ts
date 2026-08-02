@@ -22,14 +22,20 @@ export type {
 const supplierReferencePattern = /\bfactory\s+(?:style|model)(?:\s+(?:number|no\.?))?\s*[:#-]?\s*[a-z0-9-]+\b[,.]?\s*/gi;
 const hanCharacterPattern = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/u;
 
+function capitalizeFirstLetter(value: string): string {
+  return value.replace(/[A-Za-z]/, (letter) => letter.toUpperCase());
+}
+
 function removeSupplierReferences(value: string | undefined): string | undefined {
   if (!value) return value;
 
-  return value
+  const cleaned = value
     .replace(supplierReferencePattern, '')
     .replace(/\s{2,}/g, ' ')
     .replace(/^\s*is\s+/i, '')
     .trim();
+
+  return capitalizeFirstLetter(cleaned);
 }
 
 function hasPublicSafePath(image: ProductImage): boolean {
