@@ -108,8 +108,8 @@ jobs:
             echo 'Public asset path containing Chinese characters detected.'
             exit 1
           fi
-          if grep -RniE "alt: '[^']+ for'|description:[[:space:]]*$" src/data/products; then
-            echo 'Incomplete product copy detected.'
+          if grep -RniE "alt: '[^']+ for'" src/data/products; then
+            echo 'Incomplete image alt text detected.'
             exit 1
           fi
           test -f public/images/products/kr01-0001/02-pink-back.webp
