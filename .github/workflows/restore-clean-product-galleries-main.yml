@@ -1,0 +1,86 @@
+name: Restore clean product galleries on main
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/restore-clean-product-galleries-main.yml
+
+permissions:
+  contents: write
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Restore clean catalogue galleries
+        shell: bash
+        run: |
+          git checkout 0c426cd7f3d88147efebbd27a07cb07e72d52f6a -- public/images/products src/data/products
+
+          for file in src/data/products/kr01-*.ts; do
+            perl -0pi -e "s/^\s*factoryCode:\s*.*\n//mg; s/^\s*factoryStyleNumber:\s*.*\n//mg; s/Factory style [A-Za-z0-9-]+ is/This product is/gi; s/,?\s*factory style [A-Za-z0-9-]+//gi; s/Supplier style [A-Za-z0-9-]+/KARUU product/gi; s/\n\s*sizeChart:\s*\{.*?\n\s*\},\n/\n/sg" "$file"
+          done
+
+          find public/images/products -type f \( -iname '*size-chart*' -o -iname '*size_chart*' -o -iname '*sizechart*' \) -delete
+
+      - name: Create English KR01-0012 detail graphics
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq imagemagick fonts-dejavu-core
+
+          convert public/images/products/kr01-0012/01-butter-yellow.jpg \
+            -resize '1400x2100^' -gravity center -extent 1400x2100 \
+            \( -size 1400x620 xc:'#173c5cdd' \) -gravity south -composite \
+            -font DejaVu-Sans-Bold -fill white -pointsize 66 -gravity southwest \
+            -annotate +90+430 'SEAMLESS KNIT CONSTRUCTION' \
+            -font DejaVu-Sans -pointsize 42 -fill '#f3f6f8' \
+            -annotate +90+330 'Smooth close-to-body fit' \
+            -annotate +90+255 'Four-way stretch' \
+            -annotate +90+180 'Breathable quick-dry fabric' \
+            -quality 92 public/images/products/kr01-0012/07-detail-seamless-knit.jpg
+
+          convert public/images/products/kr01-0012/02-light-pink.jpg \
+            -resize '1400x2100^' -gravity center -extent 1400x2100 \
+            \( -size 1400x620 xc:'#173c5cdd' \) -gravity south -composite \
+            -font DejaVu-Sans-Bold -fill white -pointsize 66 -gravity southwest \
+            -annotate +90+430 'PERFORMANCE FABRIC' \
+            -font DejaVu-Sans -pointsize 42 -fill '#f3f6f8' \
+            -annotate +90+330 'Moisture-wicking performance' \
+            -annotate +90+255 'Soft skin-friendly hand feel' \
+            -annotate +90+180 'Designed for yoga and training' \
+            -quality 92 public/images/products/kr01-0012/08-detail-fabric-stretch.jpg
+
+      - name: Validate and build
+        shell: bash
+        run: |
+          if grep -RniE 'factoryStyleNumber|factoryCode|Factory Style|Supplier Style|factory style|supplier style' src/app src/components src/data/products src/lib; then
+            echo 'Supplier identifier detected in public source.'
+            exit 1
+          fi
+          if find public/images/products -type f | grep -Ei 'size[-_]?chart|sizechart'; then
+            echo 'Source-language size chart still present.'
+            exit 1
+          fi
+          test -f public/images/products/kr01-0001/02-pink-back.webp
+          test -f public/images/products/kr01-0008/01-main.webp
+          test -f public/images/products/kr01-0011/08-detail-back-design.jpg
+          test -f public/images/products/kr01-0012/08-detail-fabric-stretch.jpg
+          npm ci
+          npm run build
+
+      - name: Commit repair
+        shell: bash
+        run: |
+          git config user.name 'KARUU Engineering'
+          git config user.email 'john@karuu.net'
+          git add public/images/products src/data/products
+          git commit -m 'Restore clean galleries and English product graphics'
+          git push origin HEAD:main
