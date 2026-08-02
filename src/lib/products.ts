@@ -19,6 +19,7 @@ export type {
   ProductSizeChart,
 } from '@/data/products';
 
+const supplierSubjectPattern = /^\s*factory\s+(?:style|model)(?:\s+(?:number|no\.?))?\s*[:#-]?\s*[a-z0-9-]+\b[,.]?\s*/i;
 const supplierReferencePattern = /\bfactory\s+(?:style|model)(?:\s+(?:number|no\.?))?\s*[:#-]?\s*[a-z0-9-]+\b[,.]?\s*/gi;
 const hanCharacterPattern = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/u;
 
@@ -29,10 +30,12 @@ function capitalizeFirstLetter(value: string): string {
 function removeSupplierReferences(value: string | undefined): string | undefined {
   if (!value) return value;
 
-  const cleaned = value
+  const withPublicSubject = supplierSubjectPattern.test(value)
+    ? value.replace(supplierSubjectPattern, 'This product ')
+    : value;
+  const cleaned = withPublicSubject
     .replace(supplierReferencePattern, '')
     .replace(/\s{2,}/g, ' ')
-    .replace(/^\s*is\s+/i, '')
     .trim();
 
   return capitalizeFirstLetter(cleaned);
