@@ -1,0 +1,169 @@
+name: Restore clean product galleries
+
+on:
+  push:
+    branches:
+      - fix/restore-clean-product-galleries
+    paths:
+      - .github/workflows/restore-clean-product-galleries.yml
+
+permissions:
+  contents: write
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out repair branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/restore-clean-product-galleries
+          fetch-depth: 0
+
+      - name: Restore verified catalogue assets from pre-cleanup release
+        shell: bash
+        run: |
+          git checkout 0c426cd7f3d88147efebbd27a07cb07e72d52f6a -- \
+            public/images/products \
+            src/data/products/index.ts \
+            src/data/products/kr01-0001.ts \
+            src/data/products/kr01-0002.ts \
+            src/data/products/kr01-0003.ts \
+            src/data/products/kr01-0004.ts \
+            src/data/products/kr01-0005.ts \
+            src/data/products/kr01-0006.ts \
+            src/data/products/kr01-0007.ts \
+            src/data/products/kr01-0008.ts \
+            src/data/products/kr01-0009.ts \
+            src/data/products/kr01-0010.ts \
+            src/data/products/kr01-0011.ts \
+            src/data/products/kr01-0012.ts
+
+      - name: Remove supplier identifiers and source-language size charts
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+
+          const dir = path.join(process.cwd(), 'src/data/products');
+          const files = fs.readdirSync(dir).filter((name) => /^kr01-\d{4}\.ts$/.test(name));
+
+          function findMatching(source, start, openChar, closeChar) {
+            let depth = 0;
+            let quote = null;
+            let escaped = false;
+            for (let i = start; i < source.length; i += 1) {
+              const char = source[i];
+              if (quote) {
+                if (escaped) escaped = false;
+                else if (char === '\\') escaped = true;
+                else if (char === quote) quote = null;
+                continue;
+              }
+              if (char === "'" || char === '"' || char === '`') {
+                quote = char;
+                continue;
+              }
+              if (char === openChar) depth += 1;
+              if (char === closeChar) {
+                depth -= 1;
+                if (depth === 0) return i;
+              }
+            }
+            throw new Error(`Unmatched ${openChar}`);
+          }
+
+          function removeObjectProperty(source, propertyName) {
+            const pattern = new RegExp(`\\n\\s*${propertyName}:\\s*\\{`, 'm');
+            const match = pattern.exec(source);
+            if (!match) return source;
+            const propertyStart = match.index;
+            const objectStart = source.indexOf('{', match.index);
+            const objectEnd = findMatching(source, objectStart, '{', '}');
+            let end = objectEnd + 1;
+            while (end < source.length && /[ \t]/.test(source[end])) end += 1;
+            if (source[end] === ',') end += 1;
+            if (source[end] === '\r') end += 1;
+            if (source[end] === '\n') end += 1;
+            return source.slice(0, propertyStart) + '\n' + source.slice(end);
+          }
+
+          for (const name of files) {
+            const filePath = path.join(dir, name);
+            let source = fs.readFileSync(filePath, 'utf8');
+            source = source
+              .replace(/^\s*factoryCode:\s*.*\r?\n/gm, '')
+              .replace(/^\s*factoryStyleNumber:\s*.*\r?\n/gm, '')
+              .replace(/Factory style [A-Za-z0-9-]+ is/gi, 'This product is')
+              .replace(/,?\s*factory style [A-Za-z0-9-]+/gi, '')
+              .replace(/factory style [A-Za-z0-9-]+/gi, 'this product')
+              .replace(/Supplier style [A-Za-z0-9-]+/gi, 'KARUU product')
+              .replace(/supplier style [A-Za-z0-9-]+/gi, 'KARUU product');
+            source = removeObjectProperty(source, 'sizeChart');
+            fs.writeFileSync(filePath, source, 'utf8');
+          }
+          NODE
+
+          find public/images/products -type f \( -iname '*size-chart*' -o -iname '*size_chart*' -o -iname '*sizechart*' \) -delete
+
+      - name: Replace Chinese KR01-0012 detail graphics with English editions
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq imagemagick fonts-dejavu-core
+
+          convert public/images/products/kr01-0012/01-butter-yellow.jpg \
+            -resize '1400x2100^' -gravity center -extent 1400x2100 \
+            \( -size 1400x620 xc:'#173c5cdd' \) -gravity south -composite \
+            -font DejaVu-Sans-Bold -fill white -pointsize 66 -gravity southwest \
+            -annotate +90+430 'SEAMLESS KNIT CONSTRUCTION' \
+            -font DejaVu-Sans -pointsize 42 -fill '#f3f6f8' \
+            -annotate +90+330 'Smooth close-to-body fit' \
+            -annotate +90+255 'Four-way stretch' \
+            -annotate +90+180 'Breathable quick-dry fabric' \
+            -quality 92 public/images/products/kr01-0012/07-detail-seamless-knit.jpg
+
+          convert public/images/products/kr01-0012/02-light-pink.jpg \
+            -resize '1400x2100^' -gravity center -extent 1400x2100 \
+            \( -size 1400x620 xc:'#173c5cdd' \) -gravity south -composite \
+            -font DejaVu-Sans-Bold -fill white -pointsize 66 -gravity southwest \
+            -annotate +90+430 'PERFORMANCE FABRIC' \
+            -font DejaVu-Sans -pointsize 42 -fill '#f3f6f8' \
+            -annotate +90+330 'Moisture-wicking performance' \
+            -annotate +90+255 'Soft skin-friendly hand feel' \
+            -annotate +90+180 'Designed for yoga and training' \
+            -quality 92 public/images/products/kr01-0012/08-detail-fabric-stretch.jpg
+
+      - name: Validate public catalogue safety
+        shell: bash
+        run: |
+          if grep -RniE 'factoryStyleNumber|factoryCode|Factory Style|Supplier Style|factory style|supplier style' src/app src/components src/data/products src/lib; then
+            echo 'Public supplier identifier detected.'
+            exit 1
+          fi
+
+          if find public/images/products -type f | grep -Ei 'size[-_]?chart|sizechart'; then
+            echo 'Source-language size chart asset still present.'
+            exit 1
+          fi
+
+          test -f public/images/products/kr01-0011/08-detail-back-design.jpg
+          test -f public/images/products/kr01-0012/06-slate-gray.jpg
+          test -f public/images/products/kr01-0012/07-detail-seamless-knit.jpg
+          test -f public/images/products/kr01-0012/08-detail-fabric-stretch.jpg
+
+      - name: Build
+        run: |
+          npm ci
+          npm run build
+
+      - name: Commit restored professional galleries
+        shell: bash
+        run: |
+          git config user.name 'KARUU Engineering'
+          git config user.email 'john@karuu.net'
+          git add public/images/products src/data/products
+          git commit -m 'Restore clean galleries and add English product graphics'
+          git push origin HEAD:fix/restore-clean-product-galleries
