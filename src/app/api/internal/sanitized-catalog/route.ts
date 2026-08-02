@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { products, type Product, type ProductImage } from '@/data/products';
 
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 const supplierSubjectPattern = /^\s*factory\s+(?:style|model)(?:\s+(?:number|no\.?))?\s*[:#-]?\s*[a-z0-9-]+\b[,.]?\s*/i;
 const supplierReferencePattern = /\bfactory\s+(?:style|model)(?:\s+(?:number|no\.?))?\s*[:#-]?\s*[a-z0-9-]+\b[,.]?\s*/gi;
