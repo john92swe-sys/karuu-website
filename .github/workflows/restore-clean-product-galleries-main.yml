@@ -28,7 +28,7 @@ jobs:
             src/data/products
 
           for file in src/data/products/kr01-*.ts; do
-            perl -0pi -e "s/^\s*factoryCode:\s*.*\n//mg; s/^\s*factoryStyleNumber:\s*.*\n//mg; s/Factory style [A-Za-z0-9-]+ is/This product is/gi; s/,?\s*factory style [A-Za-z0-9-]+//gi; s/Supplier style [A-Za-z0-9-]+/KARUU product/gi; s/\n\s*sizeChart:\s*\{.*?\n\s*\},\n/\n/sg" "$file"
+            perl -0pi -e "s/^\s*factoryCode:\s*.*\n//mg; s/^\s*factoryStyleNumber:\s*.*\n//mg; s/Factory style [A-Za-z0-9-]+ is/This product is/gi; s/,?\s*factory style [A-Za-z0-9-]+//gi; s/Supplier style [A-Za-z0-9-]+/KARUU product/gi; s/alt: '([^']+) for',/alt: '\$1 for this KARUU product',/g; s/description:\n\s*'\s+combines/description:\n    'This product combines/gi; s/\n\s*sizeChart:\s*\{.*?\n\s*\},\n/\n/sg" "$file"
           done
           perl -0pi -e "s/^\s*factoryCode:\s*string;\s*\n//mg; s/^\s*factoryStyleNumber:\s*string;\s*\n//mg" src/data/products/types.ts
 
@@ -106,6 +106,10 @@ jobs:
           fi
           if find public -type f | grep -P '[\x{3400}-\x{4DBF}\x{4E00}-\x{9FFF}\x{F900}-\x{FAFF}]'; then
             echo 'Public asset path containing Chinese characters detected.'
+            exit 1
+          fi
+          if grep -RniE "alt: '[^']+ for'|description:[[:space:]]*$" src/data/products; then
+            echo 'Incomplete product copy detected.'
             exit 1
           fi
           test -f public/images/products/kr01-0001/02-pink-back.webp
