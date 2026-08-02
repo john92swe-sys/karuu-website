@@ -79,14 +79,14 @@ export const kr010011: Product = {
     },
     {
       src: `${imageBase}/07-detail-removable-pads.jpg`,
-      alt: 'Removable pad and support detail for',
+      alt: 'Removable pad and support detail for this KARUU product',
       width: 1400,
       height: 1866,
       kind: 'detail',
     },
     {
       src: `${imageBase}/08-detail-back-design.jpg`,
-      alt: 'Open-back halter design detail for',
+      alt: 'Open-back halter design detail for this KARUU product',
       width: 1400,
       height: 1400,
       kind: 'detail',

@@ -14,7 +14,7 @@ export const kr010010: Product = {
   shortDescription:
     'Lightweight high-waist flared yoga pants with ruched shaping and two buttoned back cargo pockets.',
   description:
-    ' combines lightweight stretch fabric with a high-rise waist, rear ruched shaping, two buttoned back pockets, and a flared-leg silhouette. The supplied specification lists 80% polyester and 20% elastane, with sizes S to XL. Designed for yoga, exercise, daily wear, and loungewear.',
+    'This product combines lightweight stretch fabric with a high-rise waist, rear ruched shaping, two buttoned back pockets, and a flared-leg silhouette. The supplied specification lists 80% polyester and 20% elastane, with sizes S to XL. Designed for yoga, exercise, daily wear, and loungewear.',
   features: [
     'High-rise waistband with tummy support',
     'Rear ruched shaping detail',
@@ -78,14 +78,14 @@ export const kr010010: Product = {
     },
     {
       src: `${imageBase}/07-detail-pockets.jpg`,
-      alt: 'Buttoned back pocket and ruched shaping detail for',
+      alt: 'Buttoned back pocket and ruched shaping detail for this KARUU product',
       width: 1200,
       height: 1600,
       kind: 'detail',
     },
     {
       src: `${imageBase}/08-detail-fabric.jpg`,
-      alt: 'Lightweight stretch fabric detail for',
+      alt: 'Lightweight stretch fabric detail for this KARUU product',
       width: 1200,
       height: 1600,
       kind: 'detail',

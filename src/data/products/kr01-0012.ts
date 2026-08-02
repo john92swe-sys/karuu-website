@@ -78,14 +78,14 @@ export const kr010012: Product = {
     },
     {
       src: `${imageBase}/07-detail-seamless-knit.jpg`,
-      alt: 'Seamless knit construction detail for',
+      alt: 'Seamless knit construction detail for this KARUU product',
       width: 1400,
       height: 2100,
       kind: 'detail',
     },
     {
       src: `${imageBase}/08-detail-fabric-stretch.jpg`,
-      alt: 'Four-way stretch fabric detail for',
+      alt: 'Four-way stretch fabric detail for this KARUU product',
       width: 1400,
       height: 2100,
       kind: 'detail',
