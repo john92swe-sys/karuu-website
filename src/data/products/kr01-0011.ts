@@ -1,0 +1,105 @@
+import type { Product } from './types';
+
+const imageBase = '/images/products/kr01-0011';
+
+export const kr010011: Product = {
+  slug: 'kr01-0011',
+  sku: 'KR01-0011',
+  name: "Women's French Halter Active Top",
+  shortName: 'French Halter Active Top',
+  category: 'yoga-tops',
+  categoryLabel: 'Yoga Tops',
+  categoryPath: ['Women', 'Activewear', 'Yoga Tops'],
+  collection: 'KARUU Active',
+  shortDescription:
+    'Cropped halter active top with removable pads, an open-back silhouette, and soft four-way stretch fabric.',
+  description:
+    'This product is a cropped halter active top made from 90% polyamide and 10% elastane. The design combines a halter neckline, open back, removable breathable pads, widened side panels, and a close fit for yoga, gym training, running, and everyday styling.',
+  features: [
+    '90% polyamide and 10% elastane',
+    'Four-way stretch',
+    'Soft and lightweight hand feel',
+    'Breathable construction',
+    'Halter neckline',
+    'Open-back design',
+    'Removable breathable pads',
+    'Widened side panels',
+    'Cropped slim fit',
+  ],
+  applications: ['Yoga', 'Gym training', 'Running', 'Daily active styling'],
+  colors: [],
+  sizes: ['S', 'M', 'L', 'XL'],
+  material: '90% polyamide, 10% elastane',
+  fit: 'Cropped slim fit',
+  customization: ['Custom color development subject to order review'],
+  moq: '300 pieces per color for custom color orders',
+  packaging: 'Individual poly bag',
+  gallery: [
+    {
+      src: `${imageBase}/01-butter-yellow.jpg`,
+      alt: "Butter yellow women's French halter active top",
+      width: 1400,
+      height: 1400,
+      kind: 'model',
+    },
+    {
+      src: `${imageBase}/02-grape.jpg`,
+      alt: "Grape women's French halter active top",
+      width: 1400,
+      height: 1400,
+      kind: 'model',
+    },
+    {
+      src: `${imageBase}/03-cornflower-blue.jpg`,
+      alt: "Cornflower blue women's French halter active top",
+      width: 1400,
+      height: 1400,
+      kind: 'model',
+    },
+    {
+      src: `${imageBase}/04-pearl-pink.jpg`,
+      alt: "Pearl pink women's French halter active top",
+      width: 1400,
+      height: 1400,
+      kind: 'model',
+    },
+    {
+      src: `${imageBase}/05-black.jpg`,
+      alt: "Black women's French halter active top",
+      width: 1400,
+      height: 1400,
+      kind: 'model',
+    },
+    {
+      src: `${imageBase}/06-merlot.jpg`,
+      alt: "Merlot women's French halter active top",
+      width: 1400,
+      height: 1400,
+      kind: 'model',
+    },
+    {
+      src: `${imageBase}/07-detail-removable-pads.jpg`,
+      alt: 'Removable pad and support detail for',
+      width: 1400,
+      height: 1866,
+      kind: 'detail',
+    },
+    {
+      src: `${imageBase}/08-detail-back-design.jpg`,
+      alt: 'Open-back halter design detail for',
+      width: 1400,
+      height: 1400,
+      kind: 'detail',
+    },
+  ],
+  documents: [],
+  seo: {
+    title: "Women's French Halter Active Top | KR01-0011",
+    description:
+      'Explore KARUU KR01-0011, a cropped French halter active top with removable pads and four-way stretch for B2B sourcing and OEM/ODM discussions.',
+    canonical: '/products/kr01-0011',
+  },
+  relatedProducts: ['kr01-0001'],
+  featured: false,
+  published: true,
+};
