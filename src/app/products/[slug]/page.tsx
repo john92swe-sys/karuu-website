@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
@@ -66,7 +65,6 @@ function StructuredData({ product }: { product: Product }) {
     '@id': `${siteUrl}/products/${product.slug}#product`,
     name: product.name,
     sku: product.sku,
-    model: product.factoryStyleNumber,
     url: `${siteUrl}/products/${product.slug}`,
     description: product.shortDescription,
     image: product.gallery.map((image) => `${siteUrl}${image.src}`),
@@ -81,12 +79,7 @@ function StructuredData({ product }: { product: Product }) {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Home',
-        item: siteUrl,
-      },
+      { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
       {
         '@type': 'ListItem',
         position: 2,
@@ -151,7 +144,7 @@ export default function ProductDetailPage({ params }: PageProps) {
   if (!product) notFound();
 
   const whatsappMessage = encodeURIComponent(
-    `Hello KARUU, I would like to inquire about ${product.name} (${product.sku}, factory style ${product.factoryStyleNumber}).`
+    `Hello KARUU, I would like to inquire about ${product.name} (${product.sku}).`
   );
   const whatsappUrl = `https://wa.me/46708802017?text=${whatsappMessage}`;
   const procurementSummary = [
@@ -176,7 +169,7 @@ export default function ProductDetailPage({ params }: PageProps) {
         />
 
         <section className="mt-8 grid items-start gap-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(360px,0.75fr)] lg:gap-14">
-          <ProductGallery images={product.gallery} colors={product.colors} />
+          <ProductGallery images={product.gallery} colors={[]} />
 
           <div className="min-w-0 lg:sticky lg:top-24 lg:self-start">
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-secondary">
@@ -188,10 +181,7 @@ export default function ProductDetailPage({ params }: PageProps) {
 
             <div className="mt-5 flex flex-wrap gap-2 text-sm">
               <span className="rounded-full bg-primary-50 px-3 py-1.5 font-semibold text-primary">
-                SKU {product.sku}
-              </span>
-              <span className="rounded-full border border-stone-200 bg-white px-3 py-1.5 font-medium text-stone-700">
-                Factory Style {product.factoryStyleNumber}
+                KARUU SKU {product.sku}
               </span>
             </div>
 
@@ -249,11 +239,6 @@ export default function ProductDetailPage({ params }: PageProps) {
           <a href="#specifications" className="rounded-full px-4 py-2 text-sm font-semibold text-primary hover:bg-primary-50">
             Specifications
           </a>
-          {product.sizeChart && (
-            <a href="#size-guide" className="rounded-full px-4 py-2 text-sm font-semibold text-primary hover:bg-primary-50">
-              Size Guide
-            </a>
-          )}
           <a href="#inquiry" className="rounded-full px-4 py-2 text-sm font-semibold text-primary hover:bg-primary-50">
             Request Quote
           </a>
@@ -337,43 +322,6 @@ export default function ProductDetailPage({ params }: PageProps) {
             </div>
           </div>
         </section>
-
-        {product.sizeChart && (
-          <section id="size-guide" className="scroll-mt-24 py-16 md:py-20">
-            <div className="grid items-center gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:gap-16">
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent">
-                  Size Guide
-                </p>
-                <h2 className="mt-3 text-3xl font-bold text-primary">
-                  {product.sku} size chart
-                </h2>
-                <p className="mt-4 text-base leading-7 text-stone-700">
-                  The source chart is retained without rewriting uncertain measurements. Open
-                  the full image when preparing your size breakdown.
-                </p>
-              </div>
-              <a
-                href={product.sizeChart.image}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block overflow-hidden rounded-2xl border border-stone-200 bg-white p-4 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
-                aria-label="Open full size chart in a new tab"
-              >
-                <Image
-                  src={product.sizeChart.image}
-                  alt={product.sizeChart.alt}
-                  width={product.sizeChart.width}
-                  height={product.sizeChart.height}
-                  className="h-auto w-full"
-                />
-                <span className="mt-3 block text-center text-sm font-semibold text-secondary">
-                  Open full size chart
-                </span>
-              </a>
-            </div>
-          </section>
-        )}
 
         <section className="border-t border-stone-200 py-16 md:py-20">
           <div className="text-center">
