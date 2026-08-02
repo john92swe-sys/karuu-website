@@ -20,10 +20,8 @@ export function ProductInquiryForm({ product }: ProductInquiryFormProps) {
             <dd className="mt-1 font-semibold text-primary">{product.shortName}</dd>
           </div>
           <div>
-            <dt className="text-stone-600">KARUU SKU / Factory Style</dt>
-            <dd className="mt-1 font-semibold text-primary">
-              {product.sku} / {product.factoryStyleNumber}
-            </dd>
+            <dt className="text-stone-600">KARUU SKU</dt>
+            <dd className="mt-1 font-semibold text-primary">{product.sku}</dd>
           </div>
         </dl>
       </div>
@@ -31,7 +29,6 @@ export function ProductInquiryForm({ product }: ProductInquiryFormProps) {
       <input type="hidden" name="formType" value="product-quote" />
       <input type="hidden" name="productSku" value={product.sku} />
       <input type="hidden" name="productName" value={product.name} />
-      <input type="hidden" name="factoryStyle" value={product.factoryStyleNumber} />
 
       <fieldset>
         <legend className="text-lg font-semibold text-primary">1. Contact and order overview</legend>
@@ -116,19 +113,6 @@ export function ProductInquiryForm({ product }: ProductInquiryFormProps) {
         </p>
 
         <div className="mt-5 grid gap-5 md:grid-cols-2">
-          {product.colors.length > 0 && (
-            <label className="text-sm font-semibold text-primary">
-              Selected Color
-              <select className={inputClassName} name="selectedColor" defaultValue="">
-                <option value="">To discuss</option>
-                {product.colors.map((color) => (
-                  <option key={color.name} value={color.name}>
-                    {color.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
           <label className="text-sm font-semibold text-primary">
             Number of Colors
             <input className={inputClassName} name="numberOfColors" inputMode="numeric" />

@@ -7,7 +7,6 @@ const inquiryEmail = 'john@karuu.net';
 const fieldLabels: Record<string, string> = {
   productSku: 'Product SKU',
   productName: 'Product Name',
-  factoryStyle: 'Factory Style',
   inquiryType: 'Inquiry Type',
   companyName: 'Company Name',
   contactName: 'Contact Name',
