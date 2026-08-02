@@ -4,7 +4,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Menu, X, ChevronDown } from 'lucide-react';
-import { categoryLabels, type ProductCategory } from '@/lib/products';
+
+type PublicProductCategory =
+  | 'yoga-leggings'
+  | 'sports-bra'
+  | 'yoga-shorts'
+  | 'yoga-tops'
+  | 'outerwear-jackets';
 
 const navItems = [
   { href: '/', label: 'Home' },
@@ -16,12 +22,12 @@ const navItems = [
   { href: '/contact', label: 'Contact', cta: true },
 ];
 
-const productCategories: { slug: ProductCategory; label: string }[] = [
-  { slug: 'yoga-leggings', label: categoryLabels['yoga-leggings'] },
-  { slug: 'sports-bra', label: categoryLabels['sports-bra'] },
-  { slug: 'yoga-shorts', label: categoryLabels['yoga-shorts'] },
-  { slug: 'yoga-tops', label: categoryLabels['yoga-tops'] },
-  { slug: 'outerwear-jackets', label: categoryLabels['outerwear-jackets'] },
+const productCategories: { slug: PublicProductCategory; label: string }[] = [
+  { slug: 'yoga-leggings', label: 'Yoga Leggings' },
+  { slug: 'sports-bra', label: 'Sports Bras' },
+  { slug: 'yoga-shorts', label: 'Yoga Shorts' },
+  { slug: 'yoga-tops', label: 'Yoga Tops' },
+  { slug: 'outerwear-jackets', label: 'Outerwear & Jackets' },
 ];
 
 export function Navbar() {
