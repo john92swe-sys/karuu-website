@@ -7,4 +7,4 @@ jobs:
   noop:
     runs-on: ubuntu-latest
     steps:
-      - run: echo 'Gallery repair is executed by the protected pull-request workflow on main.'
+      - run: echo 'Gallery repair validation cycle 4.'
