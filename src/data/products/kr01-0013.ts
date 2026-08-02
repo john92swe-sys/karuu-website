@@ -137,5 +137,5 @@ export const kr010013: Product = {
   },
   relatedProducts: ['kr01-0011', 'kr01-0012', 'kr01-0006'],
   featured: false,
-  published: false,
+  published: true,
 };
