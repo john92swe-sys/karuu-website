@@ -112,7 +112,7 @@ jobs:
           test -f public/images/products/kr01-0008/01-aqua-print.jpg
           test -f public/images/products/kr01-0011/08-detail-back-design.jpg
           test -f public/images/products/kr01-0012/08-detail-fabric-stretch.jpg
-          npm ci
+          npm install --no-audit --no-fund
           npm run build
 
       - name: Commit repair to pull-request branch
