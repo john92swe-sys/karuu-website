@@ -22,7 +22,10 @@ jobs:
       - name: Restore clean catalogue galleries
         shell: bash
         run: |
-          git checkout 0c426cd7f3d88147efebbd27a07cb07e72d52f6a -- public/images/products src/data/products
+          git checkout 0c426cd7f3d88147efebbd27a07cb07e72d52f6a -- \
+            public/images/products \
+            public/products/KR01-0008/source \
+            src/data/products
 
           for file in src/data/products/kr01-*.ts; do
             perl -0pi -e "s/^\s*factoryCode:\s*.*\n//mg; s/^\s*factoryStyleNumber:\s*.*\n//mg; s/Factory style [A-Za-z0-9-]+ is/This product is/gi; s/,?\s*factory style [A-Za-z0-9-]+//gi; s/Supplier style [A-Za-z0-9-]+/KARUU product/gi; s/\n\s*sizeChart:\s*\{.*?\n\s*\},\n/\n/sg" "$file"
@@ -30,6 +33,37 @@ jobs:
           perl -0pi -e "s/^\s*factoryCode:\s*string;\s*\n//mg; s/^\s*factoryStyleNumber:\s*string;\s*\n//mg; s/^\s*sizeChart\?:\s*ProductSizeChart;\s*\n//mg" src/data/products/types.ts
 
           find public/images/products -type f \( -iname '*size-chart*' -o -iname '*size_chart*' -o -iname '*sizechart*' \) -delete
+
+      - name: Publish KR01-0008 under English asset paths
+        shell: bash
+        run: |
+          mkdir -p public/images/products/kr01-0008
+          cp 'public/products/KR01-0008/source/color-blue/绿色 (1).jpg' \
+            public/images/products/kr01-0008/01-aqua-print.jpg
+          cp 'public/products/KR01-0008/source/color-black-leopard/黑色豹纹 (1).jpg' \
+            public/images/products/kr01-0008/02-black-leopard.jpg
+          cp 'public/products/KR01-0008/source/color-pastel-leopard/灰色 (1).jpg' \
+            public/images/products/kr01-0008/03-pastel-print.jpg
+          cp 'public/products/KR01-0008/source/color-pink/粉 (1).jpg' \
+            public/images/products/kr01-0008/04-pink-print.jpg
+          cp 'public/products/KR01-0008/source/color-polka-dot/波点 (1).jpg' \
+            public/images/products/kr01-0008/05-polka-dot.jpg
+
+          node <<'NODE'
+          const fs = require('fs');
+          const file = 'src/data/products/kr01-0008.ts';
+          let source = fs.readFileSync(file, 'utf8');
+          source = source
+            .replace("const imageBase = '/products/KR01-0008/source';", "const imageBase = '/images/products/kr01-0008';")
+            .replace("${imageBase}/color-blue/绿色 (1).jpg", "${imageBase}/01-aqua-print.jpg")
+            .replace("${imageBase}/color-black-leopard/黑色豹纹 (1).jpg", "${imageBase}/02-black-leopard.jpg")
+            .replace("${imageBase}/color-pastel-leopard/灰色 (1).jpg", "${imageBase}/03-pastel-print.jpg")
+            .replace("${imageBase}/color-pink/粉 (1).jpg", "${imageBase}/04-pink-print.jpg")
+            .replace("${imageBase}/color-polka-dot/波点 (1).jpg", "${imageBase}/05-polka-dot.jpg");
+          fs.writeFileSync(file, source);
+          NODE
+
+          rm -rf public/products/KR01-0008
 
       - name: Create English KR01-0012 detail graphics
         shell: bash
@@ -66,12 +100,16 @@ jobs:
             echo 'Supplier identifier detected in public source.'
             exit 1
           fi
-          if find public/images/products -type f | grep -Ei 'size[-_]?chart|sizechart'; then
+          if find public -type f | grep -Ei 'size[-_]?chart|sizechart'; then
             echo 'Source-language size chart still present.'
             exit 1
           fi
+          if find public -type f | grep -P '[\x{3400}-\x{4DBF}\x{4E00}-\x{9FFF}\x{F900}-\x{FAFF}]'; then
+            echo 'Public asset path containing Chinese characters detected.'
+            exit 1
+          fi
           test -f public/images/products/kr01-0001/02-pink-back.webp
-          test -f public/images/products/kr01-0008/01-main.webp
+          test -f public/images/products/kr01-0008/01-aqua-print.jpg
           test -f public/images/products/kr01-0011/08-detail-back-design.jpg
           test -f public/images/products/kr01-0012/08-detail-fabric-stretch.jpg
           npm ci
@@ -86,6 +124,6 @@ jobs:
           fi
           git config user.name 'KARUU Engineering'
           git config user.email 'john@karuu.net'
-          git add public/images/products src/data/products
+          git add public src/data/products
           git commit -m 'Restore clean galleries and English product graphics'
           git push origin HEAD:${{ github.event.pull_request.head.ref }}
