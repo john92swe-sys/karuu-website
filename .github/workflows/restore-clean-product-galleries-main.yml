@@ -27,6 +27,7 @@ jobs:
           for file in src/data/products/kr01-*.ts; do
             perl -0pi -e "s/^\s*factoryCode:\s*.*\n//mg; s/^\s*factoryStyleNumber:\s*.*\n//mg; s/Factory style [A-Za-z0-9-]+ is/This product is/gi; s/,?\s*factory style [A-Za-z0-9-]+//gi; s/Supplier style [A-Za-z0-9-]+/KARUU product/gi; s/\n\s*sizeChart:\s*\{.*?\n\s*\},\n/\n/sg" "$file"
           done
+          perl -0pi -e "s/^\s*factoryCode:\s*string;\s*\n//mg; s/^\s*factoryStyleNumber:\s*string;\s*\n//mg; s/^\s*sizeChart\?:\s*ProductSizeChart;\s*\n//mg" src/data/products/types.ts
 
           find public/images/products -type f \( -iname '*size-chart*' -o -iname '*size_chart*' -o -iname '*sizechart*' \) -delete
 
