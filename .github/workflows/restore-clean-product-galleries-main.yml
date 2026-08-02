@@ -1,23 +1,23 @@
-name: Restore clean product galleries on main
+name: Restore clean product galleries
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/restore-clean-product-galleries-main.yml
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
 
 jobs:
   restore:
+    if: github.event.pull_request.head.ref == 'fix/restore-clean-product-galleries'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Restore clean catalogue galleries
         shell: bash
@@ -76,11 +76,15 @@ jobs:
           npm ci
           npm run build
 
-      - name: Commit repair
+      - name: Commit repair to pull-request branch
         shell: bash
         run: |
+          if git diff --quiet; then
+            echo 'Gallery restoration is already applied.'
+            exit 0
+          fi
           git config user.name 'KARUU Engineering'
           git config user.email 'john@karuu.net'
           git add public/images/products src/data/products
           git commit -m 'Restore clean galleries and English product graphics'
-          git push origin HEAD:main
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
