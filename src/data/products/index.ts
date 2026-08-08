@@ -11,6 +11,8 @@ import { kr010010 } from './kr01-0010';
 import { kr010011 } from './kr01-0011';
 import { kr010012 } from './kr01-0012';
 import { kr010013 } from './kr01-0013';
+import { kr010014 } from './kr01-0014';
+import { kr010015 } from './kr01-0015';
 import type { Product, ProductCategory } from './types';
 
 export type {
@@ -38,6 +40,8 @@ export const products: Product[] = [
   kr010011,
   kr010012,
   kr010013,
+  kr010014,
+  kr010015,
 ];
 
 export const categoryLabels: Record<ProductCategory, string> = {
