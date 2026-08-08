@@ -126,14 +126,6 @@ export const kr010003: Product = {
       kind: 'product',
       color: 'Pink',
     },
-    {
-      src: `${imageBase}/11-red-pocket-detail.webp`,
-      alt: "Red women's biker shorts showing side and back pockets",
-      width: 1206,
-      height: 1197,
-      kind: 'detail',
-      color: 'Red',
-    },
   ],
   documents: [],
   seo: {

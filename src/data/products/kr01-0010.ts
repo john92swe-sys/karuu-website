@@ -76,20 +76,6 @@ export const kr010010: Product = {
       height: 1600,
       kind: 'model',
     },
-    {
-      src: `${imageBase}/07-detail-pockets.jpg`,
-      alt: 'Buttoned back pocket and ruched shaping detail for this KARUU product',
-      width: 1200,
-      height: 1600,
-      kind: 'detail',
-    },
-    {
-      src: `${imageBase}/08-detail-fabric.jpg`,
-      alt: 'Lightweight stretch fabric detail for this KARUU product',
-      width: 1200,
-      height: 1600,
-      kind: 'detail',
-    },
   ],
   documents: [],
   seo: {

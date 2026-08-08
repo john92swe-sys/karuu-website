@@ -74,20 +74,6 @@ export const kr010009: Product = {
       height: 1114,
       kind: 'model',
     },
-    {
-      src: `${imageBase}/07-detail-hip-seam.jpg`,
-      alt: 'Heart-shaped back seam detail for this KARUU product',
-      width: 790,
-      height: 866,
-      kind: 'detail',
-    },
-    {
-      src: `${imageBase}/08-detail-fabric.jpg`,
-      alt: 'Brushed stretch fabric detail for this KARUU product',
-      width: 750,
-      height: 777,
-      kind: 'detail',
-    },
   ],
   documents: [],
   seo: {
