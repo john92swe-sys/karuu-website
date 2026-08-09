@@ -7,6 +7,7 @@ export type ProductCategory =
   | 'activewear-sets'
   | 'biker-shorts'
   | 'tennis-dresses'
+  | 'tennis-skirts'
   | 'active-rompers';
 
 export type ProductImageKind =
