@@ -14,7 +14,7 @@ import { kr010013 } from './kr01-0013';
 import { kr010014 } from './kr01-0014';
 import { kr010015 } from './kr01-0015';
 
-// Supplier 2 public catalogue batch: KR02-0001 through KR02-0040.
+// Supplier 2 public catalogue batch: KR02-0001 through KR02-0040 (preview validation).
 import {
   kr020001, kr020002, kr020003, kr020004, kr020005, kr020006, kr020007, kr020008,
   kr020009, kr020010, kr020011, kr020012, kr020013, kr020014, kr020015, kr020016,
