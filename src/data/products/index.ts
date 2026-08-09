@@ -14,13 +14,13 @@ import { kr010013 } from './kr01-0013';
 import { kr010014 } from './kr01-0014';
 import { kr010015 } from './kr01-0015';
 
-// Supplier 2 public catalogue batch: KR02-0001 through KR02-0040 (preview validation).
+// Supplier 2 curated public catalogue V2: KR02-0001 through KR02-0036.
 import {
   kr020001, kr020002, kr020003, kr020004, kr020005, kr020006, kr020007, kr020008,
   kr020009, kr020010, kr020011, kr020012, kr020013, kr020014, kr020015, kr020016,
   kr020017, kr020018, kr020019, kr020020, kr020021, kr020022, kr020023, kr020024,
   kr020025, kr020026, kr020027, kr020028, kr020029, kr020030, kr020031, kr020032,
-  kr020033, kr020034, kr020035, kr020036, kr020037, kr020038, kr020039, kr020040,
+  kr020033, kr020034, kr020035, kr020036,
 } from './kr02-batch';
 import type { Product, ProductCategory } from './types';
 
@@ -87,10 +87,6 @@ export const products: Product[] = [
   kr020034,
   kr020035,
   kr020036,
-  kr020037,
-  kr020038,
-  kr020039,
-  kr020040,
 ];
 
 export const categoryLabels: Record<ProductCategory, string> = {
