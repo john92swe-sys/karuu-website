@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "prebuild": "npm run check:public-safety",
     "dev": "next dev",
     "build": "next build",
+    "check:public-safety": "node scripts/check-public-product-safety.mjs",
     "start": "next start",
     "lint": "next lint"
   },

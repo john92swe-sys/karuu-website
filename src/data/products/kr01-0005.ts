@@ -27,9 +27,9 @@ export const kr010005: Product = {
   applications: ['Tennis', 'Pickleball', 'Golf', 'Yoga', 'Fitness', 'Everyday wear'],
   colors: [
     { name: 'White', hex: '#f4f3ef', imageIndex: 0 },
-    { name: 'Red', hex: '#b7212d', imageIndex: 4 },
-    { name: 'Navy', hex: '#172647', imageIndex: 7 },
-    { name: 'Black', hex: '#1b1b1b', imageIndex: 10 },
+    { name: 'Red', hex: '#b7212d', imageIndex: 3 },
+    { name: 'Navy', hex: '#172647', imageIndex: 6 },
+    { name: 'Black', hex: '#1b1b1b', imageIndex: 9 },
   ],
   sizes: ['XS', 'S', 'M', 'L'],
   material: '100% Polyester',
@@ -58,14 +58,6 @@ export const kr010005: Product = {
       width: 800,
       height: 800,
       kind: 'product',
-      color: 'White',
-    },
-    {
-      src: `${imageBase}/03-white-front-back.webp`,
-      alt: 'White sleeveless polo tennis dress, front and back views',
-      width: 800,
-      height: 800,
-      kind: 'model',
       color: 'White',
     },
     {
