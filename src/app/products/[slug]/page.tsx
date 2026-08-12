@@ -14,6 +14,7 @@ import { Breadcrumb } from '@/components/breadcrumb';
 import { ProductGallery } from '@/components/product-gallery';
 import { ProductInquiryForm } from '@/components/product-inquiry-form';
 import { getAllProducts, getProductBySlug, type Product } from '@/lib/products';
+import { formatProductMetadataTitle } from '@/lib/product-metadata-title.mjs';
 
 interface PageProps {
   params: { slug: string };
@@ -27,16 +28,17 @@ export function generateStaticParams() {
 
 export function generateMetadata({ params }: PageProps): Metadata {
   const product = getProductBySlug(params.slug);
-  if (!product) return { title: 'Product Not Found | KARUU' };
+  if (!product) return { title: { absolute: 'Product Not Found | KARUU' } };
 
   const mainImage = product.gallery[0];
+  const pageTitle = formatProductMetadataTitle(product.seo.title);
 
   return {
-    title: product.seo.title,
+    title: { absolute: pageTitle },
     description: product.seo.description,
     alternates: { canonical: product.seo.canonical },
     openGraph: {
-      title: product.seo.title,
+      title: pageTitle,
       description: product.seo.description,
       url: product.seo.canonical,
       type: 'website',
@@ -51,7 +53,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
     },
     twitter: {
       card: 'summary_large_image',
-      title: product.seo.title,
+      title: pageTitle,
       description: product.seo.description,
       images: [mainImage.src],
     },
