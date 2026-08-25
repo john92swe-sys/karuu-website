@@ -42,7 +42,8 @@ test('product inquiry carries buyer and product context', () => {
   for (const field of ['productSku', 'productName', 'productSlug', 'companyName', 'countryRegion', 'estimatedQuantity', 'brandingRequirement', 'targetLaunchDate', 'businessEmail']) {
     assert.match(inquirySource, new RegExp(`name=\\"${field}\\"`), field);
   }
-  assert.match(inquirySource, /name="productSku" defaultValue=\{product\.sku\}/);
-  assert.match(inquirySource, /name="productName" defaultValue=\{product\.name\}/);
-  assert.match(inquirySource, /name="productSlug" defaultValue=\{product\.slug\}/);
+  assert.match(inquirySource, /name="productSku"\s+defaultValue=\{product\.sku\}/);
+  assert.match(inquirySource, /name="productName"\s+defaultValue=\{product\.name\}/);
+  assert.match(inquirySource, /name="productSlug"\s+defaultValue=\{product\.slug\}/);
+  assert.doesNotMatch(inquirySource, /type="hidden" name="product(?:Sku|Name|Slug)"/);
 });

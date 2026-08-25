@@ -17,19 +17,40 @@ export function ProductInquiryForm({ product }: ProductInquiryFormProps) {
         <dl className="mt-3 grid gap-4 text-sm sm:grid-cols-2">
           <div>
             <dt className="text-stone-600">Product</dt>
-            <dd className="mt-1 font-semibold text-primary">{product.shortName}</dd>
+            <dd className="mt-1">
+              <input
+                className="w-full bg-transparent font-semibold text-primary outline-none"
+                name="productName"
+                defaultValue={product.name}
+                readOnly
+                aria-label="Selected product"
+              />
+            </dd>
           </div>
           <div>
             <dt className="text-stone-600">KARUU SKU</dt>
-            <dd className="mt-1 font-semibold text-primary">{product.sku}</dd>
+            <dd className="mt-1">
+              <input
+                className="w-full bg-transparent font-semibold text-primary outline-none"
+                name="productSku"
+                defaultValue={product.sku}
+                readOnly
+                aria-label="Selected KARUU SKU"
+              />
+            </dd>
           </div>
         </dl>
       </div>
 
       <input type="hidden" name="formType" defaultValue="product-quote" />
-      <input type="hidden" name="productSku" defaultValue={product.sku} />
-      <input type="hidden" name="productName" defaultValue={product.name} />
-      <input type="hidden" name="productSlug" defaultValue={product.slug} />
+      <input
+        className="sr-only"
+        name="productSlug"
+        defaultValue={product.slug}
+        readOnly
+        aria-label="Selected product slug"
+        tabIndex={-1}
+      />
 
       <fieldset>
         <legend className="text-lg font-semibold text-primary">1. Contact and order overview</legend>
