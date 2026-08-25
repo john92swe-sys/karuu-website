@@ -26,10 +26,10 @@ export function ProductInquiryForm({ product }: ProductInquiryFormProps) {
         </dl>
       </div>
 
-      <input type="hidden" name="formType" value="product-quote" />
-      <input type="hidden" name="productSku" value={product.sku} />
-      <input type="hidden" name="productName" value={product.name} />
-      <input type="hidden" name="productSlug" value={product.slug} />
+      <input type="hidden" name="formType" defaultValue="product-quote" />
+      <input type="hidden" name="productSku" defaultValue={product.sku} />
+      <input type="hidden" name="productName" defaultValue={product.name} />
+      <input type="hidden" name="productSlug" defaultValue={product.slug} />
 
       <fieldset>
         <legend className="text-lg font-semibold text-primary">1. Contact and order overview</legend>
