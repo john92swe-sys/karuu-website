@@ -3,21 +3,22 @@ import {
   HeroSection,
   CoreAdvantagesSection,
   FeaturedCollectionSection,
+  HydrationCollectionSection,
   DocumentationSection,
   PartnershipSection,
   HomeContactSection,
 } from '@/components/sections/home-sections';
 
 export const metadata: Metadata = {
-  title: 'Swedish B2B Activewear Sourcing Partner',
+  title: 'Nordic B2B Active Lifestyle Product Development Partner',
   description:
-    'KARUU connects global activewear brands with selected manufacturing capabilities through sourcing, product development, OEM/ODM coordination, and international service.',
+    'KARUU supports activewear brands with product development, sourcing, OEM/ODM coordination, and an adjacent hydration and drinkware collection.',
   keywords:
     'activewear sourcing, yoga apparel wholesale, OEM ODM coordination, private label activewear, KARUU AB',
   openGraph: {
-    title: 'KARUU | Swedish B2B Activewear Sourcing Partner',
+    title: 'KARUU | Nordic B2B Active Lifestyle Product Development Partner',
     description:
-      'Sourcing, product development, OEM/ODM coordination, quality communication, and international service.',
+      'Activewear-led sourcing, product development, OEM/ODM coordination, and adjacent hydration products.',
     type: 'website',
     locale: 'en_US',
   },
@@ -32,6 +33,7 @@ export default function HomePage() {
       <HeroSection />
       <CoreAdvantagesSection />
       <FeaturedCollectionSection />
+      <HydrationCollectionSection />
       <DocumentationSection />
       <PartnershipSection />
       <HomeContactSection />

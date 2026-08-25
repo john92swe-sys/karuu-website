@@ -7,6 +7,7 @@ const inquiryEmail = 'john@karuu.net';
 const fieldLabels: Record<string, string> = {
   productSku: 'Product SKU',
   productName: 'Product Name',
+  productSlug: 'Product Slug',
   inquiryType: 'Inquiry Type',
   companyName: 'Company Name',
   contactName: 'Contact Name',
@@ -20,8 +21,10 @@ const fieldLabels: Record<string, string> = {
   customLogo: 'Custom Logo',
   customLabel: 'Custom Label',
   customPackaging: 'Custom Packaging',
+  brandingRequirement: 'Branding Requirement',
   preferredTradeTerm: 'Preferred Trade Term',
   requiredDeliveryDate: 'Required Delivery Date',
+  targetLaunchDate: 'Target Launch Date',
   message: 'Message',
   privacyConsent: 'Privacy Consent',
 };
@@ -44,6 +47,7 @@ export async function POST(request: Request) {
   const formData = await request.formData();
   const productSku = readField(formData, 'productSku');
   const productName = readField(formData, 'productName');
+  const productSlug = readField(formData, 'productSlug');
   const inquiryType = readField(formData, 'inquiryType');
   const subjectParts = ['KARUU inquiry'];
 
@@ -94,7 +98,7 @@ export async function POST(request: Request) {
       <h1>Your email draft is ready</h1>
       <p>Your email application should open automatically. Review the message and send it to complete your inquiry. KARUU has not received anything until you send the email.</p>
       <a href="${safeMailto}">Open email draft</a>
-      <p><a href="/products/${encodeURIComponent(productSku.toLowerCase())}" style="background:transparent;color:#1a3a5c;padding-left:0">Return to product</a></p>
+      <p><a href="/products/${encodeURIComponent(productSlug || productSku.toLowerCase())}" style="background:transparent;color:#1a3a5c;padding-left:0">Return to product</a></p>
     </main>
     <script>window.location.href=${JSON.stringify(mailto)};</script>
   </body>

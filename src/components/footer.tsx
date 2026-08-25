@@ -7,6 +7,7 @@ const productLinks = [
   ['Yoga Shorts', '/products?category=yoga-shorts'],
   ['Yoga Tops', '/products?category=yoga-tops'],
   ['Outerwear & Jackets', '/products?category=outerwear-jackets'],
+  ['Hydration & Drinkware', '/products/hydration-drinkware'],
 ];
 
 const companyLinks = [
@@ -52,8 +53,8 @@ export function Footer() {
               </span>
             </div>
             <p className="text-sm text-white/60 mb-4 leading-relaxed">
-              Swedish B2B activewear sourcing and manufacturing partner connecting global
-              brands with selected manufacturing capabilities.
+              Swedish B2B active lifestyle product development and sourcing partner, with
+              activewear at the core and hydration as an adjacent collection pillar.
             </p>
             <div className="space-y-2 text-sm">
               <div className="flex items-start gap-2.5">
@@ -90,7 +91,7 @@ export function Footer() {
               Need a quick quote? Send your requirements directly to our team on WhatsApp.
             </p>
             <a
-              href="https://wa.me/46708802017?text=Hi%20KARUU%20team%2C%20I%27d%20like%20to%20inquire%20about%20yoga%20apparel%20wholesale."
+              href="https://wa.me/46708802017?text=Hi%20KARUU%20team%2C%20I%27d%20like%20to%20discuss%20an%20active%20lifestyle%20product%20project."
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#25D366] text-white font-semibold text-sm rounded-md hover:bg-[#128C7E] transition-all hover:-translate-y-0.5"
