@@ -7,6 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes = [
     '',
     '/products',
+    '/products/hydration-drinkware',
     '/oem-odm',
     '/manufacturing',
     '/quality-certifications',
@@ -19,7 +20,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const categories = getAllCategories();
 
   const productRoutes = products.map((p) => `/products/${p.slug}`);
-  const categoryRoutes = categories.map((c) => `/products?category=${c.slug}`);
+  const categoryRoutes = categories
+    .filter((c) => c.slug !== 'hydration-drinkware')
+    .map((c) => `/products?category=${c.slug}`);
 
   const allRoutes = [...staticRoutes, ...productRoutes, ...categoryRoutes];
 

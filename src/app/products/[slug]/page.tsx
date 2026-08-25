@@ -70,10 +70,14 @@ function StructuredData({ product }: { product: Product }) {
     url: `${siteUrl}/products/${product.slug}`,
     description: product.shortDescription,
     image: product.gallery.map((image) => `${siteUrl}${image.src}`),
-    brand: { '@type': 'Brand', name: 'KARUU' },
+    ...(product.category !== 'hydration-drinkware'
+      ? { brand: { '@type': 'Brand', name: 'KARUU' } }
+      : {}),
     category: product.categoryPath.join(' > '),
     material: product.material,
-    color: product.colors.map((color) => color.name).join(', '),
+    ...(product.colors.length
+      ? { color: product.colors.map((color) => color.name).join(', ') }
+      : {}),
     size: product.sizes.join(', '),
   };
 
@@ -112,7 +116,7 @@ function StructuredData({ product }: { product: Product }) {
 }
 
 function ProductDetails({ product }: { product: Product }) {
-  const details = [
+  const standardDetails = [
     ['Material', product.material],
     ['Fit', product.fit],
     ['Neckline', product.neckline],
@@ -123,6 +127,9 @@ function ProductDetails({ product }: { product: Product }) {
     ['Sample time', product.sampleTime],
     ['Lead time', product.leadTime],
   ].filter((entry): entry is [string, string] => Boolean(entry[1]));
+  const details = product.specifications?.length
+    ? product.specifications.map((item) => [item.label, item.value] as [string, string])
+    : standardDetails;
 
   return (
     <dl className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
@@ -151,12 +158,15 @@ export default function ProductDetailPage({ params }: PageProps) {
   const whatsappUrl = `https://wa.me/46708802017?text=${whatsappMessage}`;
   const procurementSummary = [
     ['Material', product.material],
-    ['Sizes', product.sizes.join(' / ')],
+    [product.category === 'hydration-drinkware' ? 'Capacity' : 'Sizes', product.sizes.join(' / ')],
     ['MOQ', product.moq],
     ['Packaging', product.packaging],
     ['Fit', product.fit],
     ['Customization', product.customization[0] || 'Project-based review'],
   ].filter((entry): entry is [string, string] => Boolean(entry[1]));
+  const relatedProducts = product.relatedProducts
+    .map((slug) => getProductBySlug(slug))
+    .filter((item): item is Product => Boolean(item));
 
   return (
     <main className="overflow-x-clip pb-24 pt-20 md:pt-24">
@@ -218,6 +228,14 @@ export default function ProductDetailPage({ params }: PageProps) {
                 Request a Quote
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </a>
+              {product.category === 'hydration-drinkware' && (
+                <a
+                  href="#inquiry"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-primary/20 bg-white px-6 py-3.5 font-semibold text-primary transition-colors hover:border-secondary hover:bg-stone-faint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
+                >
+                  Request a Sample
+                </a>
+              )}
               <a
                 href={whatsappUrl}
                 target="_blank"
@@ -230,6 +248,46 @@ export default function ProductDetailPage({ params }: PageProps) {
             </div>
           </div>
         </section>
+
+        {product.category === 'hydration-drinkware' && (
+          <section className="border-t border-stone-200 py-16 md:py-20">
+            <div className="grid gap-8 rounded-3xl bg-primary px-7 py-10 text-white md:grid-cols-[1.2fr_0.8fr] md:items-center md:px-10">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent">
+                  Pair with Your Activewear Collection
+                </p>
+                <h2 className="mt-3 text-3xl font-bold text-white">Build a coordinated active lifestyle range</h2>
+                <p className="mt-4 max-w-2xl leading-7 text-white/75">
+                  Combine branded hydration with yoga, fitness, and activewear development through one KARUU project brief.
+                </p>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row md:flex-col">
+                <Link href="/products" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-accent px-6 py-3 font-semibold text-primary">
+                  Explore Activewear
+                </Link>
+                <Link href="/contact?interest=activewear-hydration" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/30 px-6 py-3 font-semibold text-white">
+                  Build Your Collection
+                </Link>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {relatedProducts.length > 0 && (
+          <section className="border-t border-stone-200 py-16 md:py-20">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent">Related Products</p>
+            <h2 className="mt-3 text-3xl font-bold text-primary">More hydration options</h2>
+            <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {relatedProducts.map((item) => (
+                <Link key={item.sku} href={`/products/${item.slug}`} className="rounded-2xl border border-stone-200 bg-white p-6 transition hover:border-secondary hover:shadow-lg">
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-secondary">{item.sku}</p>
+                  <h3 className="mt-2 text-xl font-semibold text-primary">{item.name}</h3>
+                  <p className="mt-3 text-sm leading-6 text-stone-700">{item.shortDescription}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         <nav
           className="mt-12 flex flex-wrap gap-2 border-y border-stone-200 py-4"

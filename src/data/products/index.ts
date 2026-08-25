@@ -22,6 +22,7 @@ import {
   kr020025, kr020026, kr020027, kr020028, kr020029, kr020030, kr020031, kr020032,
   kr020033, kr020034, kr020035, kr020036,
 } from './kr02-batch';
+import { hydrationProducts } from './hydration';
 import type { Product, ProductCategory } from './types';
 
 export type {
@@ -32,6 +33,7 @@ export type {
   ProductImage,
   ProductImageKind,
   ProductSeo,
+  ProductSpecification,
   ProductSizeChart,
 } from './types';
 
@@ -87,6 +89,7 @@ export const products: Product[] = [
   kr020034,
   kr020035,
   kr020036,
+  ...hydrationProducts,
 ];
 
 export const categoryLabels: Record<ProductCategory, string> = {
@@ -100,4 +103,5 @@ export const categoryLabels: Record<ProductCategory, string> = {
   'tennis-dresses': 'Tennis Dresses',
   'tennis-skirts': 'Tennis Skirts',
   'active-rompers': 'Active Rompers',
+  'hydration-drinkware': 'Hydration & Drinkware',
 };

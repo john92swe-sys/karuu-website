@@ -29,6 +29,7 @@ export function ProductInquiryForm({ product }: ProductInquiryFormProps) {
       <input type="hidden" name="formType" value="product-quote" />
       <input type="hidden" name="productSku" value={product.sku} />
       <input type="hidden" name="productName" value={product.name} />
+      <input type="hidden" name="productSlug" value={product.slug} />
 
       <fieldset>
         <legend className="text-lg font-semibold text-primary">1. Contact and order overview</legend>
@@ -129,6 +130,10 @@ export function ProductInquiryForm({ product }: ProductInquiryFormProps) {
               <option>To discuss</option>
             </select>
           </label>
+          <label className="text-sm font-semibold text-primary md:col-span-2">
+            Branding Requirement
+            <input className={inputClassName} name="brandingRequirement" placeholder="Logo method, placement, finish, label, or packaging brief" />
+          </label>
           <label className="text-sm font-semibold text-primary">
             Custom Label
             <select className={inputClassName} name="customLabel" defaultValue="To discuss">
@@ -155,7 +160,11 @@ export function ProductInquiryForm({ product }: ProductInquiryFormProps) {
               <option>DDP</option>
             </select>
           </label>
-          <label className="text-sm font-semibold text-primary md:col-span-2">
+          <label className="text-sm font-semibold text-primary">
+            Target Launch Date
+            <input className={inputClassName} name="targetLaunchDate" type="date" />
+          </label>
+          <label className="text-sm font-semibold text-primary">
             Required Delivery Date
             <input className={inputClassName} name="requiredDeliveryDate" type="date" />
           </label>

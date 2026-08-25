@@ -93,6 +93,17 @@ export default function OemOdmPage() {
         </div>
       </section>
 
+      <section className="mb-20 rounded-2xl border border-secondary/20 bg-secondary/5 p-8 md:p-10">
+        <div className="grid gap-7 md:grid-cols-[1fr_auto] md:items-center">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-widest text-secondary">Adjacent Product Development</p>
+            <h2 className="mt-3 text-2xl font-bold text-primary md:text-3xl">Add hydration to your activewear collection</h2>
+            <p className="mt-4 max-w-3xl leading-7 text-stone-700">KARUU can coordinate a combined brief covering activewear and documented hydration products, with product-specific branding, sampling, and commercial terms confirmed during review.</p>
+          </div>
+          <Link href="/products/hydration-drinkware" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-white">Explore Hydration<ArrowRight className="h-4 w-4" /></Link>
+        </div>
+      </section>
+
       {/* Process */}
       <section className="mb-20">
         <div className="text-center mb-12">

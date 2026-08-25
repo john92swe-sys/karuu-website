@@ -1,8 +1,9 @@
 import type { Product, ProductCategory } from './types';
 
-type Spec = readonly [sku: string, name: string, category: ProductCategory, dimensions: readonly (readonly [number, number])[]];
+type ActivewearCategory = Exclude<ProductCategory, 'hydration-drinkware'>;
+type Spec = readonly [sku: string, name: string, category: ActivewearCategory, dimensions: readonly (readonly [number, number])[]];
 
-const categoryMeta: Record<ProductCategory, { label: string; path: string[]; applications: string[] }> = {
+const categoryMeta: Record<ActivewearCategory, { label: string; path: string[]; applications: string[] }> = {
   'yoga-leggings': { label: 'Yoga Leggings', path: ['Women', 'Activewear', 'Yoga Leggings'], applications: ['Yoga', 'Studio training', 'Gym training', 'Active everyday wear'] },
   'sports-bra': { label: 'Sports Bras', path: ['Women', 'Activewear', 'Sports Bras'], applications: ['Gym training', 'Yoga', 'Studio training', 'Layered activewear'] },
   'yoga-shorts': { label: 'Yoga Shorts', path: ['Women', 'Activewear', 'Yoga Shorts'], applications: ['Yoga', 'Studio training', 'Active everyday wear'] },

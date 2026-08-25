@@ -16,6 +16,7 @@ export type {
   ProductImage,
   ProductImageKind,
   ProductSeo,
+  ProductSpecification,
   ProductSizeChart,
 } from '@/data/products';
 

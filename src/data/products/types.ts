@@ -8,7 +8,8 @@ export type ProductCategory =
   | 'biker-shorts'
   | 'tennis-dresses'
   | 'tennis-skirts'
-  | 'active-rompers';
+  | 'active-rompers'
+  | 'hydration-drinkware';
 
 export type ProductImageKind =
   | 'product'
@@ -51,6 +52,11 @@ export interface ProductSeo {
   canonical: string;
 }
 
+export interface ProductSpecification {
+  label: string;
+  value: string;
+}
+
 export interface Product {
   slug: string;
   sku: string;
@@ -76,6 +82,7 @@ export interface Product {
   leadTime?: string;
   packaging?: string;
   careInstructions?: string[];
+  specifications?: ProductSpecification[];
   gallery: ProductImage[];
   sizeChart?: ProductSizeChart;
   documents: ProductDocument[];

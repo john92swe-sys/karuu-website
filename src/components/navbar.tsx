@@ -10,7 +10,8 @@ type PublicProductCategory =
   | 'sports-bra'
   | 'yoga-shorts'
   | 'yoga-tops'
-  | 'outerwear-jackets';
+  | 'outerwear-jackets'
+  | 'hydration-drinkware';
 
 const navItems = [
   { href: '/', label: 'Home' },
@@ -28,6 +29,7 @@ const productCategories: { slug: PublicProductCategory; label: string }[] = [
   { slug: 'yoga-shorts', label: 'Yoga Shorts' },
   { slug: 'yoga-tops', label: 'Yoga Tops' },
   { slug: 'outerwear-jackets', label: 'Outerwear & Jackets' },
+  { slug: 'hydration-drinkware', label: 'Hydration & Drinkware' },
 ];
 
 export function Navbar() {
@@ -97,7 +99,7 @@ export function Navbar() {
                       {productCategories.map((category) => (
                         <Link
                           key={category.slug}
-                          href={`/products?category=${category.slug}`}
+                          href={category.slug === 'hydration-drinkware' ? '/products/hydration-drinkware' : `/products?category=${category.slug}`}
                           className="block px-4 py-2 text-sm text-stone transition-colors hover:bg-bg-alt hover:text-primary"
                         >
                           {category.label}
@@ -168,7 +170,7 @@ export function Navbar() {
             {productCategories.map((category) => (
               <Link
                 key={category.slug}
-                href={`/products?category=${category.slug}`}
+                href={category.slug === 'hydration-drinkware' ? '/products/hydration-drinkware' : `/products?category=${category.slug}`}
                 className="rounded-md px-8 py-2.5 text-sm text-stone-light hover:bg-bg-alt hover:text-primary"
               >
                 {category.label}

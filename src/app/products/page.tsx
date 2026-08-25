@@ -79,6 +79,12 @@ export default function ProductsPage({
 
         <nav className="mt-8 flex flex-wrap gap-2" aria-label="Product categories">
           <Link
+            href="/products/hydration-drinkware"
+            className="inline-flex min-h-11 items-center rounded-full border border-secondary/30 bg-secondary/5 px-5 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-secondary/10"
+          >
+            Hydration & Drinkware
+          </Link>
+          <Link
             href="/products"
             className={`inline-flex min-h-11 items-center rounded-full px-5 py-2.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${
               !selectedCategory
@@ -88,7 +94,7 @@ export default function ProductsPage({
           >
             All Products
           </Link>
-          {categories.map((category) => (
+          {categories.filter((category) => category.slug !== 'hydration-drinkware').map((category) => (
             <Link
               key={category.slug}
               href={`/products?category=${category.slug}`}

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getFeaturedProducts } from '@/lib/products';
+import { getFeaturedProducts, getProductsByCategory } from '@/lib/products';
 import { ProductCard } from '@/components/product-card';
 import {
   Award,
@@ -32,18 +32,18 @@ export function HeroSection() {
         <div className="max-w-3xl">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm text-sm font-medium mb-6 border border-white/20">
             <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-            Swedish B2B Activewear Partner
+            Swedish B2B Active Lifestyle Partner
           </div>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-            Build Your Activewear Range
+            Build Your Active Lifestyle Range
             <br />
             <span className="text-accent">With Clear Coordination</span>
           </h1>
 
           <p className="text-lg md:text-xl text-white/80 mb-8 max-w-2xl leading-relaxed">
-            KARUU connects global brands with selected manufacturing capabilities through
-            sourcing, product development, OEM/ODM coordination, and international service.
+            Build the complete active lifestyle collection—from performance apparel to branded
+            hydration—with clear sourcing, development, and OEM/ODM coordination.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
@@ -150,7 +150,9 @@ export function CoreAdvantagesSection() {
 }
 
 export function FeaturedCollectionSection() {
-  const products = getFeaturedProducts(4);
+  const products = getFeaturedProducts(8)
+    .filter((product) => product.category !== 'hydration-drinkware')
+    .slice(0, 4);
 
   return (
     <section className="section-spacing bg-stone-faint">
@@ -177,6 +179,31 @@ export function FeaturedCollectionSection() {
           {products.map((product) => (
             <ProductCard key={product.sku} product={product} />
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function HydrationCollectionSection() {
+  const products = getProductsByCategory('hydration-drinkware').filter((product) => product.featured).slice(0, 4);
+
+  return (
+    <section className="section-spacing bg-white">
+      <div className="container mx-auto px-6">
+        <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+          <div>
+            <span className="text-accent font-semibold text-sm uppercase tracking-widest">Adjacent Product Pillar</span>
+            <h2 className="mt-3 text-3xl font-bold text-primary md:text-4xl">Complete the Active Lifestyle Collection</h2>
+            <p className="mt-4 max-w-xl leading-7 text-stone-light">Extend your activewear collection with private-label hydration products designed for fitness, yoga, wellness, and everyday movement.</p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
+              <Link href="/products/hydration-drinkware" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-semibold text-white">Explore Hydration & Drinkware<ArrowRight className="h-4 w-4" /></Link>
+              <Link href="/contact?interest=activewear-hydration" className="inline-flex min-h-12 items-center justify-center rounded-lg border border-primary/20 px-6 py-3 font-semibold text-primary">Build Your Collection</Link>
+            </div>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {products.map((product) => <ProductCard key={product.sku} product={product} />)}
+          </div>
         </div>
       </div>
     </section>
