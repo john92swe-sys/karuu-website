@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Menu, X, ChevronDown } from 'lucide-react';
+import { HYDRATION_PUBLICLY_DISCOVERABLE } from '@/config/catalog';
 
 type PublicProductCategory =
   | 'yoga-leggings'
@@ -29,7 +30,9 @@ const productCategories: { slug: PublicProductCategory; label: string }[] = [
   { slug: 'yoga-shorts', label: 'Yoga Shorts' },
   { slug: 'yoga-tops', label: 'Yoga Tops' },
   { slug: 'outerwear-jackets', label: 'Outerwear & Jackets' },
-  { slug: 'hydration-drinkware', label: 'Hydration & Drinkware' },
+  ...(HYDRATION_PUBLICLY_DISCOVERABLE
+    ? [{ slug: 'hydration-drinkware' as const, label: 'Hydration & Drinkware' }]
+    : []),
 ];
 
 export function Navbar() {

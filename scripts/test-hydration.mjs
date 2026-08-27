@@ -7,6 +7,13 @@ const root = process.cwd();
 const hydrationSource = readFileSync(join(root, 'src/data/products/hydration.ts'), 'utf8');
 const collectionSource = readFileSync(join(root, 'src/app/products/hydration-drinkware/page.tsx'), 'utf8');
 const inquirySource = readFileSync(join(root, 'src/components/product-inquiry-form.tsx'), 'utf8');
+const catalogueConfigSource = readFileSync(join(root, 'src/config/catalog.ts'), 'utf8');
+const homepageSource = readFileSync(join(root, 'src/app/page.tsx'), 'utf8');
+const navbarSource = readFileSync(join(root, 'src/components/navbar.tsx'), 'utf8');
+const footerSource = readFileSync(join(root, 'src/components/footer.tsx'), 'utf8');
+const productsPageSource = readFileSync(join(root, 'src/app/products/page.tsx'), 'utf8');
+const sitemapSource = readFileSync(join(root, 'src/app/sitemap.ts'), 'utf8');
+const productPageSource = readFileSync(join(root, 'src/app/products/[slug]/page.tsx'), 'utf8');
 
 const slugs = [...hydrationSource.matchAll(/slug: '([^']+)'/g)].map((match) => match[1]);
 const skus = [...hydrationSource.matchAll(/sku: '(KHD-[0-9]{4})'/g)].map((match) => match[1]);
@@ -46,4 +53,18 @@ test('product inquiry carries buyer and product context', () => {
   assert.match(inquirySource, /name="productName"\s+defaultValue=\{product\.name\}/);
   assert.match(inquirySource, /name="productSlug"\s+defaultValue=\{product\.slug\}/);
   assert.doesNotMatch(inquirySource, /type="hidden" name="product(?:Sku|Name|Slug)"/);
+});
+
+test('temporary hydration discovery switch is off and reversible', () => {
+  assert.match(catalogueConfigSource, /HYDRATION_PUBLICLY_DISCOVERABLE = false/);
+  assert.match(homepageSource, /HYDRATION_PUBLICLY_DISCOVERABLE && <HydrationCollectionSection/);
+  assert.match(navbarSource, /HYDRATION_PUBLICLY_DISCOVERABLE/);
+  assert.match(footerSource, /HYDRATION_PUBLICLY_DISCOVERABLE/);
+  assert.match(productsPageSource, /HYDRATION_PUBLICLY_DISCOVERABLE/);
+  assert.match(sitemapSource, /HYDRATION_PUBLICLY_DISCOVERABLE/);
+});
+
+test('preserved hydration detail URLs are noindex and do not expose related products', () => {
+  assert.match(productPageSource, /\? \{ index: false, follow: false \}/);
+  assert.match(productPageSource, /publiclyDiscoverableRelatedProducts/);
 });

@@ -1,15 +1,18 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle2, PackageCheck, Palette, SearchCheck } from 'lucide-react';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { ProductCard } from '@/components/product-card';
 import { getProductsByCategory } from '@/lib/products';
+import { HYDRATION_PUBLICLY_DISCOVERABLE } from '@/config/catalog';
 
 export const metadata: Metadata = {
   title: { absolute: 'Custom Water Bottles & Drinkware | Private Label | KARUU' },
   description: 'Explore custom water bottles and branded hydration products for activewear, fitness, yoga, and wellness brands. Request samples and OEM/private-label quotes from KARUU.',
   keywords: ['custom water bottles for brands', 'private label water bottles', 'OEM drinkware', 'branded hydration products', 'custom bottles for fitness brands'],
   alternates: { canonical: 'https://karuu.net/products/hydration-drinkware' },
+  robots: HYDRATION_PUBLICLY_DISCOVERABLE ? undefined : { index: false, follow: false },
   openGraph: {
     title: 'Custom Water Bottles & Drinkware | Private Label | KARUU',
     description: 'Hydration products for activewear, fitness, yoga, and wellness collections.',
@@ -26,6 +29,7 @@ const faq = [
 ];
 
 export default function HydrationCollectionPage() {
+  if (!HYDRATION_PUBLICLY_DISCOVERABLE) redirect('/products');
   const products = getProductsByCategory('hydration-drinkware');
   const breadcrumbData = {
     '@context': 'https://schema.org', '@type': 'BreadcrumbList',
