@@ -42,8 +42,8 @@ export function HeroSection() {
           </h1>
 
           <p className="text-lg md:text-xl text-white/80 mb-8 max-w-2xl leading-relaxed">
-            Build the complete active lifestyle collection—from performance apparel to branded
-            hydration—with clear sourcing, development, and OEM/ODM coordination.
+            Develop women’s activewear, yoga, and fitness collections with clear sourcing,
+            product development, and OEM/ODM coordination.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">

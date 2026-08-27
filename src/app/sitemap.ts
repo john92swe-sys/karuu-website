@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { getAllProducts, getAllCategories } from '@/lib/products';
+import { HYDRATION_PUBLICLY_DISCOVERABLE } from '@/config/catalog';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://karuu.net';
@@ -7,7 +8,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes = [
     '',
     '/products',
-    '/products/hydration-drinkware',
     '/oem-odm',
     '/manufacturing',
     '/quality-certifications',
@@ -19,7 +19,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const products = getAllProducts();
   const categories = getAllCategories();
 
-  const productRoutes = products.map((p) => `/products/${p.slug}`);
+  const productRoutes = products
+    .filter((p) => HYDRATION_PUBLICLY_DISCOVERABLE || p.category !== 'hydration-drinkware')
+    .map((p) => `/products/${p.slug}`);
   const categoryRoutes = categories
     .filter((c) => c.slug !== 'hydration-drinkware')
     .map((c) => `/products?category=${c.slug}`);

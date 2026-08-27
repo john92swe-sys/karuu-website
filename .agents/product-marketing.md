@@ -1,13 +1,13 @@
 # KARUU Product Marketing Context
 
-Version: 1.1.0
-Updated: 2026-08-25
+Version: 1.2.0
+Updated: 2026-08-27
 
 ## Positioning
 
 KARUU is a Nordic B2B Active Lifestyle Product Development & Sourcing Partner. Activewear remains the primary product pillar and the source of KARUU's specialist market positioning.
 
-Hydration & Drinkware is KARUU's first adjacent growth pillar. It helps activewear, yoga, fitness, wellness, and related retail brands extend a coordinated collection without turning KARUU into a general wholesale marketplace.
+Women’s activewear, yoga, and fitness are the only publicly promoted categories. Hydration & Drinkware remains preserved internally but is temporarily excluded from public discovery until approved high-resolution product photography is available.
 
 ## Business model
 
@@ -18,7 +18,7 @@ Hydration & Drinkware is KARUU's first adjacent growth pillar. It helps activewe
 
 ## Core narrative
 
-Build the complete active lifestyle collection—from performance apparel to branded hydration.
+Develop women’s activewear, yoga, and fitness collections with clear sourcing, product development, and OEM/ODM coordination.
 
 ## Evidence rules
 
@@ -28,6 +28,12 @@ Build the complete active lifestyle collection—from performance apparel to bra
 - Never describe sourced products as original KARUU designs unless documentary evidence supports that statement.
 
 ## Changelog
+
+### 1.2.0 — 2026-08-27
+
+- Temporarily removed Hydration & Drinkware from public discovery.
+- Preserved all Hydration product data and historical URLs for later restoration.
+- Set women’s activewear, yoga, and fitness as the only public commercial focus.
 
 ### 1.1.0 — 2026-08-25
 

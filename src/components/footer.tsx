@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Mail, Phone, MapPin, MessageCircle } from 'lucide-react';
+import { HYDRATION_PUBLICLY_DISCOVERABLE } from '@/config/catalog';
 
 const productLinks = [
   ['Yoga Leggings', '/products?category=yoga-leggings'],
@@ -7,7 +8,9 @@ const productLinks = [
   ['Yoga Shorts', '/products?category=yoga-shorts'],
   ['Yoga Tops', '/products?category=yoga-tops'],
   ['Outerwear & Jackets', '/products?category=outerwear-jackets'],
-  ['Hydration & Drinkware', '/products/hydration-drinkware'],
+  ...(HYDRATION_PUBLICLY_DISCOVERABLE
+    ? [['Hydration & Drinkware', '/products/hydration-drinkware']]
+    : []),
 ];
 
 const companyLinks = [
@@ -53,8 +56,8 @@ export function Footer() {
               </span>
             </div>
             <p className="text-sm text-white/60 mb-4 leading-relaxed">
-              Swedish B2B active lifestyle product development and sourcing partner, with
-              activewear at the core and hydration as an adjacent collection pillar.
+              Swedish B2B women’s activewear, yoga, and fitness product development and sourcing
+              partner for OEM, ODM, and private-label projects.
             </p>
             <div className="space-y-2 text-sm">
               <div className="flex items-start gap-2.5">

@@ -15,6 +15,7 @@ import { ProductGallery } from '@/components/product-gallery';
 import { ProductInquiryForm } from '@/components/product-inquiry-form';
 import { getAllProducts, getProductBySlug, type Product } from '@/lib/products';
 import { formatProductMetadataTitle } from '@/lib/product-metadata-title.mjs';
+import { HYDRATION_PUBLICLY_DISCOVERABLE } from '@/config/catalog';
 
 interface PageProps {
   params: { slug: string };
@@ -37,6 +38,10 @@ export function generateMetadata({ params }: PageProps): Metadata {
     title: { absolute: pageTitle },
     description: product.seo.description,
     alternates: { canonical: product.seo.canonical },
+    robots:
+      product.category === 'hydration-drinkware' && !HYDRATION_PUBLICLY_DISCOVERABLE
+        ? { index: false, follow: false }
+        : undefined,
     openGraph: {
       title: pageTitle,
       description: product.seo.description,
@@ -167,6 +172,10 @@ export default function ProductDetailPage({ params }: PageProps) {
   const relatedProducts = product.relatedProducts
     .map((slug) => getProductBySlug(slug))
     .filter((item): item is Product => Boolean(item));
+  const publiclyDiscoverableRelatedProducts =
+    product.category === 'hydration-drinkware' && !HYDRATION_PUBLICLY_DISCOVERABLE
+      ? []
+      : relatedProducts;
 
   return (
     <main className="overflow-x-clip pb-24 pt-20 md:pt-24">
@@ -273,12 +282,12 @@ export default function ProductDetailPage({ params }: PageProps) {
           </section>
         )}
 
-        {relatedProducts.length > 0 && (
+        {publiclyDiscoverableRelatedProducts.length > 0 && (
           <section className="border-t border-stone-200 py-16 md:py-20">
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent">Related Products</p>
             <h2 className="mt-3 text-3xl font-bold text-primary">More hydration options</h2>
             <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {relatedProducts.map((item) => (
+              {publiclyDiscoverableRelatedProducts.map((item) => (
                 <Link key={item.sku} href={`/products/${item.slug}`} className="rounded-2xl border border-stone-200 bg-white p-6 transition hover:border-secondary hover:shadow-lg">
                   <p className="text-xs font-semibold uppercase tracking-[0.14em] text-secondary">{item.sku}</p>
                   <h3 className="mt-2 text-xl font-semibold text-primary">{item.name}</h3>

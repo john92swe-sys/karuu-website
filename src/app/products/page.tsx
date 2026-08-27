@@ -9,6 +9,7 @@ import {
 } from '@/lib/products';
 import { ProductCard } from '@/components/product-card';
 import { Breadcrumb } from '@/components/breadcrumb';
+import { HYDRATION_PUBLICLY_DISCOVERABLE } from '@/config/catalog';
 
 export const metadata: Metadata = {
   title: 'B2B Activewear Products',
@@ -23,7 +24,9 @@ export default function ProductsPage({
 }: {
   searchParams: { category?: string };
 }) {
-  const categories = getAllCategories();
+  const categories = getAllCategories().filter(
+    (category) => HYDRATION_PUBLICLY_DISCOVERABLE || category.slug !== 'hydration-drinkware'
+  );
   const selectedCategory = searchParams?.category as ProductCategory | undefined;
 
   if (selectedCategory && !categories.find((category) => category.slug === selectedCategory)) {
@@ -32,7 +35,9 @@ export default function ProductsPage({
 
   const products = selectedCategory
     ? getProductsByCategory(selectedCategory)
-    : getAllProducts();
+    : getAllProducts().filter(
+        (product) => HYDRATION_PUBLICLY_DISCOVERABLE || product.category !== 'hydration-drinkware'
+      );
 
   const categoryLabel = selectedCategory
     ? categories.find((category) => category.slug === selectedCategory)?.label || 'Products'
@@ -79,12 +84,6 @@ export default function ProductsPage({
 
         <nav className="mt-8 flex flex-wrap gap-2" aria-label="Product categories">
           <Link
-            href="/products/hydration-drinkware"
-            className="inline-flex min-h-11 items-center rounded-full border border-secondary/30 bg-secondary/5 px-5 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-secondary/10"
-          >
-            Hydration & Drinkware
-          </Link>
-          <Link
             href="/products"
             className={`inline-flex min-h-11 items-center rounded-full px-5 py-2.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${
               !selectedCategory
@@ -94,7 +93,7 @@ export default function ProductsPage({
           >
             All Products
           </Link>
-          {categories.filter((category) => category.slug !== 'hydration-drinkware').map((category) => (
+          {categories.map((category) => (
             <Link
               key={category.slug}
               href={`/products?category=${category.slug}`}
