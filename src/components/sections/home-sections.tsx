@@ -32,13 +32,13 @@ export function HeroSection() {
         <div className="max-w-3xl">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm text-sm font-medium mb-6 border border-white/20">
             <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-            Swedish B2B Active Lifestyle Partner
+            Swedish B2B Women’s Activewear Partner
           </div>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-            Build Your Active Lifestyle Range
+            Women’s Activewear, Yoga &amp; Fitness
             <br />
-            <span className="text-accent">With Clear Coordination</span>
+            <span className="text-accent">OEM / ODM / Private Label</span>
           </h1>
 
           <p className="text-lg md:text-xl text-white/80 mb-8 max-w-2xl leading-relaxed">
