@@ -5,11 +5,11 @@ import { SiteLayout } from '@/components/site-layout';
 export const metadata: Metadata = {
   metadataBase: new URL('https://karuu.net'),
   title: {
-    default: 'KARUU | Swedish B2B Activewear Sourcing Partner',
+    default: 'KARUU | Women’s Activewear, Yoga & Fitness OEM/ODM Partner',
     template: '%s | KARUU',
   },
   description:
-    'KARUU is a Swedish B2B activewear sourcing and manufacturing partner connecting global brands with selected manufacturing capabilities.',
+    'KARUU is a Swedish B2B women’s activewear, yoga, and fitness OEM/ODM and private-label product development partner.',
   keywords: [
     'yoga wear wholesale',
     'activewear sourcing',
@@ -42,13 +42,13 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://karuu.net',
     siteName: 'KARUU',
-    title: 'KARUU | Swedish B2B Activewear Sourcing Partner',
+    title: 'KARUU | Women’s Activewear, Yoga & Fitness OEM/ODM Partner',
     description:
       'Activewear sourcing, product development, OEM/ODM coordination, quality communication, and international service.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'KARUU | Swedish B2B Activewear Sourcing Partner',
+    title: 'KARUU | Women’s Activewear, Yoga & Fitness OEM/ODM Partner',
     description:
       'Activewear sourcing, product development, OEM/ODM coordination, and international service.',
   },
