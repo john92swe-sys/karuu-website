@@ -290,7 +290,7 @@ export default function ProductDetailPage({ params }: PageProps) {
         {publiclyDiscoverableRelatedProducts.length > 0 && (
           <section className="border-t border-stone-200 py-16 md:py-20">
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent">Related Products</p>
-            <h2 className="mt-3 text-3xl font-bold text-primary">More hydration options</h2>
+            <h2 className="mt-3 text-3xl font-bold text-primary">More activewear options</h2>
             <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {publiclyDiscoverableRelatedProducts.map((item) => (
                 <Link key={item.sku} href={`/products/${item.slug}`} className="rounded-2xl border border-stone-200 bg-white p-6 transition hover:border-secondary hover:shadow-lg">
