@@ -74,6 +74,7 @@ test('temporary hydration discovery switch is off and reversible', () => {
 test('preserved hydration detail URLs are noindex and do not expose related products', () => {
   assert.match(productPageSource, /\? \{ index: false, follow: false \}/);
   assert.match(productPageSource, /publiclyDiscoverableRelatedProducts/);
+  assert.doesNotMatch(productPageSource, /More hydration options/);
 });
 
 test('activewear MOQ wording uses the approved series-level statement', () => {
