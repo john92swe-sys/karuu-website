@@ -31,7 +31,7 @@ export const kr010012: Product = {
   material: '90% Polyamide, 10% Elastane',
   fit: 'Cropped close fit',
   customization: ['Custom color development subject to order review'],
-  moq: '500 pieces per color for custom color orders',
+  moq: 'Mixed-style MOQ available within the same product series; final order structure confirmed during quotation.',
   packaging: 'Poly bag',
   gallery: [
     {

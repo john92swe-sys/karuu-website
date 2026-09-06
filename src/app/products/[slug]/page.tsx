@@ -16,6 +16,7 @@ import { ProductInquiryForm } from '@/components/product-inquiry-form';
 import { getAllProducts, getProductBySlug, type Product } from '@/lib/products';
 import { formatProductMetadataTitle } from '@/lib/product-metadata-title.mjs';
 import { HYDRATION_PUBLICLY_DISCOVERABLE } from '@/config/catalog';
+import { ACTIVEWEAR_MOQ_STATEMENT } from '@/config/mixed-style-moq';
 
 interface PageProps {
   params: { slug: string };
@@ -127,7 +128,9 @@ function ProductDetails({ product }: { product: Product }) {
     ['Neckline', product.neckline],
     ['Sleeve', product.sleeve],
     ['Sizes', product.sizes.join(' / ')],
-    ['MOQ', product.moq],
+    ...(product.category !== 'hydration-drinkware'
+      ? [['Starting MOQ', ACTIVEWEAR_MOQ_STATEMENT]]
+      : [['MOQ', product.moq]]),
     ['Packaging', product.packaging],
     ['Sample time', product.sampleTime],
     ['Lead time', product.leadTime],
@@ -164,7 +167,9 @@ export default function ProductDetailPage({ params }: PageProps) {
   const procurementSummary = [
     ['Material', product.material],
     [product.category === 'hydration-drinkware' ? 'Capacity' : 'Sizes', product.sizes.join(' / ')],
-    ['MOQ', product.moq],
+    ...(product.category !== 'hydration-drinkware'
+      ? [['Starting MOQ', ACTIVEWEAR_MOQ_STATEMENT]]
+      : [['MOQ', product.moq]]),
     ['Packaging', product.packaging],
     ['Fit', product.fit],
     ['Customization', product.customization[0] || 'Project-based review'],

@@ -43,22 +43,23 @@ export function HeroSection() {
 
           <p className="text-lg md:text-xl text-white/80 mb-8 max-w-2xl leading-relaxed">
             Develop women’s activewear, yoga, and fitness collections with clear sourcing,
-            product development, and OEM/ODM coordination.
+            product development, and OEM/ODM coordination. Start from 200 pieces per product
+            series, with styles mixable within the same series.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <Link
-              href="/products"
+              href="/contact"
               className="inline-flex min-h-12 items-center justify-center gap-2 bg-accent text-primary px-7 py-3.5 rounded-lg font-semibold hover:bg-accent-light transition-all hover:-translate-y-0.5 hover:shadow-lg"
             >
-              Explore Collection
+              Request a Mixed-Style Collection Plan
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
-              href="/contact"
+              href="/products"
               className="inline-flex min-h-12 items-center justify-center gap-2 border-2 border-white/30 text-white px-7 py-3.5 rounded-lg font-semibold hover:bg-white/10 transition-all hover:-translate-y-0.5"
             >
-              Request Quote
+              Browse the Full Collection
             </Link>
           </div>
 

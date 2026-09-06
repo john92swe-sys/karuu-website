@@ -31,7 +31,7 @@ export const kr010010: Product = {
   material: '80% polyester, 20% elastane',
   fit: 'High waist with rear ruched shaping and a flared leg',
   customization: ['Custom color development subject to order review'],
-  moq: '200 pieces per color for custom color orders',
+  moq: 'Mixed-style MOQ available within the same product series; final order structure confirmed during quotation.',
   packaging: 'Individual poly bag',
   gallery: [
     {
