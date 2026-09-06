@@ -15,7 +15,7 @@ import ContactForm from '@/components/contact-form';
 export const metadata: Metadata = {
   title: 'Contact Us | KARUU Yoga Apparel Wholesale',
   description:
-    'Get in touch with KARUU AB for yoga apparel wholesale, OEM/ODM inquiries. Swedish headquarters and Asian support team ready to help.',
+    'Contact KARUU AB, a Swedish B2B women’s activewear, yoga, and fitness partner, to discuss a mixed-style collection plan or OEM/ODM project.',
   alternates: { canonical: '/contact' },
 };
 
@@ -34,9 +34,8 @@ export default function ContactPage() {
           <span className="text-secondary">Great Together</span>
         </h1>
         <p className="text-lg text-stone-light leading-relaxed">
-          Whether you&apos;re looking for wholesale yoga apparel, custom OEM/ODM services,
-          or have questions about our products, our team is here to help. We typically
-          respond within 24 hours.
+          Discuss a coordinated women&apos;s activewear, yoga, or fitness collection, an OEM/ODM
+          project, or a product question with KARUU&apos;s Swedish B2B contact point.
         </p>
       </div>
 
@@ -65,7 +64,11 @@ export default function ContactPage() {
               </p>
               <p className="flex items-center gap-2">
                 <Clock className="w-4 h-4 flex-shrink-0 text-secondary" />
-                Mon – Fri, 09:00 – 17:00 CET
+                Swedish B2B contact point
+              </p>
+              <p className="flex items-center gap-2">
+                <Building className="w-4 h-4 flex-shrink-0 text-secondary" />
+                KARUU AB · Reg. No. 559244-1892
               </p>
             </div>
           </div>
@@ -88,7 +91,7 @@ export default function ContactPage() {
               </p>
               <p className="flex items-center gap-2">
                 <Package className="w-4 h-4 flex-shrink-0 text-secondary" />
-                Response: within 24 hours
+                OEM/ODM and private-label projects reviewed per brief
               </p>
             </div>
           </div>
@@ -116,9 +119,10 @@ export default function ContactPage() {
         {/* Form */}
         <div className="lg:col-span-2">
           <div className="p-8 rounded-2xl bg-white border border-stone-lighter">
-            <h2 className="text-2xl font-bold text-primary mb-2">Send Us a Message</h2>
+            <h2 className="text-2xl font-bold text-primary mb-2">Request a Mixed-Style Collection Plan</h2>
             <p className="text-stone-light mb-6 text-sm">
-              Fill out the form below and we&apos;ll get back to you within 24 hours.
+              Start with the essentials, then add optional planning details when ready. Submitting
+              prepares an email draft; KARUU does not receive an inquiry until you send that email.
             </p>
             <ContactForm />
           </div>

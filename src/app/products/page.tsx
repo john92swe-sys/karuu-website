@@ -10,6 +10,7 @@ import {
 import { ProductCard } from '@/components/product-card';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { HYDRATION_PUBLICLY_DISCOVERABLE } from '@/config/catalog';
+import { MixedStyleMoqBanner } from '@/components/mixed-style-collection';
 
 export const metadata: Metadata = {
   title: 'B2B Activewear Products',
@@ -82,6 +83,8 @@ export default function ProductsPage({
           </div>
         </section>
 
+        <MixedStyleMoqBanner />
+
         <nav className="mt-8 flex flex-wrap gap-2" aria-label="Product categories">
           <Link
             href="/products"
@@ -124,18 +127,19 @@ export default function ProductsPage({
           <div className="mx-auto flex max-w-4xl flex-col items-center gap-7 text-center md:flex-row md:justify-between md:text-left">
             <div>
               <h2 className="text-2xl font-bold text-white md:text-3xl">
-                Need a product-specific quotation?
+                Need a coordinated collection plan?
               </h2>
               <p className="mt-3 max-w-2xl text-base leading-7 text-white/75">
-                Open any product to review its specifications and prepare an inquiry based on
-                your quantity, size, color, branding, and delivery requirements.
+                Select representative styles from the full catalogue. KARUU confirms the eligible
+                product series and final style, color, size, branding, and delivery requirements
+                during quotation.
               </p>
             </div>
             <Link
               href="/contact"
               className="inline-flex min-h-12 flex-none items-center justify-center rounded-xl bg-accent px-7 py-3 font-semibold text-primary transition-colors hover:bg-accent/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
-              General Inquiry
+              Request a Mixed-Style Collection Plan
             </Link>
           </div>
         </section>

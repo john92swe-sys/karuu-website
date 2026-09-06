@@ -41,7 +41,7 @@ export const kr010005: Product = {
     'Label and packaging requirements can be reviewed before quotation',
     'Color development is reviewed against material and trim minimums',
   ],
-  moq: 'New production: 500 pieces per color',
+  moq: 'Mixed-style MOQ available within the same product series; final order structure confirmed during quotation.',
   packaging: 'Individual poly bag',
   gallery: [
     {

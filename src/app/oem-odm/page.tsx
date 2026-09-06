@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { HYDRATION_PUBLICLY_DISCOVERABLE } from '@/config/catalog';
+import { ACTIVEWEAR_MOQ_STATEMENT } from '@/config/mixed-style-moq';
 
 export const metadata: Metadata = {
   title: 'OEM / ODM Coordination | KARUU Activewear',
@@ -169,7 +170,7 @@ export default function OemOdmPage() {
                 href="/contact"
                 className="inline-flex items-center gap-2 bg-accent text-primary px-6 py-3 rounded-lg font-semibold hover:bg-accent-light transition-all"
               >
-                Get a Free Quote
+                Request a Mixed-Style Collection Plan
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <a
@@ -193,7 +194,7 @@ export default function OemOdmPage() {
                 { label: 'Product Scope', value: 'Confirmed against the buyer brief' },
                 { label: 'Material', value: 'Reviewed from available options and documents' },
                 { label: 'Sizing', value: 'Confirmed for each selected style' },
-                { label: 'MOQ', value: 'Confirmed per product, color, and customization scope' },
+                { label: 'Starting MOQ', value: ACTIVEWEAR_MOQ_STATEMENT },
                 { label: 'Sample Time', value: 'Confirmed after requirements review' },
                 { label: 'Bulk Lead Time', value: 'Confirmed after sample and order approval' },
                 { label: 'Customization', value: 'Reviewed for design, color, logo, label, and packaging' },

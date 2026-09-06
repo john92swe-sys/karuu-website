@@ -14,6 +14,13 @@ const footerSource = readFileSync(join(root, 'src/components/footer.tsx'), 'utf8
 const productsPageSource = readFileSync(join(root, 'src/app/products/page.tsx'), 'utf8');
 const sitemapSource = readFileSync(join(root, 'src/app/sitemap.ts'), 'utf8');
 const productPageSource = readFileSync(join(root, 'src/app/products/[slug]/page.tsx'), 'utf8');
+const mixedStyleSource = readFileSync(join(root, 'src/components/mixed-style-collection.tsx'), 'utf8');
+const contactSource = readFileSync(join(root, 'src/components/contact-form.tsx'), 'utf8');
+const moqConfigSource = readFileSync(join(root, 'src/config/mixed-style-moq.ts'), 'utf8');
+const activewearDataSource = [
+  ...Array.from({ length: 15 }, (_, index) => `src/data/products/kr01-${String(index + 1).padStart(4, '0')}.ts`),
+  'src/data/products/kr02-batch.ts',
+].map((path) => readFileSync(join(root, path), 'utf8')).join('\n');
 
 const slugs = [...hydrationSource.matchAll(/slug: '([^']+)'/g)].map((match) => match[1]);
 const skus = [...hydrationSource.matchAll(/sku: '(KHD-[0-9]{4})'/g)].map((match) => match[1]);
@@ -67,4 +74,37 @@ test('temporary hydration discovery switch is off and reversible', () => {
 test('preserved hydration detail URLs are noindex and do not expose related products', () => {
   assert.match(productPageSource, /\? \{ index: false, follow: false \}/);
   assert.match(productPageSource, /publiclyDiscoverableRelatedProducts/);
+});
+
+test('activewear MOQ wording uses the approved series-level statement', () => {
+  assert.match(moqConfigSource, /Starting MOQ: 200 pieces per product series, with styles mixable within the same series/);
+  assert.match(productPageSource, /ACTIVEWEAR_MOQ_STATEMENT/);
+  assert.doesNotMatch(activewearDataSource, /\b\d+\s*(?:pieces|pcs)\s*(?:per|\/)\s*colou?r/i);
+  assert.doesNotMatch(activewearDataSource, /MOQ\s*:?\s*200\s*(?:pieces|pcs)?\s*(?:per|\/)\s*colou?r/i);
+});
+
+test('mixed-style module provides three bounded procurement scenarios', () => {
+  for (const scenario of [
+    'Yoga Studio & Teacher Training Capsule',
+    'Pilates & Barre Studio Capsule',
+    'Emerging Activewear Brand Capsule',
+  ]) {
+    assert.match(mixedStyleSource, new RegExp(scenario));
+  }
+  assert.match(mixedStyleSource, /do not indicate all pieces are available together in a single 200-piece\s+order/);
+  assert.match(mixedStyleSource, /View the Full KARUU Catalogue/);
+});
+
+test('collection-plan form stays low-friction and accurately describes email delivery', () => {
+  for (const field of [
+    'companyName', 'contactName', 'businessEmail', 'countryRegion', 'businessType', 'message',
+    'intendedUse', 'instructorStaffWear', 'memberRetail', 'teacherTraining', 'privateLabel',
+    'estimatedQuantity', 'preferredProductCategories', 'representativeStyles',
+    'targetLaunchDate', 'brandingRequirement',
+  ]) {
+    assert.match(contactSource, new RegExp(`name=\"${field}\"`), field);
+  }
+  assert.match(contactSource, /<details/);
+  assert.match(contactSource, /does not store this form/);
+  assert.match(contactSource, /Request a Mixed-Style Collection Plan/);
 });
