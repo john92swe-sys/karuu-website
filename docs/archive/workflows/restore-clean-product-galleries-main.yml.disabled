@@ -1,3 +1,11 @@
+# ARCHIVED 2026-09-07 — historical evidence only; not an active workflow.
+# Moved out of .github/workflows to prevent automatic reuse of this one-time repair.
+# Do not run or re-enable this historical body: it restores all src/data/products
+# from 0c426cd7, which contains superseded MOQ values, and pushes repository changes.
+# Future gallery repairs must use selected approved images and minimal current-data
+# edits, preserving current business facts and public-product safety checks.
+# The original workflow is preserved unchanged below for traceability.
+
 name: Restore clean product galleries
 
 on:
