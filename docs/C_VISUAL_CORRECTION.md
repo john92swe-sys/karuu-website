@@ -2,7 +2,7 @@
 
 日期：2026-10-13。本轮依据用户纠偏指令与 C 的桌面/手机网页区域，对当前官网首页展示层进行修正；业务能力、版次、品牌隔离和 KRU 开关分别记录，不用视觉替代功能验收。
 
-> **迭代状态：手机收紧后的新正式 workerd 截图与四张对照已核验，远程新版本发布仍待实际读回。** 本稿当前使用 `work/c-visual-worker-compact/` 的新图；第一轮图与记录保留在 `work/c-visual-comparison/iteration-1/`。当前结果用于展示实际结构和差异，不宣称逐像素还原或商用端到端全部通过。
+> **迭代状态：compact 新版本已发布到独立 review Worker，线上五视口截图已验证；正式站保持原版本。** 四张 C/前后对照继续使用 `work/c-visual-worker-compact/` 的真实本地截图，线上证据独立保存在 `work/c-visual-remote/`；不将本地对照冒称线上对照。第一轮图与记录保留在 `work/c-visual-comparison/iteration-1/`。当前结果展示实际结构和差异，不宣称逐像素还原或商用端到端全部通过。
 
 
 ## 截图版本与验证范围
@@ -10,10 +10,11 @@
 | 证据 | 实际范围 |
 | --- | --- |
 | Before | 旧 runtime `649dc7968b75d9980c9fd429d0d63812384c7ebd`，截图记录时间 `04:43:42.679 UTC`；这是纠偏前页面，不是新视觉基线 |
-| After | 正式 OpenNext 构建的本地 workerd `http://localhost:3097`，截图时间 `06:38:32.091 UTC`，Edge `155.0.4283.45` headless；不含 Next dev 的 N 指示器。截图报告的 HEAD 为 `e78f9d794fe76668a3f425e30ecde4303ca840b2`，`builtSource` 明确写为该提交加手机 CSS 修正，采集时 `src/app/home-c.css` 尚未提交；不能把该 HEAD 单独称为最终构建提交 |
+| After（本地） | 正式 OpenNext 构建的本地 workerd `http://localhost:3097`，截图时间 `06:38:32.091 UTC`，Edge `155.0.4283.45` headless；不含 Next dev 的 N 指示器。截图报告的 HEAD 为 `e78f9d794fe76668a3f425e30ecde4303ca840b2`，`builtSource` 明确写为该提交加手机 CSS 修正，采集时 `src/app/home-c.css` 尚未提交；不能把该 HEAD 单独称为最终构建提交 |
+| After（线上独立 review） | 实际远程 URL 下 Edge 截图，时间 `07:03:30.574 UTC`；源码 `72634a8fa6064e1e7e0f4a7d104e1a3691b11b1a`，Worker 版本 `10b5ed26-6f51-4082-bf2b-a26e8cd3e936`。该次报告的 workingTree 仅有文档修改；不替换本地截图身份及时间 |
 | C 参考 | 已裁纯网页的 `reference-desktop.png`（1105×1002）、`reference-mobile.png`（337×1002）；不含图外中文标题、外框、底说明。原图 SHA 与坐标保存在 `docs/design-reference/reference-crops.json` |
 
-After 脚本实际记录了五个规定 CSS 视口，分别为 **1440×1000、1920×1080、390×844、430×932、360×844**。每次回读 viewport/窗口宽高，文档与 body 滚动宽度等于该视口宽度，五项记录均 passed，脚本 pageerror 列表为空。桌面9个、手机8个实际渲染的内容图片条目均 complete 且 naturalWidth>0。手机重复 audio 插图记录 `rendered:false`、零尺寸和未请求状态，属于隐藏元素，不当作断图。来源是[compact 视觉报告](../work/c-visual-worker-compact/visual-browser-verification.json)，本对照任务没有重复执行五视口测试。模拟 CSS 视口不称为实机手机测试，pageerror 为空不等于所有控制台或网络请求均正常。
+本地 After 脚本实际记录了五个规定 CSS 视口，分别为 **1440×1000、1920×1080、390×844、430×932、360×844**。每次回读 viewport/窗口宽高，文档与 body 滚动宽度等于该视口宽度，五项记录均 passed，脚本 pageerror 列表为空。桌面9个、手机8个实际渲染的内容图片条目均 complete 且 naturalWidth>0。手机重复 audio 插图记录 `rendered:false`、零尺寸和未请求状态，属于隐藏元素，不当作断图。来源是[compact 本地视觉报告](../work/c-visual-worker-compact/visual-browser-verification.json)，本对照任务没有重复执行五视口测试。模拟 CSS 视口不称为实机手机测试，pageerror 为空不等于所有控制台或网络请求均正常。
 
 本子任务新增的浏览器操作只有 1440×1000 与 390×844 两次只读页脚 boundingBox。实际页高与 After 截图证据相符；未修改、停止或重启父任务持有的 workerd。
 
@@ -28,7 +29,21 @@ After 脚本实际记录了五个规定 CSS 视口，分别为 **1440×1000、19
 全高含公司页脚，对照裁图按另行实测的 footer 起点排除页脚。五个视口的原始首屏/全页截图保留于 `work/c-visual-worker-compact/`。
 
 
-## 可以直接看的对照图
+## 独立 review 线上截图与本地截图
+
+[独立 review 页面](https://karuu-c-review-20261013.john92swe.workers.dev) 已由真实线上 Edge 正常请求；未修改 UA 或保护策略。线上报告记录五个指定 CSS 视口均 passed，页面与 body 宽度均未越出视口，pageerror 为0；实际显示的内容图片均加载，手机隐藏 audio 图片按 `rendered:false` 排除。完整记录见[线上视觉报告](../work/c-visual-remote/visual-browser-verification.json)。本次新增五视口浏览器证据独立记录，保留前轮 HTTP 403 的原报告，不把它改写为成功，也不据此宣称 API 或账户/支付/交付端到端通过。
+
+| CSS 视口 | 本地首屏 / 全页 | 线上 review 首屏 / 全页 |
+| --- | --- | --- |
+| 1440×1000 | [首屏](../work/c-visual-worker-compact/home-1440x1000-first.png) / [全页](../work/c-visual-worker-compact/home-1440x1000-full.png) | [首屏](../work/c-visual-remote/home-1440x1000-first.png) / [全页](../work/c-visual-remote/home-1440x1000-full.png) |
+| 1920×1080 | [首屏](../work/c-visual-worker-compact/home-1920x1080-first.png) / [全页](../work/c-visual-worker-compact/home-1920x1080-full.png) | [首屏](../work/c-visual-remote/home-1920x1080-first.png) / [全页](../work/c-visual-remote/home-1920x1080-full.png) |
+| 390×844 | [首屏](../work/c-visual-worker-compact/home-390x844-first.png) / [全页](../work/c-visual-worker-compact/home-390x844-full.png) | [首屏](../work/c-visual-remote/home-390x844-first.png) / [全页](../work/c-visual-remote/home-390x844-full.png) |
+| 430×932 | [首屏](../work/c-visual-worker-compact/home-430x932-first.png) / [全页](../work/c-visual-worker-compact/home-430x932-full.png) | [首屏](../work/c-visual-remote/home-430x932-first.png) / [全页](../work/c-visual-remote/home-430x932-full.png) |
+| 360×844 | [首屏](../work/c-visual-worker-compact/home-360x844-first.png) / [全页](../work/c-visual-worker-compact/home-360x844-full.png) | [首屏](../work/c-visual-remote/home-360x844-first.png) / [全页](../work/c-visual-remote/home-360x844-full.png) |
+
+线上1440及390全页图已另行目视核对，呈现 compact 新版湖山首屏、真实封面、手机紧凑双分区及未启用 KRU 信息条。内置浏览器 reload 后的独立桌面截图保存在交付目录 `after-online/in-app-desktop.jpg`，亦已目视查看；该截图不冒称五个规定视口之一。
+
+## 可以直接看的本地对照图
 
 各图均为 **左侧参考/修改前，右侧当前实现**。没有给任何图计算“还原度百分比”或自动通过评分。
 
@@ -55,11 +70,9 @@ Pillow仅进行所声明的截图裁切、等比例Lanczos缩放与并排排版�
 
 ## 功能、素材与资源的独立证据
 
-- [C_CORRECTION_FUNCTIONAL_QA.md](C_CORRECTION_FUNCTIONAL_QA.md)：路由、菜单、搜索、分类、外链及账户/询盘未配置状态的真实本地浏览器结果；127与localhost Origin的不同结果分别记录。不能把报错提示当作成功入库。
+- [C_CORRECTION_FUNCTIONAL_QA.md](C_CORRECTION_FUNCTIONAL_QA.md)：远程只读的20页面、4组交互与5个匿名API，以及本地路由、菜单、搜索、分类、外链和账户/询盘未配置结果；127与localhost Origin的不同结果分别记录。远程没有提交询盘、付款或账户表单，不能把本地报错提示当作成功入库。
 - [C_VISUAL_ASSET_EVIDENCE.md](C_VISUAL_ASSET_EVIDENCE.md)：原素材身份、封面编码，以及独立PGlite真实SQL/持久化和通知fixture回执。该回执不是远程数据库或客户真实收件证明。
 - [C_DESIGN_RESOURCES.md](C_DESIGN_RESOURCES.md)：五组官方原仓库版本与许可；唯一主指导为已局部保存的 Anthropic frontend-design，impeccable只作审查方法，复用已有shadcn/Playwright，没有为美化重启系统。
-
-## 发布状态：待父任务实际新版本读回
 
 ## 本地最终回归与构建
 
@@ -67,8 +80,27 @@ compact 截图逐项目视核对 C 后，仅更新三组手机的首屏/整页�
 
 最终 OpenNext 构建完成；Wrangler dry-run 读取523个资产，上传体积6830.12KiB、gzip1323.49KiB，所有商用开关仍false。28项业务/目录测试、TypeScript和lint记录见工作目录；正式 workerd 的20路由/6宽度、5原流程与13组补测另见功能报告。数据库缺失和品牌路由缺失的503按未配置结果记录，不称询盘已成功保存。
 
-手机第一本书的 Google 平台入口经真实详情页可达；第二本书下方直接显示 Kindle。没有为了概念图对称而伪造第一本书的 Kindle 版。正式站域名仍待既有发布范围与当前生产源核对。
+手机第一本书的 Google 平台入口经真实详情页可达；第二本书下方直接显示 Kindle。没有为了概念图对称而伪造第一本书的 Kindle 版。发布范围为独立 review；正式站原生产版本的实际读回见下节。
 
-本轮图像证据证明当前本地正式 workerd 的视觉结果，并不独立证明正式站更新。此前独立review的 `acc84001-1b28-4a91-8e64-6f70f39e3593` 对应旧649 runtime，不将其部署成功借给本次新视觉。当前新截图只标识 `e78f9d794fe76668a3f425e30ecde4303ca840b2` 加手机 CSS 修正的本地构建。最终 runtime提交、Cloudflare版本/部署ID、流量及正式站状态将在父任务提供实际读回后补入；本对照子任务没有执行commit、登录或部署。
+## 发布状态：独立 review 新版已发布，正式站原版本未变
+
+| 记录 | 当前可确认事实 |
+| --- | --- |
+| 首轮视觉源码 | `e78f9d794fe76668a3f425e30ecde4303ca840b2`；本轮 compact 原始截图在此 HEAD 加手机 CSS 修正的构建上采集，保留原报告，不事后改写采集身份 |
+| 最终 compact runtime 源码 | `72634a8fa6064e1e7e0f4a7d104e1a3691b11b1a`，tree `0436d9fbfd5f536343af4c18f0d0af8ed16d6b72`；本地 Git 已只读回读确认该提交与 tree，主代理已确认提交到远程 |
+| 测试源码对应关系 | 主代理记录本地 tested `7d506f0` 与上述最终远程 runtime 的 tree 一致；截图的原始 HEAD、时间及未提交状态继续按采集时报告单独记载 |
+| 新独立 review Worker | 版本 `10b5ed26-6f51-4082-bf2b-a26e8cd3e936`，部署 `f90a64e1-bd60-4476-b5be-86207341e345`，该 review 的100%流量；版本创建时间 `2026-10-13T06:59:16.424931Z`，部署创建时间 `2026-10-13T06:59:19.056222Z`。官方 CLI/API JSON 已读回 |
+| 正式站 | `karuu-production` 仍为部署 `8b611224-1961-40d1-9726-b6cda2e4fe74` → 版本 `5abbde92-a504-4a86-9d6a-34d0689a2b88`，100%生产流量，创建时间 `2026-09-17T20:42:35.821555Z`。本次未更新正式站 |
+
+官方读回来源分别为 [review 部署清单](../work/c-correction-review-deployments.json)、[review 版本资料](../work/c-correction-review-version.json) 与 [生产部署清单](../work/c-correction-production-deployments.json)。此前独立 review 的 `acc84001-1b28-4a91-8e64-6f70f39e3593` 对应旧 `649dc7968b75d9980c9fd429d0d63812384c7ebd` runtime；本次新视觉的发布证据为上表新版本与线上报告。四张本地合成图及 comparison JSON 保留生成时的原始来源、时间与待发布备注，当前发布状态由本节独立记载。后续文档单独提交不会更改此处固定的 runtime 源码身份。
+
+## 恢复位置：仅记录候选，未执行回滚
+
+| 候选 | 身份及适用范围 |
+| --- | --- |
+| 视觉纠偏前源码恢复分支 | `codex/karuu-c-before-visual-correction-20261013` → `b7b2763600f855c8e14d9f5621cb2b53bdae006e`；本地 `refs/heads` 已只读核对，作为源码恢复位置 |
+| 前轮独立 review Worker 版本 | `acc84001-1b28-4a91-8e64-6f70f39e3593`；仅为独立 `karuu-c-review-20261013` 的回滚候选，不是正式 `karuu-production` 的回滚版本 |
+
+本对照子任务仅编辑文档，没有登录、部署、改写 runtime 或执行源码/Worker 回滚；未操作正式站回滚。
 
 数据库、真实支付、邮件、私有文件交付、游戏服务和 KRU 仍按已知配置状态分别记录。新截图、构建通过和预览可打开不能替代真实商用端到端验证；本对照任务没有改应用、测试或视觉基线。

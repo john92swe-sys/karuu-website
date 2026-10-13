@@ -8,6 +8,9 @@ The current application uses Next.js 15.5.27, React 18, Tailwind 4 and OpenNext
 recovered. This checkout and its deploy script target only the isolated
 `karuu-c-review-20261013` Worker. See `docs/C_RELEASE_HANDOFF.md` for verified
 deployment evidence and the boundary between preview and production.
+The latest C visual correction, deployed version, exact screenshots and recovery
+points are recorded in `docs/C_VISUAL_CORRECTION.md`; original and final
+functional checks are distinguished in `docs/C_CORRECTION_FUNCTIONAL_QA.md`.
 
 Run `npm test`, `npm run build:cloudflare` and `npm run check:cloudflare` before a
 review upload. With the existing official Wrangler authorization, use

@@ -1,6 +1,27 @@
-# C 视觉纠偏后的本地功能回归
+# C 视觉纠偏功能回归
 
-## 最新：正式 OpenNext / workerd 回归
+## 最新：真实远程独立审查版本
+
+2026-10-13 `07:09–07:22 UTC`，对 [Cloudflare独立审查站](https://karuu-c-review-20261013.john92swe.workers.dev) 做限定只读实际浏览器补测。源码 **`72634a8fa6064e1e7e0f4a7d104e1a3691b11b1a`**；Worker版本 **`10b5ed26-6f51-4082-bf2b-a26e8cd3e936`**。身份对应本轮官方Wrangler读回：deployment `f90a64e1-bd60-4476-b5be-86207341e345`，`06:59:19 UTC`，该版本100%。报告保存版本证据SHA；未复制认证/部署日志。实际浏览器为正常安装的 Edge155 / Playwright headless，保留默认UA，没有伪装UA、调整安全保护或绕过403。
+
+最终覆盖 **20/20页面GET、4组交互/门禁流程及5个匿名API读取**，全部通过；没有403、pageerror或非GET请求：
+
+| 远程范围 | 实际结果 |
+| --- | --- |
+| 20页面 | 与下方路由清单一致，全部200、有页面主标题；admin实际显示Administrator access required |
+| 首页交互 | Books / Books & audio / Music / Games点击切换真实内容，键盘ArrowRight循环与End通过 |
+| 手机390×844 | 实际视口确认，touch菜单打开、Escape关闭、点击Digital creations跳目录并关闭；进入搜索后真正GET提交low tide，找到原书 |
+| 媒体目标 | 音乐图href为精确YouTube `i6mns_U5nxE`，游戏图指向Nordic真实原型详情；未远程播放音轨或启动试玩 |
+| 匿名API | status200且database/accounts/payments/privateMedia/inquiries/KRU全部关闭；catalog200 `items=[]`；orders/library/admin各401 `authentication_required` |
+| 索引门禁 | 首页meta及HTTP均noindex/nofollow；所有20页有有效noindex/nofollow。Legacy商品详情无robots meta，但HTTP X-Robots-Tag明确noindex/nofollow；搜索meta为noindex/follow，其HTTP头仍noindex/nofollow |
+
+最初测试强制每页必须有robots meta，在legacy商品页超时；改为核有效meta/HTTP策略后完成。随后admin的networkidle等待超时，改以DOM及实际管理员门禁就绪验证；手机首次只等DOM后tap未出现菜单，等待正常页面load及帧稳定后通过。只继续未完成部分，没有改应用或安全措施，三个原始失败JSON均保留；不能把这些超时描述为被修复的服务故障。
+
+远程没有提交任何联系/询盘/账户/支付表单，没有发邮件、建立订单、扣款、授予下载或执行KRU。唯一表单提交是明确授权的搜索GET。服务关闭是实际配置状态，**不是商业交易、真实询盘入库或履约验收成功**。本地PGlite持久化fixture及workerd双品牌503证据仍各自独立；真实远程五规定视口视觉截图另由视觉报告记录。本次审查部署不代表替换现网www主站。
+
+证据在 `work/c-correction-remote-functional/`：`remote-functional-verification.json`（版本/源码、20路由、5API、4流程、实际UA/视口和请求方法）、6张业务截图、3个初次失败记录及复核脚本。记录时HEAD等于上述应用源码，只有README/视觉说明在编辑；最终报告回读真实dirty列表，不把文档工作区称为clean。
+
+## 此前：正式 OpenNext / workerd 本地回归
 
 2026-10-13 `06:41–06:46 UTC`，对已经运行的正式 OpenNext 本地 workerd **`http://localhost:3097`** 执行实际 headless Edge **155.0.4283.45** / bundled Playwright 回归。未启动构建、改应用、停服务、部署或commit。源码HEAD为 **`e78f9d794fe76668a3f425e30ecde4303ca840b2`**，并有未提交 `home-c.css`、视觉QA脚本、说明及360/390/430基线更新；报告保留真实dirty清单，不把它称为clean提交原样。补测的六份首页/导航/作品文件前后SHA相同，同时记录浏览器实际取得的两份CSS URL/字节/SHA，限定本次所测运行产物。
 
