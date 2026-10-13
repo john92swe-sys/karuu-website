@@ -6,11 +6,12 @@
 
 | 对象 | 本次实际发现 | 状态 / 边界 |
 | --- | --- | --- |
-| KARUU 主站现行部署 | 本次 Cloudflare 后台已核：Worker `karuu-production`，active 显示标识 `5abbde92`，Ready / 100%；部署者 Wrangler，界面显示 `25d ago`；自定义域名 `www.karuu.net`、`karuu.net`；workers.dev `https://karuu-production.john92swe.workers.dev` | 现网归属已确认是 Cloudflare，撤回此前将 Vercel 记录当成现网对应关系的结论；尚未取得该 Worker 版本对应源码提交及可恢复部署制品 |
-| 现行 Worker 运行配置 | 仅有 `ASSETS` binding；没有环境变量 / 数据库 binding；compatibility date `2026-09-17`；没有 `nodejs_compat` | 不能据此认定新 Next.js 服务端、PostgreSQL、支付回调或私有交付可以直接运行；本次 C 源码已实现动态 Workers 适配并通过 OpenNext 构建、dry-run 与本地 workerd；远程预览、真实服务配置及正式部署仍未完成 |
+| KARUU 主站现行部署 | 本次后台及官方 Wrangler CLI 已核：Worker `karuu-production`，active version `5abbde92-a504-4a86-9d6a-34d0689a2b88`（number 1），deployment `8b611224-1961-40d1-9726-b6cda2e4fe74`，100%；创建 `2026-09-17T20:42:35.821555Z`；source Wrangler、triggered_by upload；自定义域名 `www.karuu.net`、`karuu.net`；workers.dev `https://karuu-production.john92swe.workers.dev` | 现网归属已确认是 Cloudflare，撤回此前将 Vercel 记录当成现网对应关系的结论。version/deployment annotations 无 Git commit；仍未证明对应 `5994198` 或取得可恢复原制品 |
+| 现行 Worker 运行配置 | 仅有 `ASSETS` binding，但存在 `fetch` script handler；etag `1f778ebcdd9d6d3ff9a5bacd98a082519716b22e25dc58cbc5f887ce917800db`；assets `serve_directly:true`，`static_routing.user_worker` 与 `raw_run_worker_first` 均为 `/api/*`，HTML drop-trailing-slash、404-page；compatibility date `2026-09-17`；后台无环境变量 / 数据库 binding | `ASSETS` 是唯一 binding 不等于没有 JS。实际配置是 assets 与 fetch Worker 配合，API 路径优先脚本；原 API 是否处理邮件草稿、持久发送或委托其他服务，须读回原脚本，现阶段不能仅凭 binding 猜。不能据此认定新动态交易后端可直接运行；C 源码适配的构建/runtime 验证另列 |
 | 同账号 Cloudflare Pages | `karuu-website`：`No Git`、界面显示 `25d ago`；`karuu-digital-store`：`No Git`、显示 `2d ago` | 数字 Pages 当前域名、部署及公开内容已另行读回，详见下一行；两个 Pages 名称不证明与主站 Worker 使用同一制品或 Git 提交 |
 | 数字 Pages 当前生产部署 | deployment `eab7a056-9701-44b4-abee-713bfcef96c4`，Success；后台显示 `Oct 10, 9:27 AM`，UI 时区未核；生产仅 `karuu-digital-store.pages.dev`；6 个静态 assets（404、favicon、index、release、robots、sitemap）；环境变量 0 | 已读到 16 条公开作品记录，主线内容与历史 Netlify 副本一致；该部署没有订单数据库。未取得源码提交对应、平台客户资料或订单导出资格，不推断外平台无订单 |
 | 本次升级 Git 起点 | `john92swe-sys/karuu-website`；Git 基线 `5994198f63e840cceb0d2226b1f15214ee5a522c`；隔离分支 `codex/karuu-c-store-20261013` | `5994198` 仅证明现有 Git 工程起点，尚未证明对应 Cloudflare active 版本；旧 Vercel 部署记录不能代替该对应核验 |
+| C 独立审查部署 | Worker `karuu-c-review-20261013`，版本 `acc84001-1b28-4a91-8e64-6f70f39e3593`；[审查地址](https://karuu-c-review-20261013.john92swe.workers.dev)；运行来源 commit `649dc7968b75d9980c9fd429d0d63812384c7ebd` / tree `c44a23f08fece825b412f78cc413e1b9e14bd55d` | 已部署，主要桌面页面及内容/禁用状态检查完成，未提交联系表或付款；status 被客户端阻止、独立 HTTP 403，远程接口仍未验证。390 视口覆盖未生效，不能称远程手机通过。生产 after 仍是 `5abbde92…` 100%；DB/付款/邮件/私有媒体/KRU 未接通，32 项通过仅为本地检查 |
 | https://discover.karuu.net/ | 本机 HTTP 200，HTML title `Europe–China Market Access · KARUU`；JS `/assets/index-BflE123c.js`、CSS `/assets/index-BM40w8Vi.css` | 当前是欧洲—中国市场服务 SPA，不能当作数字作品商店整站替换或全部重定向 |
 | https://karuu-digital-store.netlify.app/ | 本机 HTTP 200；title `KARUU Digital Store — Books, Audio & Xiaoju World`；页面内商品 JSON version `1.0.1`、mode `public-platform-store`、`paymentsEnabled: false` | 历史部署的当前可访问副本，提供英文/中文内容、平台入口、筛选、搜索和本机收藏；本次迁移资料来源之一，不再认定为当前正式数字站部署 |
 | 数字站原源码位置 | JOHN 原机 `D:\KARUU_Data\Projects\karuu-digital-store` | 来源为已恢复 `PUBLICATION_RECORD.json` 读回；本机没有把该路径冒充当前已拉取 Git 工程 |
@@ -19,6 +20,8 @@
 | 旧站外链问题 | 页面 JSON 有 Amazon / Fanqie / Ximalaya 条目，但脚本 safeExternal 仅允许 Google / YouTube / Payhip | 内容数据存在不等于现有每个按钮可工作；迁移应逐条核身份及新 allowlist |
 
 来源：本会话 Cloudflare 后台及当前数字 Pages 公网页面实际读回、`D:\KARUU_Workspace\References\Media-Recovery\JOHN\20261012-original-record-readback.txt`、`20261012-media-source-locations.json`，及上述历史副本本次 HTTP/JSON 读回。下文“旧站”商品资料主要指初次读取的 Netlify 历史副本；当前数字 Pages 的 16 条公开记录已确认主线内容一致。工作副本合并了 12 项适用作品，同书电子书/音频按格式归并，开发/未来项目不变成可售 SKU；仍需完成逐记录来源及旧 URL 对照，不移入不存在的本站订单库或未经许可的平台客户资料。
+
+现网只读 CLI 证据：`wrangler versions view 5abbde92-a504-4a86-9d6a-34d0689a2b88 --name karuu-production --json` 与 `wrangler deployments status --name karuu-production --json`。已在本工作副本 `work/cloudflare-production-evidence/` 保存去除作者邮箱等不必要字段的 JSON，无 token/密钥。官方 Wrangler 4.148.0 `init --from-dash` 默认会委托 C3，C3 2.73.4 现行代码仍转回 `--no-delegate-c3` 下载路径，该路径明确不支持 Workers with Assets。本次仅运行其已核纯读取分支：`init --from-dash karuu-production --no-delegate-c3 --yes`，工具实际返回“Unable to fetch bindings, routes, or services metadata”，下载目录没有文件。原模块/原资产尚未恢复，不能把元数据 SHA 或 script etag 冒充已备份代码 SHA。没有触发 login、修改资源/权限或部署。
 
 ## 2. 已复制的网站真实素材
 
@@ -120,4 +123,4 @@ Harbor Unity 的 `KruWallet.cs` 是本地 long Balance + KruEntry Ledger（Tutor
 | KRU市场/供应商/签名治理/可用预算与报价规则 | 链上奖励、KRU付款/兑换 | 经营者/KRU负责人 | 复用已核Mint，补规则后测试隔离环境；钱包连接不算收款完成 |
 | 历史数字副本原源码、现行数字站部署源码对应及平台导出资格 | 实际切域/替换数字站与适用平台订单迁移 | 经营者/原站维护者 | 从 JOHN 原工程核 Git，与已核 Cloudflare Pages deployment/域名对应；两公开目录已读取、当前 Pages 无订单数据库，但尚未取得平台客户订单；discover 当前另有真实业务需保留 |
 
-以上区分已核实素材、工作副本已实现、待配置与待外部材料。当前数字 Pages 的域名/部署、16 条公开目录和无订单数据库已核；Cloudflare 适配和本地 Workers 验证已完成；现网源码提交映射、数字记录/旧 URL 完整映射、远程预览及生产发布未完成。本清单不能替代网站同提交业务测试或正式部署验收。
+以上区分已核实素材、工作副本已实现、待配置与待外部材料。当前数字 Pages 的域名/部署、16 条公开目录和无订单数据库已核；Cloudflare 适配、本地 Workers 验证、独立审查部署与主要桌面页面检查已完成。远程接口仍受客户端阻止/HTTP 403 限制；手机覆盖尝试未生效，六视口证据归前次本地检查。现网源码提交映射、数字记录/旧 URL 完整映射及生产发布未完成，生产 after 读回没有替换现行版本。本清单不能替代真实 DB/支付/交付接通测试或正式生产部署验收。

@@ -4,20 +4,45 @@ This upgrade continues the existing Git source in `john92swe-sys/karuu-website`
 from baseline commit `5994198f63e840cceb0d2226b1f15214ee5a522c`, in branch
 `codex/karuu-c-store-20261013`. The original D-drive checkout was clean and is
 preserved. The source commit corresponding to the active Cloudflare production
-version has not yet been established. The current production site has not been
-replaced by this work.
+version has not yet been established. An independent Cloudflare review Worker
+has now been deployed; the current production site has not been replaced.
+
+## Published review and production boundary
+
+- Review URL: [KARUU C review](https://karuu-c-review-20261013.john92swe.workers.dev).
+- Review Worker: `karuu-c-review-20261013`; deployed version
+  `acc84001-1b28-4a91-8e64-6f70f39e3593`.
+- Deployed runtime source commit:
+  `649dc7968b75d9980c9fd429d0d63812384c7ebd`; Git tree
+  `c44a23f08fece825b412f78cc413e1b9e14bd55d`. These identify the published runtime;
+  subsequent handoff-document edits do not silently change that identity.
+- The review upload succeeded and the listed desktop browser page checks are
+  complete. Remote API verification remains incomplete: the browser client's
+  status request was blocked and independent HTTP checks received 403. The
+  32 successful checks below belong to local workerd, not the remote review URL.
+- Post-upload production readback in `work/cloudflare-production-after.json`
+  still records deployment `8b611224-1961-40d1-9726-b6cda2e4fe74`, version
+  `5abbde92-a504-4a86-9d6a-34d0689a2b88`, 100% traffic, and the original
+  `2026-09-17T20:42:35.821555Z` timestamp. Production was not promoted or replaced.
+- The review has no real database, merchant, verification-mail or private-media
+  configuration. Persisted customer operations, real payments and delivery are
+  not enabled. Real game fulfilment and KRU execution remain unfinished.
 
 ## Verified starting point
 
 - The current Cloudflare dashboard verifies that Worker `karuu-production`
-  serves custom domains `www.karuu.net` and `karuu.net`. Its active displayed
-  version identifier is `5abbde92`, Ready with 100% traffic. The dashboard lists
-  Wrangler as the deployer and displays `25d ago`. Its workers.dev endpoint is
+  serves custom domains `www.karuu.net` and `karuu.net`. Official CLI readback
+  identifies active version `5abbde92-a504-4a86-9d6a-34d0689a2b88`, deployment
+  `8b611224-1961-40d1-9726-b6cda2e4fe74`, 100% traffic and creation at
+  `2026-09-17T20:42:35.821555Z`. Its source is Wrangler. Its workers.dev endpoint is
   `https://karuu-production.john92swe.workers.dev`.
-- That Worker currently has only an `ASSETS` binding, no environment or database
-  bindings, compatibility date `2026-09-17`, and no `nodejs_compat` flag. This
-  is not evidence that the new Next.js server routes, PostgreSQL, payment events
-  or private delivery already run in Cloudflare.
+- That Worker has an `ASSETS` binding and a `fetch` script handler. Assets are
+  served directly with `/api/*` routed first to the user Worker. Having only one
+  ASSETS binding does not mean it has no JavaScript. The dashboard showed no
+  environment or database bindings, compatibility date `2026-09-17`, and no
+  explicit `nodejs_compat` flag. This is not evidence that the new PostgreSQL,
+  payment events or private delivery already run in production. Original modules
+  and the actual API handler implementation have not yet been recovered.
 - The same account also lists Pages projects `karuu-website` (`No Git`, displayed
   `25d ago`) and `karuu-digital-store` (`No Git`, displayed `2d ago`). The digital
   Pages production deployment is verified as
@@ -39,8 +64,10 @@ replaced by this work.
   parameters, route contexts and cookies use the current asynchronous interfaces.
   Existing Radix/shadcn components and Lucide are retained; no new hosted CMS
   service is created.
-- The original inquiry endpoint prepares a mail draft. It does not persist or
-  deliver enquiries. The new `/api/inquiries` is a separate persistent service;
+- The inspected Git baseline's inquiry endpoint prepares a mail draft and does
+  not persist or deliver enquiries. The deployed production Worker's API source
+  has not been recovered, so that Git finding alone does not prove its current
+  implementation. The new `/api/inquiries` is a separate persistent service;
   the old `/api/inquiry-mailto` remains compatible.
 - `discover.karuu.net` currently serves Europe–China Market Access. It is not
   the consumer store. The historical, still-accessible digital catalogue copy
@@ -115,9 +142,10 @@ confirmed, map its work IDs to the matching
 These are source implementations and local verification results. Cloudflare
 runtime adaptation is implemented using OpenNext dynamic Workers. Adapter
 packaging, a Wrangler dry run and the C homepage in local workerd have been
-verified. This is not a remote Cloudflare release or a replacement of the active
-ASSETS-only production Worker. External providers and production operation are
-not inferred from code, packaging or local test results; the new dynamic account,
+verified. The independent review Worker has also been deployed and renders the
+C page in the actual browser. It does not replace the active production Worker,
+which combines assets with a fetch script. External providers and transaction
+operation are not inferred from a deployed review page; the new dynamic account,
 database, checkout and delivery services have not been enabled in production.
 
 ## Validation and its limits
@@ -146,9 +174,13 @@ worker upload size of 6712.57 KiB, gzip 1305.29 KiB. Local workerd at
 `http://127.0.0.1:3097` passed 32 HTTP checks: 20 application pages, preview robots,
 and 11 service/permission checks. It rendered the actual C homepage. The exact
 final backend guard was rebuilt and checked. Preview metadata and response headers
-are noindex/nofollow and robots disallows crawling. These checks prove local Workers
-rendering and honest unconfigured-service behaviour, not a remote deployment or
-real Hyperdrive, merchant, mail or private-media integration.
+are noindex/nofollow and robots disallows crawling in the local verification.
+These 32 checks prove local Workers rendering and honest unconfigured-service
+behaviour. They are not 32 passing remote checks. The separate review deployment
+is confirmed and desktop browser page checks are complete, but remote API
+verification is limited by a client-blocked status request and HTTP 403 responses.
+No real Hyperdrive, merchant, mail or
+private-media integration has been verified.
 
 The review configuration is `wrangler.jsonc` with independent Worker name
 `karuu-c-review-20261013`, the generated `.open-next/worker.js`, ASSETS and a
@@ -163,10 +195,16 @@ Any Vercel preview generated by the repository's historical Git integration is
 an incidental preview artifact. It is not the production host or the Cloudflare
 runtime acceptance environment.
 
-Browser testing uses installed Microsoft Edge headless with simulated viewports
-320, 360, 390, 768, 1280 and 1440 pixels. It covers page rendering, navigation,
-search/filter/empty states and honest unconfigured-service feedback. These are
-not tests on a physical phone and not production user performance measurements.
+Earlier local Microsoft Edge headless testing used simulated viewports 320,
+360, 390, 768, 1280 and 1440 pixels; that evidence is separate from this remote
+review. The remote desktop browser checked the homepage and both businesses,
+catalogue/filter/search, Key details and the account/bag/member/admin/contact
+states. The catalogue had 12 works, Music 3 and bundles 2; `low tide` search
+returned one work. The homepage loaded its images, declared noindex/nofollow
+and had no horizontal overflow at the measured 1743-pixel width. No contact form,
+login, order or payment was submitted. The attempted 390-pixel mobile override
+did not take effect: measured widths were 1743 and subsequently 1280. Remote
+mobile acceptance and physical-phone testing are not complete.
 
 ## Before external operation
 
@@ -177,7 +215,7 @@ commerce, taxes, distribution rights and legal terms.
 
 | Dependency | Owner and concrete action | Affected operation |
 | --- | --- | --- |
-| Exact production source and final Cloudflare runtime acceptance | OpenNext adaptation, dry-run packaging and local homepage are verified; maintainer preserves the active Worker's source/artifact, rebuilds the final runtime-guard version and checks key APIs before any approved remote review upload | Reproducible release/rollback and acceptance of new server routes in the actual deployment |
+| Exact production source and remaining Cloudflare acceptance | OpenNext packaging, local checks, independent review deployment and listed desktop page checks are verified; maintainer still recovers the production source/artifact and completes remote API/mobile acceptance. Client-blocked status and HTTP 403 results do not count as passing checks | Reproducible production rollback and acceptance beyond desktop page rendering |
 | Digital Pages source and record mapping | Production hostname, deployment ID and 16-record public catalogue are verified; maintainer identifies the deployed source/artifact and completes each old-record mapping without fabricating external orders | Reproducible digital migration and old-to-new URL/work mapping |
 | Secure PostgreSQL/Hyperdrive connection and operator role | Operator selects the approved provider/plan, supplies the real `HYPERDRIVE_COMMERCE` binding with caching disabled and verified server settings, applies reviewed schema and tests actual requests | Persisted enquiries, accounts, CMS and orders in Workers |
 | Separate JKJ-Plus owner and mail delivery | Brand owner confirms receiver and service credentials separately | JKJ-Plus brief intake and notification |
@@ -198,18 +236,19 @@ contracts remain disabled and must not be represented as provider integrations.
 
 ## Deployment and rollback
 
-1. Preserve the active Cloudflare Worker version `5abbde92`, its routing and
+1. Preserve the active Cloudflare Worker version
+   `5abbde92-a504-4a86-9d6a-34d0689a2b88`, its routing and
    settings, and obtain its recoverable deployment artifact/source before any
    replacement. Retain Git baseline `5994198` separately; it is not a verified
    rollback artifact for the current Worker. Use this isolated branch for review;
-   a draft PR, local build or preview is not a production promotion.
+   a draft PR, local build or deployed review is not a production promotion.
 2. Use the implemented Next.js `15.5.27` / React 18 / OpenNext `1.20.10` path and
-   independent review Worker configuration. Rebuild the final backend
-   runtime-guard source, repeat dry-run packaging and verify key APIs in local
-   workerd before any authorized remote preview. The active production Worker
-   remains ASSETS-only; do not change its domains, traffic or bindings as part
-   of an isolated review upload. Actual Hyperdrive, merchant, media and mail
-   integration acceptance remains outstanding.
+   independent review Worker configuration. The review version above has been
+   built, checked locally and deployed. For later runtime changes, rebuild and
+   repeat the applicable local gates before updating the review. The active
+   production Worker still combines assets and a fetch script; its domains,
+   traffic and bindings were not changed by the isolated review upload. Actual
+   Hyperdrive, merchant, media and mail integration acceptance remains outstanding.
 3. Supply environment-specific values only in the verified server deployment
    settings. Set `KARUU_DEPLOYMENT_ENV=preview` for preview; production must remove
    that override. `VERCEL_ENV=preview` remains a compatible indexing signal in
@@ -222,8 +261,8 @@ contracts remain disabled and must not be represented as provider integrations.
    `npm run check:cloudflare` and the exact workerd artifact. Verify old product
    links, metadata, authority and honest unavailable-service responses; verify
    real database, payments and media only when their services are configured.
-   Local build and workerd evidence do not prove remote deployment or production
-   transaction readiness.
+   Remote deployment identity is recorded above; local build/workerd evidence
+   and browser rendering do not prove production transaction readiness.
 6. Promote only the reviewed Cloudflare-compatible artifact with confirmed
    operator authorization and verified domain/traffic routing.
 7. On rollback, disable new checkout/inquiry intake if necessary, route the

@@ -2,7 +2,9 @@
 
 ## 验证边界（2026-10-13）
 
-当前实际生产域名由 Cloudflare Worker `karuu-production` 承载（主任务核对）。本次 C 分支为兼容当前受支持 OpenNext 1.20.10 升级到 Next.js 15.5.27，仍沿用已有 App Router 工程，未部署替换生产 Worker。现生产仅核到 ASSETS 绑定，未取得本次交易数据库、商户、私有文件服务或验证邮件配置。下面的已编码服务不代表生产已启用。没有真实文件、发行权、价格、税务、完整成本和商户配置的 SKU 不接受本站付款。原平台购买继续由相应平台履约；没有取得或合并 Amazon / Google / Payhip 顾客、订单或账户。
+当前实际生产域名由 Cloudflare Worker `karuu-production` 承载，官方 CLI 已核 active version `5abbde92-a504-4a86-9d6a-34d0689a2b88`、deployment `8b611224-1961-40d1-9726-b6cda2e4fe74`、100%、2026-09-17 创建。其 ASSETS 是唯一 binding，但脚本有 fetch handler，`/api/*` 配置优先交给该脚本，因此不能称它为“没有 JS 的完全静态 Worker”。未取得原模块/API 实现与真实 Git commit 对应，不能以旧 Vercel 或本次 `5994198` Git 起点冒充迁移来源。本次 C 分支为兼容当前受支持 OpenNext 1.20.10 升级到 Next.js 15.5.27，仍沿用已有 App Router 工程，未部署替换生产 Worker。未取得本次交易数据库、商户、私有文件服务或验证邮件配置。下面的已编码服务不代表生产已启用。没有真实文件、发行权、价格、税务、完整成本和商户配置的 SKU 不接受本站付款。原平台购买继续由相应平台履约；没有取得或合并 Amazon / Google / Payhip 顾客、订单或账户。
+
+独立审查 Worker 已部署：[KARUU C review](https://karuu-c-review-20261013.john92swe.workers.dev)，版本 `acc84001-1b28-4a91-8e64-6f70f39e3593`；运行代码来自 commit `649dc7968b75d9980c9fd429d0d63812384c7ebd` / tree `c44a23f08fece825b412f78cc413e1b9e14bd55d`。实际桌面浏览器的主要页面及诚实禁用/空态检查已完成，没有提交联系表、登录、订单或付款。远程 status 请求被客户端阻止、独立 HTTP 检查遇到 403，接口仍未验证；32 项通过是本地 workerd 检查。390 手机视口覆盖未生效，实际测得 1743/1280，不能说远程手机验收通过；此前六视口证据归前次本地检查。`work/cloudflare-production-after.json` 读回生产仍是上述 `5abbde92…` 版本、100%，没有替换生产。审查部署仍无真实 DB/邮件/Stripe/私有媒体配置，KRU 与真实游戏适配依然未完成。
 
 `node --test scripts/test-commerce.mjs` 使用 PGlite 的 PostgreSQL WASM 引擎执行真实 SQL、唯一键、事务与磁盘重开。Stripe 签名验证使用实际 SDK，但 Checkout / refund / 查询、私有文件与邮件网络边界使用隔离 fixture。测试不向客户发邮件、不发生真实或 Stripe sandbox 资金流水、不生成链上记录。此数据库适配器将测试事务串行化，因此不是生产 PostgreSQL 多连接压力 / 锁等待验收。生产服务只使用 `pg` 连接 PostgreSQL，不把 Vercel 本地文件系统当数据库。
 
