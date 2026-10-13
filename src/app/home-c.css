@@ -167,3 +167,29 @@
   .hc-tab { font-size:10px; padding-inline:7px; }
   .hc-work-row h3 { font-size:11px; }
 }
+
+/* Phone reference: image entrances first, edition actions in the list below. */
+@media(max-width:700px) {
+  .hc-hero { height:240px; }
+  .hc-hero-copy { top:18px; }
+  .hc-hero-copy h1 { font-size:27px; }
+  .hc-hero-copy>p { margin-bottom:10px; }
+  .hc-business-heading h2 { font-size:21px; }
+  .hc-mobile-section-link { min-width:44px; min-height:44px; }
+  .hc-physical-card { height:132px; }
+  .hc-mobile-physical-footer { display:none; }
+  .hc-digital-grid { gap:10px; }
+  .hc-book-cover { height:168px; max-width:125px; margin-bottom:0; }
+  .hc-featured-book h3,.hc-featured-book>.hc-button,.hc-featured-book>.hc-platform-link { display:none; }
+  .hc-audio-entry { display:none; }
+  .hc-work-row { min-height:101px; }
+  .hc-work-row-actions .hc-button { min-height:40px; }
+  .hc-media-copy p { min-height:30px; font-size:11px; }
+  .hc-media-copy>a { min-height:30px; }
+}
+@media(max-width:379px) {
+  .hc-hero-copy h1 { font-size:26px; }
+  .hc-hero-copy>p { max-width:220px; }
+  .hc-business-heading h2 { font-size:20px; }
+  .hc-book-cover { height:157px; }
+}

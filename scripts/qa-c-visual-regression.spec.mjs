@@ -18,7 +18,10 @@ for (const viewport of viewports) {
       const response = await page.goto('/', { waitUntil: 'networkidle' });
       expect(response.status()).toBe(200);
       await page.locator('footer').scrollIntoViewIfNeeded();
-      await expect.poll(() => page.locator('img').evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0))).toBe(true);
+      await expect.poll(() => page.locator('img').evaluateAll(images => images.filter(image => {
+        const rect = image.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      }).every(image => image.complete && image.naturalWidth > 0))).toBe(true);
       await page.evaluate(() => document.fonts.ready);
       await page.evaluate(() => window.scrollTo(0, 0));
       const actual = await page.evaluate(() => ({ width: innerWidth, height: innerHeight, scrollWidth: document.documentElement.scrollWidth }));

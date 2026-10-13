@@ -28,7 +28,7 @@ try {
   await page.evaluate(()=>window.scrollTo(0,0));
   const observation=await page.evaluate(()=>{
    const rect=s=>{const e=document.querySelector(s);if(!e)return null;const r=e.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};};
-   return {viewport:{width:innerWidth,height:innerHeight},scrollWidth:document.documentElement.scrollWidth,bodyWidth:document.body.scrollWidth,pageHeight:document.documentElement.scrollHeight,hero:rect('.hc-hero')||rect('.c-hero'),physical:rect('.hc-physical'),digital:rect('.hc-digital'),heroBackground:document.querySelector('.hc-hero-scene')?getComputedStyle(document.querySelector('.hc-hero-scene')).backgroundImage:null,images:Array.from(document.images).map(i=>({src:i.getAttribute('src'),complete:i.complete,naturalWidth:i.naturalWidth,naturalHeight:i.naturalHeight})),emptyLinks:Array.from(document.querySelectorAll('main a')).filter(a=>!a.getAttribute('href')||a.getAttribute('href')==='#').map(a=>a.textContent)};
+   return {viewport:{width:innerWidth,height:innerHeight},scrollWidth:document.documentElement.scrollWidth,bodyWidth:document.body.scrollWidth,pageHeight:document.documentElement.scrollHeight,hero:rect('.hc-hero')||rect('.c-hero'),physical:rect('.hc-physical'),digital:rect('.hc-digital'),heroBackground:document.querySelector('.hc-hero-scene')?getComputedStyle(document.querySelector('.hc-hero-scene')).backgroundImage:null,images:Array.from(document.images).map(i=>{const r=i.getBoundingClientRect();return {src:i.getAttribute('src'),rendered:r.width>0&&r.height>0,complete:i.complete,naturalWidth:i.naturalWidth,naturalHeight:i.naturalHeight};}),emptyLinks:Array.from(document.querySelectorAll('main a')).filter(a=>!a.getAttribute('href')||a.getAttribute('href')==='#').map(a=>a.textContent)};
   });
   assert.deepEqual(observation.viewport,viewport,'Requested viewport must actually apply');
   assert.ok(observation.scrollWidth<=viewport.width&&observation.bodyWidth<=viewport.width,'No whole-page horizontal overflow');
@@ -36,7 +36,7 @@ try {
   if(phase!=='before'){
     assert.ok(observation.heroBackground.includes(viewport.width<700?'c-lakeside-hero-mobile.webp':'c-lakeside-hero-desktop.webp'),'Separate intended hero scene');
     assert.ok(observation.physical&&observation.digital,'Both image businesses must exist');
-    assert.ok(observation.images.every(i=>i.complete&&i.naturalWidth>0),'All visible and full-page images must load');
+    assert.ok(observation.images.filter(i=>i.rendered).every(i=>i.complete&&i.naturalWidth>0),'All rendered first-screen and full-page images must load');
     const backgroundResponse=await context.request.get(base+'/images/lifestyle/'+(viewport.width<700?'c-lakeside-hero-mobile.webp':'c-lakeside-hero-desktop.webp'));
     assert.equal(backgroundResponse.status(),200,'Hero scene file must be served');
     const physical=observation.physical,digital=observation.digital;
