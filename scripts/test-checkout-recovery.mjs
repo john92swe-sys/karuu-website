@@ -120,9 +120,16 @@ await test('future quote timestamp fails closed',async()=>{
 });
 await test('already bound session with a missing URL is retrieved even after the safe create window',async()=>{
   const f=await fixture(),original=await commerce.checkout(f.user,f.input,crypto.randomUUID());
+  await db.query("UPDATE commerce_skus SET currency='EUR' WHERE id=$1",[f.skuId]);
   await db.query("UPDATE commerce_orders SET checkout_url=NULL,created_at=now()-interval '25 hours' WHERE id=$1",[original.orderId]);
   const start=createRequests.length;const recovered=await commerce.checkout(f.user,f.input,crypto.randomUUID());
-  assert.equal(recovered.orderId,original.orderId);assert.ok(recovered.url);assert.equal(createRequests.length,start);
+  assert.equal(recovered.orderId,original.orderId);assert.ok(recovered.url);assert.equal(createRequests.length,start);assert.equal((await f.orders())[0].currency,'SEK');
+});
+await test('bound checkout URL still resumes its immutable currency after SKU currency changes',async()=>{
+  const f=await fixture(),original=await commerce.checkout(f.user,f.input,crypto.randomUUID());
+  await db.query("UPDATE commerce_skus SET currency='EUR' WHERE id=$1",[f.skuId]);
+  const start=createRequests.length,recovered=await commerce.checkout(f.user,f.input,crypto.randomUUID());
+  assert.equal(recovered.orderId,original.orderId);assert.equal(recovered.url,original.url);assert.equal(createRequests.length,start);assert.equal((await f.orders())[0].currency,'SEK');
 });
 await test('unbound recovery rechecks withdrawn asset rights before contacting the payment provider',async()=>{
   const f=await fixture();taxFailure=true;await assert.rejects(commerce.checkout(f.user,f.input,crypto.randomUUID()));taxFailure=false;
@@ -135,6 +142,14 @@ await test('changed quote does not replace its immutable price or create another
   await db.query('UPDATE commerce_skus SET price_minor=1100 WHERE id=$1',[f.skuId]);
   const start=createRequests.length;await assert.rejects(commerce.checkout(f.user,f.input,crypto.randomUUID()),code('checkout_quote_changed'));
   assert.equal(createRequests.length,start);assert.equal((await f.orders())[0].total_minor,1000);
+});
+await test('unbound recovery rejects a changed currency even when minor price and components are identical',async()=>{
+  const f=await fixture();taxFailure=true;await assert.rejects(commerce.checkout(f.user,f.input,crypto.randomUUID()));taxFailure=false;
+  const original=(await f.orders())[0],start=createRequests.length,sessionCount=providerSessions.size;
+  await db.query("UPDATE commerce_skus SET currency='EUR' WHERE id=$1",[f.skuId]);
+  await assert.rejects(commerce.checkout(f.user,f.input,crypto.randomUUID()),code('checkout_quote_changed'));
+  const remaining=(await f.orders())[0];assert.equal(createRequests.length,start);assert.equal(providerSessions.size,sessionCount);
+  assert.equal(remaining.id,original.id);assert.equal(remaining.currency,'SEK');assert.equal(remaining.total_minor,1000);assert.equal(remaining.stripe_session_id,null);assert.equal(remaining.status,'pending');
 });
 await test('merchant metadata, amount and mode mismatches cannot be bound',async()=>{
   for(const change of [s=>({...s,metadata:{...s.metadata,userId:crypto.randomUUID()}}),s=>({...s,amount_total:s.amount_total+1}),s=>({...s,currency:'eur'})]){

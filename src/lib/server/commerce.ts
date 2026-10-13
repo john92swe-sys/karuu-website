@@ -126,12 +126,14 @@ export async function checkout(user:User,input:Record<string,unknown>,keyValue:u
   if(!order.stripe_session_id){
     const currentQuote=await transaction(async client=>{
       await client.query('SELECT id FROM commerce_users WHERE id=$1 FOR UPDATE',[user.id]);
-      return snapshotFor(client,snapshot.map(item=>item.skuId),user,market);
+      const currentSnapshot=await snapshotFor(client,snapshot.map(item=>item.skuId),user,market);
+      const currency=(await client.query('SELECT currency FROM commerce_skus WHERE id=$1',[snapshot[0].skuId])).rows[0]?.currency;
+      return {snapshot:currentSnapshot,currency};
     });
     // JSONB reorders object keys. Compare ordered commercial identities, preserving
     // the old display titles while rejecting changed price, edition or tax inputs.
     const identity=(quote:OrderSnapshot)=>JSON.stringify(quote.map(item=>[item.skuId,item.priceMinor,item.components.map(c=>[c.assetId,c.format,c.language,c.editionVersion,c.contentSha256,c.amountMinor,c.taxRate,c.stripeTaxRateId])]));
-    if(identity(currentQuote)!==identity(snapshot)) fail(409,'checkout_quote_changed',`The price or contents of order ${order.id} have changed. Contact KARUU to check the original checkout before continuing.`);
+    if(currentQuote.currency!==order.currency||identity(currentQuote.snapshot)!==identity(snapshot)) fail(409,'checkout_quote_changed',`The price, currency or contents of order ${order.id} have changed. Contact KARUU to check the original checkout before continuing.`);
   }
   // Confirm merchant tax-rate objects rather than trusting a staff-entered identifier.
   if(!order.stripe_session_id)for(const item of snapshot)for(const component of item.components){
