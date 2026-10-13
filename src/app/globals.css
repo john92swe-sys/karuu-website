@@ -1,10 +1,8 @@
-@import "https://fonts.googleapis.cn/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap";
-
 @import "tailwindcss";
 
 @theme {
   /* Nordic Minimalist Color Palette */
-  --color-primary: #1A3A5C;
+  --color-primary: #0A2F50;
   --color-primary-light: #2A5A8C;
   --color-primary-dark: #0F2540;
   --color-primary-50: #F0F4F8;
@@ -27,8 +25,8 @@
   --color-bg-alt: #F5F7FA;
 
   /* Typography */
-  --font-sans: 'Inter', 'Montserrat', system-ui, sans-serif;
-  --font-heading: 'Montserrat', 'Inter', system-ui, sans-serif;
+  --font-sans: 'Segoe UI', Arial, system-ui, sans-serif;
+  --font-heading: 'Segoe UI', Arial, system-ui, sans-serif;
   --font-serif: 'Playfair Display', Georgia, serif;
 
   /* Spacing */

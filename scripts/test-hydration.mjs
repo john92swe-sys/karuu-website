@@ -62,11 +62,12 @@ test('product inquiry carries buyer and product context', () => {
   assert.doesNotMatch(inquirySource, /type="hidden" name="product(?:Sku|Name|Slug)"/);
 });
 
-test('temporary hydration discovery switch is off and reversible', () => {
+test('legacy hydration catalogue stays excluded from public discovery', () => {
   assert.match(catalogueConfigSource, /HYDRATION_PUBLICLY_DISCOVERABLE = false/);
-  assert.match(homepageSource, /HYDRATION_PUBLICLY_DISCOVERABLE && <HydrationCollectionSection/);
-  assert.match(navbarSource, /HYDRATION_PUBLICLY_DISCOVERABLE/);
-  assert.match(footerSource, /HYDRATION_PUBLICLY_DISCOVERABLE/);
+  // C's separate JKJ-Plus collaboration must not expose unapproved legacy SKUs.
+  for (const source of [homepageSource, navbarSource, footerSource]) {
+    assert.doesNotMatch(source, /\/products\/hydration-drinkware|\/products\/khd-/);
+  }
   assert.match(productsPageSource, /HYDRATION_PUBLICLY_DISCOVERABLE/);
   assert.match(sitemapSource, /HYDRATION_PUBLICLY_DISCOVERABLE/);
 });
@@ -96,7 +97,7 @@ test('mixed-style module provides three bounded procurement scenarios', () => {
   assert.match(mixedStyleSource, /View the Full KARUU Catalogue/);
 });
 
-test('collection-plan form stays low-friction and accurately describes email delivery', () => {
+test('collection-plan form keeps buyer fields and reports persisted requests accurately', () => {
   for (const field of [
     'companyName', 'contactName', 'businessEmail', 'countryRegion', 'businessType', 'message',
     'intendedUse', 'instructorStaffWear', 'memberRetail', 'teacherTraining', 'privateLabel',
@@ -106,6 +107,11 @@ test('collection-plan form stays low-friction and accurately describes email del
     assert.match(contactSource, new RegExp(`name=\"${field}\"`), field);
   }
   assert.match(contactSource, /<details/);
-  assert.match(contactSource, /does not store this form/);
-  assert.match(contactSource, /Request a Mixed-Style Collection Plan/);
+  assert.match(contactSource, /InquiryFormShell/);
+  assert.match(contactSource, /A saved request returns a reference number/);
+  const submission = readFileSync(join(root, 'src/components/inquiry-form-shell.tsx'), 'utf8');
+  assert.match(submission, /\/api\/inquiries/);
+  assert.match(submission, /result.status !== 'received'/);
+  assert.match(submission, /Idempotency-Key/);
+  assert.doesNotMatch(contactSource, /does not store this form/);
 });

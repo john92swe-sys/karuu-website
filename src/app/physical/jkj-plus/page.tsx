@@ -1,0 +1,5 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import ContactForm from '@/components/contact-form';
+export const metadata: Metadata = { title: 'JKJ-Plus drinkware collaboration', alternates: { canonical: '/physical/jkj-plus' } };
+export default function JkjPage() { return <div className="c-container c-page"><Link href="/physical" className="c-text-link">← Physical products</Link><div className="c-two-cards"><section><span className="c-eyebrow">A SEPARATE BRAND. A CLEAR PROJECT BRIEF.</span><h1 className="c-title">JKJ-Plus<br />drinkware collaboration.</h1><p className="c-lead">Explore cups and bottles for your business, retail concept or branded project.</p><p>JKJ-Plus retains its own brand identity. Submit a JKJ-Plus brief below; it is recorded separately from KARUU activewear enquiries. Model availability, materials, minimum quantities, customization and delivery terms are confirmed before quotation.</p><p>For activewear, <Link className="c-text-link" href="/products">explore the KARUU collection</Link>.</p></section><section className="c-panel"><h2>Tell us about your project</h2><ContactForm brand="jkj-plus" /></section></div></div>; }

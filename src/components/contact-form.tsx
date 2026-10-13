@@ -1,26 +1,28 @@
+import { InquiryFormShell } from './inquiry-form-shell';
+
 const inputClassName =
   'mt-1.5 min-h-12 w-full rounded-lg border border-stone-lighter bg-white px-4 py-3 text-sm text-stone outline-none transition-colors placeholder:text-stone-400 focus:border-secondary focus:ring-2 focus:ring-secondary/20';
 
-export default function ContactForm() {
+export default function ContactForm({ brand = 'karuu' }: { brand?: 'karuu' | 'jkj-plus' }) {
   return (
-    <form action="/api/inquiry-mailto" method="post" className="space-y-6">
-      <input type="hidden" name="formType" value="mixed-style-collection-plan" />
-      <input type="hidden" name="inquiryType" value="Mixed-style collection plan" />
+    <InquiryFormShell brand={brand} className="space-y-6 mt-5">
+      <input type="hidden" name="formType" value={brand === 'jkj-plus' ? 'drinkware-project-brief' : 'mixed-style-collection-plan'} />
+      <input type="hidden" name="inquiryType" value={brand === 'jkj-plus' ? 'Drinkware partnership brief' : 'Mixed-style collection plan'} />
 
       <fieldset>
         <legend className="text-lg font-semibold text-primary">Start with the essentials</legend>
-        <p className="mt-1 text-sm leading-6 text-stone-600">These fields help KARUU understand your business and prepare the right next conversation.</p>
+        <p className="mt-1 text-sm leading-6 text-stone-600">These fields help {brand === 'jkj-plus' ? 'the JKJ-Plus project team' : 'KARUU'} understand your brief and prepare the right next conversation.</p>
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           <label className="text-sm font-medium text-stone">Company Name <span className="text-accent">*</span><input className={inputClassName} type="text" name="companyName" required autoComplete="organization" placeholder="Your company" /></label>
           <label className="text-sm font-medium text-stone">Contact Name <span className="text-accent">*</span><input className={inputClassName} type="text" name="contactName" required autoComplete="name" placeholder="Your full name" /></label>
           <label className="text-sm font-medium text-stone">Business Email <span className="text-accent">*</span><input className={inputClassName} type="email" name="businessEmail" required autoComplete="email" placeholder="you@company.com" /></label>
           <label className="text-sm font-medium text-stone">Country <span className="text-accent">*</span><input className={inputClassName} type="text" name="countryRegion" required autoComplete="country-name" placeholder="Your market" /></label>
-          <label className="text-sm font-medium text-stone md:col-span-2">Business Type <span className="text-accent">*</span><select className={inputClassName} name="businessType" defaultValue="" required><option value="" disabled>Select your business type</option><option>Yoga Studio</option><option>Pilates Studio</option><option>Activewear Brand</option><option>Other</option></select></label>
+          <label className="text-sm font-medium text-stone md:col-span-2">Business Type <span className="text-accent">*</span><select className={inputClassName} name="businessType" defaultValue="" required><option value="" disabled>Select your business type</option>{(brand === 'jkj-plus' ? ['Retailer', 'Distributor', 'Brand', 'Other'] : ['Yoga Studio', 'Pilates Studio', 'Activewear Brand', 'Other']).map(type => <option key={type}>{type}</option>)}</select></label>
         </div>
         <label className="mt-4 block text-sm font-medium text-stone">Message <span className="text-accent">*</span><textarea className={`${inputClassName} min-h-32 resize-y`} name="message" required placeholder="Tell us about your collection idea, target market, or the help you need." /></label>
       </fieldset>
 
-      <details className="group rounded-xl border border-stone-200 bg-stone-faint p-5 open:bg-white open:shadow-sm">
+      {brand === 'karuu' && <details className="group rounded-xl border border-stone-200 bg-stone-faint p-5 open:bg-white open:shadow-sm">
         <summary className="cursor-pointer list-none font-semibold text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"><span className="flex items-center justify-between gap-4">Add optional collection details<span className="text-sm font-medium text-secondary group-open:hidden">Optional +</span><span className="hidden text-sm font-medium text-secondary group-open:inline">Hide −</span></span></summary>
         <p className="mt-2 text-sm leading-6 text-stone-600">Share only what is already known. Product series, color and size splits, pricing, sampling, and timing are confirmed for each project.</p>
         <div className="mt-5 grid gap-4 md:grid-cols-2">
@@ -36,14 +38,14 @@ export default function ContactForm() {
           <label className="text-sm font-medium text-stone">Branding Requirement<input className={inputClassName} name="brandingRequirement" placeholder="Logo, label, or packaging brief" /></label>
           <label className="text-sm font-medium text-stone md:col-span-2">WhatsApp / Phone<input className={inputClassName} type="tel" name="phone" autoComplete="tel" placeholder="Optional direct contact number" /></label>
         </div>
-      </details>
+      </details>}
 
-      <label className="flex items-start gap-3 text-sm leading-relaxed text-stone-600"><input type="checkbox" name="privacyConsent" value="Agreed" required className="mt-1 h-4 w-4 rounded border-stone-300 text-secondary focus:ring-secondary" /><span>I agree that KARUU may use this information to respond to my business inquiry.<span className="text-accent"> *</span></span></label>
+      <label className="flex items-start gap-3 text-sm leading-relaxed text-stone-600"><input type="checkbox" name="privacyConsent" value="Agreed" required className="mt-1 h-4 w-4 rounded border-stone-300 text-secondary focus:ring-secondary" /><span>I agree that this information may be used to respond to my {brand === 'jkj-plus' ? 'JKJ-Plus project brief, with separate brand handling' : 'KARUU business inquiry'}.<span className="text-accent"> *</span></span></label>
 
       <div>
-        <button type="submit" className="inline-flex min-h-12 w-full items-center justify-center rounded-lg bg-primary px-8 py-3.5 font-semibold text-white transition-colors hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 md:w-auto">Request a Mixed-Style Collection Plan</button>
-        <p className="mt-3 text-xs leading-relaxed text-stone-500">This opens a prepared email to john@karuu.net for you to review and send. The website does not store this form or claim that KARUU has received it before you send the email.</p>
+        <button type="submit" className="c-btn w-full md:w-auto">Submit {brand === 'jkj-plus' ? 'JKJ-Plus project brief' : 'collection brief'}</button>
+        <p className="mt-3 text-xs leading-relaxed text-stone-500">A saved request returns a reference number. Commercial terms are confirmed after project review. Read our <a href="/privacy" className="underline">privacy notice</a>.</p>
       </div>
-    </form>
+    </InquiryFormShell>
   );
 }

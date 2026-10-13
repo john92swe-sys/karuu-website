@@ -12,6 +12,9 @@ __pycache__/
 *.egg-info/
 /.env
 .env
+.env.*
+!.env.example
+work/
 
 # JS/TS bundlers & build outputs
 .next
@@ -25,7 +28,6 @@ storybook-static
 
 # Package manager artifacts
 pnpm-lock.yaml
-package-lock.json
 yarn.lock
 .pnp*
 .npm

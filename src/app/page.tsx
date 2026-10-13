@@ -1,49 +1,34 @@
 import type { Metadata } from 'next';
-import {
-  HeroSection,
-  CoreAdvantagesSection,
-  FeaturedCollectionSection,
-  HydrationCollectionSection,
-  DocumentationSection,
-  PartnershipSection,
-  HomeContactSection,
-} from '@/components/sections/home-sections';
-import {
-  CollectionScenariosSection,
-  MixedStyleMoqBanner,
-} from '@/components/mixed-style-collection';
-import { HYDRATION_PUBLICLY_DISCOVERABLE } from '@/config/catalog';
-
-export const metadata: Metadata = {
-  title: 'Women’s Activewear, Yoga & Fitness OEM/ODM Partner',
-  description:
-    'KARUU supports women’s activewear, yoga, and fitness brands with product development, sourcing, and OEM/ODM coordination. Start coordinated product series from 200 pieces, with styles mixable within the same series.',
-  keywords:
-    'activewear sourcing, yoga apparel wholesale, OEM ODM coordination, private label activewear, KARUU AB',
-  openGraph: {
-    title: 'KARUU | Women’s Activewear, Yoga & Fitness OEM/ODM Partner',
-    description:
-      'Women’s activewear, yoga, and fitness sourcing, product development, and OEM/ODM coordination. Starting MOQ: 200 pieces per product series, with styles mixable within the same series.',
-    type: 'website',
-    locale: 'en_US',
-  },
-  alternates: {
-    canonical: '/',
-  },
-};
-
-export default function HomePage() {
-  return (
-    <>
-      <HeroSection />
-      <MixedStyleMoqBanner />
-      <CoreAdvantagesSection />
-      <FeaturedCollectionSection />
-      <CollectionScenariosSection />
-      {HYDRATION_PUBLICLY_DISCOVERABLE && <HydrationCollectionSection />}
-      <DocumentationSection />
-      <PartnershipSection />
-      <HomeContactSection />
-    </>
-  );
+import Link from 'next/link';
+import Image from 'next/image';
+import { ArrowRight, BookOpen, Headphones, Music2, Gamepad2, Sparkles, Leaf } from 'lucide-react';
+import { getFeaturedProducts } from '@/lib/products';
+import { listPublicCreations } from '@/lib/server/works';
+import { status } from '@/lib/server/commerce';
+export const dynamic = 'force-dynamic';
+export const metadata: Metadata = { title: 'Products for life. Stories to explore.', description: 'Explore KARUU women’s activewear, JKJ-Plus collaboration, and original books, audio, music and games. Physical products and digital creations from Sweden.', alternates: { canonical: '/' } };
+export default async function HomePage() {
+  const [allCreations, availability] = await Promise.all([listPublicCreations(), status()]);
+  const featuredCreations = allCreations.filter(book => book.featured && book.categories.includes('ebooks')).slice(0, 2);
+  const music = allCreations.find(work => work.slug === 'kitchen-floor-gravity');
+  const game = allCreations.find(work => work.slug === 'nordic-rush-aurora-relay');
+  const product = getFeaturedProducts(1)[0];
+  return <div className="c-home">{!availability.publicCatalogAvailable && <div className="c-container pt-5"><p className="c-form-error" role="status">Digital creation information is temporarily unavailable. Please try again later. Physical product pages remain available.</p></div>}<section className="c-hero c-container" aria-labelledby="home-title">
+    <div className="c-hero-copy"><span className="c-eyebrow"><span /> FROM SWEDEN, WITH CURIOSITY</span><h1 id="home-title">Products for life.<br />Stories to explore.</h1><p>Physical products and original<br className="c-desktop-break" /> digital creations from KARUU.</p><div className="c-button-row"><Link href="/physical" className="c-btn">Explore products <ArrowRight size={18} /></Link><Link href="/creations" className="c-btn c-btn-outline">Explore creations <ArrowRight size={18} /></Link></div><span className="c-hero-note"><Leaf size={16} /> For everyday movement. For curious minds.</span></div>
+    <div className="c-hero-art" aria-label="KARUU activewear and original books"><div className="c-hero-orbit" /><span className="c-art-note">A more active life.<br />A richer imagination.</span>
+      {product && <Link href={`/products/${product.slug}`} className="c-hero-product"><Image src={product.gallery[0].src} alt={product.gallery[0].alt} fill sizes="(max-width: 650px) 240px, 330px" priority /><span>MOVE THROUGH LIFE ↗</span></Link>}
+      <div className="c-hero-books">{featuredCreations.slice(0, 2).map((book, index) => <Link href={`/creations/${book.slug}`} key={book.slug} className={`c-hero-book c-hero-book-${index}`} aria-label={book.title}>{book.cover ? <Image src={book.cover} alt={`${book.title} cover`} fill sizes="180px" priority /> : <span>{book.title}</span>}</Link>)}</div><div className="c-hero-sticker"><BookOpen size={20} /><span>A new chapter<br /><strong>starts here.</strong></span></div>
+    </div></section>
+    <section className="c-container c-business-grid" aria-label="Explore our two businesses">
+      <div className="c-panel c-physical-panel"><div className="c-panel-heading"><div><span className="c-eyebrow">MADE FOR EVERYDAY LIFE</span><h2>Physical products</h2><p>Thoughtful design. Practical partnerships.</p></div><Link href="/physical" className="c-round-link" aria-label="Explore physical products"><ArrowRight /></Link></div><div className="c-physical-cards"><Link href="/products" className="c-activewear-card">{product && <Image src={product.gallery[0].src} alt={product.gallery[0].alt} fill sizes="(max-width: 650px) 45vw, 280px" />}<div><span>THE KARUU COLLECTION</span><h3>Women’s<br />activewear</h3><p>OEM / ODM &amp; private label</p><strong>Explore activewear <ArrowRight size={16} /></strong></div></Link><Link href="/physical/jkj-plus" className="c-jkj-card"><div className="c-jkj-symbol"><span>JKJ</span><span>PLUS</span></div><span>BRAND COLLABORATION</span><h3>JKJ-Plus<br />drinkware</h3><p>Explore a separate brand’s cup and bottle collaboration.</p><strong>Explore collaboration <ArrowRight size={16} /></strong></Link></div><Link href="/contact" className="c-panel-bottom-link">Have a collection in mind? <strong>Start a project <ArrowRight size={16} /></strong></Link></div>
+      <div className="c-panel c-digital-panel"><div className="c-panel-heading"><div><span className="c-eyebrow">ORIGINAL WORLDS TO DISCOVER</span><h2>Digital creations</h2><p>Stories to read. Worlds to explore.</p></div><Link href="/creations" className="c-round-link" aria-label="Explore digital creations"><ArrowRight /></Link></div><div className="c-featured-books">{featuredCreations.slice(0, 2).map(book => <article key={book.slug}><Link className="c-book-cover" href={`/creations/${book.slug}`}>{book.cover ? <Image src={book.cover} alt={`${book.title} cover`} fill sizes="(max-width: 650px) 38vw, 180px" /> : <span>{book.title}</span>}</Link><h3><Link href={`/creations/${book.slug}`}>{book.title}</Link></h3><p>By {book.author}</p><Link href={`/creations/${book.slug}`} className="c-btn c-btn-small">Explore book <ArrowRight size={15} /></Link></article>)}</div><Link href="/creations?category=bundles" className="c-panel-bottom-link"><Headphones size={18} /> Discover books &amp; audio <ArrowRight size={16} /></Link></div>
+    </section>
+    <section className="c-container c-explore-section"><div className="c-section-heading"><div><span className="c-eyebrow">FOLLOW YOUR CURIOSITY</span><h2>More to explore</h2></div><Link href="/creations" className="c-text-link">Explore all creations <ArrowRight size={17} /></Link></div><div className="c-explore-grid">{[
+      { icon: BookOpen, title: 'Books', text: 'Original fiction by K. R. Gannet.', link: '/creations?category=ebooks', label: 'Find your next read', cls: 'c-explore-books' },
+      { icon: Headphones, title: 'Books & audio', text: 'Explore a story in another way.', link: '/creations?category=bundles', label: 'Explore reading & listening', cls: 'c-explore-audio' },
+      { icon: Music2, title: music?.title || 'Music', text: music?.summary || 'Explore the current music catalogue.', link: music ? `/creations/${music.slug}` : '/creations?category=music', label: music ? 'Explore this track' : 'Explore music', cls: 'c-explore-music' },
+      { icon: Gamepad2, title: game?.title || 'Games', text: game ? 'Explore the actual v0.1.0 game prototype. In development.' : 'Explore the current game projects.', link: game ? `/creations/${game.slug}` : '/creations?category=games', label: game ? 'Meet the project' : 'Explore games', cls: 'c-explore-games' },
+    ].map(item => <Link href={item.link} key={item.title} className={`c-explore-card ${item.cls}`}><item.icon size={29} strokeWidth={1.5} /><h3>{item.title}</h3><p>{item.text}</p><strong>{item.label} <ArrowRight size={16} /></strong></Link>)}</div></section>
+    <section className="c-container"><Link href="/member-benefits" className="c-member-strip"><div className="c-member-icon"><Sparkles size={28} /></div><div><h2>Your creations, together.</h2><p>Explore your library, reading and listening options, and member information.</p></div><span className="c-btn c-btn-outline c-btn-small">Member benefits <ArrowRight size={16} /></span></Link></section>
+  </div>;
 }

@@ -9,11 +9,12 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { Breadcrumb } from '@/components/breadcrumb';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'About KARUU | Swedish B2B Activewear Partner',
+  title: 'About KARUU AB',
   description:
-    'KARUU is a Swedish B2B activewear sourcing and manufacturing partner connecting global brands with selected manufacturing capabilities.',
+    'Meet KARUU AB, Sweden: physical product sourcing and development, alongside original books, audio, music and games.',
   alternates: { canonical: '/about' },
 };
 
@@ -27,24 +28,26 @@ export default function AboutPage() {
           Our Story
         </span>
         <h1 className="text-3xl md:text-5xl font-bold text-primary mt-3 mb-6 leading-tight">
-          Designed in Scandinavia.
+          Everyday life.
           <br />
-          <span className="text-secondary">Crafted for the World.</span>
+          <span className="text-secondary">Original imagination.</span>
         </h1>
         <p className="text-lg text-stone-light leading-relaxed">
-          KARUU AB is a Swedish B2B activewear sourcing and manufacturing partner. We
-          coordinate product sourcing, development, OEM/ODM requirements, quality
-          communication, and international service for brands and professional buyers.
+          KARUU AB brings physical products and original digital creations together.
+          From our Swedish contact point, we coordinate women’s activewear sourcing,
+          product development and OEM/ODM projects, and publish stories for curious minds.
         </p>
       </div>
+
+      <section className="c-two-cards mb-16" aria-label="KARUU businesses"><Link href="/physical" className="c-panel c-mint"><h2>Physical products</h2><p>Women’s activewear, yoga and fitness collections for brands and professional buyers. JKJ-Plus drinkware collaboration retains its own brand and project handling.</p><span className="c-text-link">Explore physical products →</span></Link><Link href="/creations" className="c-panel c-lilac"><h2>Digital creations</h2><p>Original fiction, audio editions and music, with new game worlds in development. Explore the available editions and their actual platform or direct purchase options.</p><span className="c-text-link">Explore digital creations →</span></Link></section>
 
       {/* Company overview */}
       <section className="mb-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             { num: 'Sweden', label: 'KARUU AB headquarters' },
-            { num: 'B2B', label: 'Wholesale and private label' },
-            { num: 'OEM / ODM', label: 'Product development support' },
+            { num: 'Products', label: 'B2B development and collaboration' },
+            { num: 'Creations', label: 'Original stories, music and games' },
           ].map((s, i) => (
             <div key={i} className="p-6 rounded-xl bg-stone-faint text-center">
               <div className="text-3xl md:text-4xl font-bold text-primary mb-1">{s.num}</div>
@@ -119,7 +122,7 @@ export default function AboutPage() {
                 { icon: Building, label: 'Company Name', value: 'KARUU AB' },
                 { icon: Award, label: 'Registration No.', value: '559244-1892 (Bolagsverket)' },
                 { icon: MapPin, label: 'Headquarters', value: 'Vattugatan 2A, 302 33 Halmstad, Sweden' },
-                { icon: Users, label: 'Business Model', value: 'B2B sourcing and product coordination' },
+                { icon: Users, label: 'Business Model', value: 'Physical products and original digital creations' },
                 { icon: Globe, label: 'Service', value: 'International buyer communication' },
                 { icon: Clock, label: 'Founded', value: 'February 2020' },
               ].map((item, i) => (

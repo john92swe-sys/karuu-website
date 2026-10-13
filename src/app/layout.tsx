@@ -1,15 +1,16 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import './creative-store.css';
 import { SiteLayout } from '@/components/site-layout';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://karuu.net'),
+  metadataBase: new URL('https://www.karuu.net'),
   title: {
-    default: 'KARUU | Women’s Activewear, Yoga & Fitness OEM/ODM Partner',
+    default: 'KARUU | Products for life. Stories to explore.',
     template: '%s | KARUU',
   },
   description:
-    'KARUU is a Swedish B2B women’s activewear, yoga, and fitness OEM/ODM and private-label product development partner.',
+    'Physical products and original digital creations from KARUU AB, Sweden. Women’s activewear, books, audio, music and games.',
   keywords: [
     'yoga wear wholesale',
     'activewear sourcing',
@@ -28,11 +29,11 @@ export const metadata: Metadata = {
   },
   manifest: '/site.webmanifest',
   robots: {
-    index: true,
-    follow: true,
+    index: process.env.VERCEL_ENV !== 'preview' && process.env.KARUU_DEPLOYMENT_ENV !== 'preview',
+    follow: process.env.VERCEL_ENV !== 'preview' && process.env.KARUU_DEPLOYMENT_ENV !== 'preview',
     googleBot: {
-      index: true,
-      follow: true,
+      index: process.env.VERCEL_ENV !== 'preview' && process.env.KARUU_DEPLOYMENT_ENV !== 'preview',
+      follow: process.env.VERCEL_ENV !== 'preview' && process.env.KARUU_DEPLOYMENT_ENV !== 'preview',
       'max-image-preview': 'large',
       'max-snippet': -1,
     },
@@ -40,17 +41,17 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://karuu.net',
+    url: 'https://www.karuu.net',
     siteName: 'KARUU',
-    title: 'KARUU | Women’s Activewear, Yoga & Fitness OEM/ODM Partner',
+    title: 'KARUU | Products for life. Stories to explore.',
     description:
-      'Activewear sourcing, product development, OEM/ODM coordination, quality communication, and international service.',
+      'Physical products and original digital creations from KARUU AB, Sweden.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'KARUU | Women’s Activewear, Yoga & Fitness OEM/ODM Partner',
+    title: 'KARUU | Products for life. Stories to explore.',
     description:
-      'Activewear sourcing, product development, OEM/ODM coordination, and international service.',
+      'Physical products and original digital creations from KARUU AB, Sweden.',
   },
   alternates: {
     canonical: '/',
@@ -60,7 +61,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#1A3A5C',
+  themeColor: '#F2F8FC',
 };
 
 export default function RootLayout({

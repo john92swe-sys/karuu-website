@@ -1,12 +1,15 @@
 import type { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
+  if (process.env.VERCEL_ENV === 'preview' || process.env.KARUU_DEPLOYMENT_ENV === 'preview') {
+    return { rules: { userAgent: '*', disallow: '/' } };
+  }
   return {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/api/'],
+      disallow: ['/api/', '/account', '/admin', '/bag', '/search'],
     },
-    sitemap: 'https://karuu.net/sitemap.xml',
+    sitemap: 'https://www.karuu.net/sitemap.xml',
   };
 }
