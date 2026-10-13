@@ -1,7 +1,6 @@
 import Stripe from 'stripe';
-import { PoolClient } from 'pg';
 import { allocate, costResult, CostInputs, fail, hash, idempotency, text, uuid } from './core';
-import { audit, databaseConfigured, query, transaction } from './db';
+import { audit, databaseConfigured, DbClient, query, transaction } from './db';
 import { User } from './auth';
 
 export type Asset={id:string,work_slug:string,title:string,format:string,language:string,object_key:string,edition_version:string,content_sha256:string|null,rights_verified:boolean,delivery_verified:boolean};
@@ -20,17 +19,18 @@ export function stripeClient(){
   const key=process.env.STRIPE_SECRET_KEY!;
   const live=process.env.KARUU_PAYMENT_MODE==='live';
   if(!(live?/^(sk|rk)_live_/:/^(sk|rk)_test_/).test(key)) fail(503,'payment_mode_mismatch','The merchant key does not match the configured payment environment.');
-  return new Stripe(key,{maxNetworkRetries:2,timeout:15000});
+  return new Stripe(key,{maxNetworkRetries:2,timeout:15000,httpClient:Stripe.createFetchHttpClient()});
 }
 export async function status(){
-  let ready=false;
-  if(databaseConfigured()) {try{ready=Boolean((await query('SELECT version FROM commerce_schema WHERE version=1'))[0]);}catch{ready=false;}}
-  let publicCatalogAvailable=!databaseConfigured();
+  let configured=false,ready=false;
+  try{configured=await databaseConfigured();}catch{configured=true;}
+  if(configured) {try{ready=Boolean((await query('SELECT version FROM commerce_schema WHERE version=1'))[0]);}catch{ready=false;}}
+  let publicCatalogAvailable=!configured;
   if(ready){try{await query('SELECT slug FROM commerce_creations LIMIT 1');publicCatalogAvailable=true;}catch{publicCatalogAvailable=false;}}
   return {database:ready,publicCatalogAvailable,accounts:ready&&Boolean(process.env.KARUU_MAIL_ENDPOINT&&process.env.KARUU_MAIL_TOKEN&&process.env.KARUU_SITE_ORIGIN),payments:ready&&paymentsConfigured(),privateMedia:mediaConfigured(),inquiries:ready,kru:{enabled:false,reason:'KRU requires verified market eligibility, legal approval, network, mint, budgets and controlled signing. Ordinary content purchases do not require KRU.'}};
 }
 export async function catalog(){
-  if(!databaseConfigured()) return {items:[]};
+  if(!(await databaseConfigured())) return {items:[]};
   const skus=await query<Sku>('SELECT * FROM commerce_skus WHERE status=$1 ORDER BY updated_at DESC',['active']);
   const assets=await query<Asset>('SELECT * FROM commerce_assets');
   const costs=await query<{sku_id:string,inputs:CostInputs}>('SELECT sku_id,inputs FROM commerce_costs');
@@ -47,7 +47,7 @@ export async function catalog(){
     return {id:sku.id,slug:sku.slug,title:sku.title,kind:sku.kind,currency:sku.currency,priceMinor:available?sku.price_minor:null,normalPriceMinor:available?rawSku.price_minor:null,promotion:available&&sku.price_minor!==rawSku.price_minor,components:components.filter((a):a is Asset=>Boolean(a)).map(a=>({id:a.id,title:a.title,format:a.format,language:a.language})),available,unavailableReason:available?null:'Direct purchase is awaiting verified price, distribution rights, delivery files and merchant configuration.'};
   })};
 }
-async function snapshotFor(client:PoolClient,skuIds:string[],user:User,market:string):Promise<OrderSnapshot> {
+async function snapshotFor(client:DbClient,skuIds:string[],user:User,market:string):Promise<OrderSnapshot> {
   const ownedRows=await client.query('SELECT DISTINCT asset_id FROM commerce_entitlements WHERE user_id=$1 AND status=$2',[user.id,'active']);
   const owned=new Set<string>(ownedRows.rows.map(row=>row.asset_id));
   const seen=new Set<string>(),snapshot:OrderSnapshot=[];

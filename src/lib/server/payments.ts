@@ -65,6 +65,6 @@ export async function webhook(request:Request){
   if(payload.length>2_000_000) fail(413,'event_too_large','The payment event is too large.');
   const stripe=stripeClient();
   let event:Stripe.Event;
-  try{event=stripe.webhooks.constructEvent(payload,signature,process.env.STRIPE_WEBHOOK_SECRET!,300);}catch{return fail(400,'invalid_signature','The payment event signature could not be verified.');}
+  try{event=await stripe.webhooks.constructEventAsync(payload,signature,process.env.STRIPE_WEBHOOK_SECRET!,300,Stripe.createSubtleCryptoProvider());}catch{return fail(400,'invalid_signature','The payment event signature could not be verified.');}
   return processPaymentEvent(event);
 }

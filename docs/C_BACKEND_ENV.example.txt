@@ -1,5 +1,9 @@
 # Server-only names. No value below is a credential or a commercial configuration.
 KARUU_DATABASE_URL=
+KARUU_RUNTIME=cloudflare
+# Workers: real HYPERDRIVE_COMMERCE binding plus verified Cloudflare caching.disabled=true.
+# This server flag is an operator attestation, not an API switch that changes Hyperdrive settings.
+KARUU_HYPERDRIVE_CACHING_DISABLED=false
 KARUU_SITE_ORIGIN=
 KARUU_MAIL_ENDPOINT=
 KARUU_MAIL_TOKEN=

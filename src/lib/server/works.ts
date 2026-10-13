@@ -8,7 +8,8 @@ function publicCreation(creation:Creation):Creation{
   return {id:creation.id,slug:creation.slug,title:creation.title,author:creation.author,publisher:creation.publisher,language:creation.language,summary:creation.summary,cover:creation.cover,coverAlt:creation.coverAlt,categories:creation.categories,featured:creation.featured,formats:creation.formats.map(format=>({label:format.label,status:format.status,note:format.note})),links:creation.links.map(link=>({label:link.label,format:link.format,url:link.url})),evidence:[],...(creation.aiDisclosure?{aiDisclosure:creation.aiDisclosure}:{}),...(creation.development?{development:{status:creation.development.status,version:creation.development.version,...(creation.development.imageCaption?{imageCaption:creation.development.imageCaption}:{})}}:{})};
 }
 export async function listPublicCreations():Promise<Creation[]>{
-  if(!databaseConfigured())return creations.map(publicCreation);
+  try{if(!(await databaseConfigured()))return creations.map(publicCreation);}
+  catch(error){console.error('creation_catalog_database_unavailable',error instanceof Error?error.name:'UnknownError');return [];}
   let rows:{slug:string,publication_status:string,data:Creation}[];
   try{rows=await query<{slug:string,publication_status:string,data:Creation}>('SELECT slug,publication_status,data FROM commerce_creations');}
   catch(error){console.error('creation_catalog_database_unavailable',error instanceof Error?error.name:'UnknownError');return [];}

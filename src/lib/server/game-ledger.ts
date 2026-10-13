@@ -1,6 +1,5 @@
-import { PoolClient } from 'pg';
 import { fail, hash, idempotency, identifier, uuid } from './core';
-import { transaction } from './db';
+import { DbClient, transaction } from './db';
 
 export type GameRules={gameId:string,version:string,approved:boolean,spendOrder:'paid-first'|'gift-first'};
 function rulesCheck(rules:GameRules){
@@ -8,12 +7,12 @@ function rulesCheck(rules:GameRules){
   identifier(rules.gameId);
 }
 function units(value:string){if(!/^[1-9]\d{0,17}$/.test(value))fail(400,'invalid_points','Use a positive whole-number point quantity.');return BigInt(value);}
-async function replay(client:PoolClient,key:string,digest:string){
+async function replay(client:DbClient,key:string,digest:string){
   const old=(await client.query('SELECT request_hash,result FROM commerce_point_operations WHERE event_key=$1',[key])).rows[0];
   if(old&&old.request_hash!==digest)fail(409,'point_operation_conflict','This point operation was already used for another instruction.');return old?.result;
 }
-async function record(client:PoolClient,key:string,digest:string,result:unknown){await client.query('INSERT INTO commerce_point_operations(event_key,request_hash,result) VALUES($1,$2,$3)',[key,digest,JSON.stringify(result)]);}
-async function lockUser(client:PoolClient,userId:string){if(!(await client.query('SELECT id FROM commerce_users WHERE id=$1 FOR UPDATE',[userId])).rows[0])fail(404,'account_not_found','No account exists for this ledger operation.');}
+async function record(client:DbClient,key:string,digest:string,result:unknown){await client.query('INSERT INTO commerce_point_operations(event_key,request_hash,result) VALUES($1,$2,$3)',[key,digest,JSON.stringify(result)]);}
+async function lockUser(client:DbClient,userId:string){if(!(await client.query('SELECT id FROM commerce_users WHERE id=$1 FOR UPDATE',[userId])).rows[0])fail(404,'account_not_found','No account exists for this ledger operation.');}
 // Server-only primitives. No public credit/recharge endpoint or game adapter calls these yet.
 export async function creditConfirmedGameFunding(userId:string,fundingId:string,eventKey:string,rules:GameRules){
   rulesCheck(rules);const key=idempotency(eventKey),digest=hash(JSON.stringify({userId,fundingId,gameId:rules.gameId,version:rules.version}));
@@ -44,7 +43,7 @@ export async function grantGameFundingReward(userId:string,fundingId:string,camp
     const result={id,gameId:rules.gameId,source:'gift',units:String(campaign.reward_units)};await record(client,key,digest,result);return result;
   });
 }
-async function lots(client:PoolClient,userId:string,gameId:string){return (await client.query(`SELECT c.id,c.source,c.expires_at,c.created_at,c.funding_source_id,c.units+COALESCE((SELECT sum(d.units) FROM commerce_point_ledger d WHERE d.lot_id=c.id),0) AS available
+async function lots(client:DbClient,userId:string,gameId:string){return (await client.query(`SELECT c.id,c.source,c.expires_at,c.created_at,c.funding_source_id,c.units+COALESCE((SELECT sum(d.units) FROM commerce_point_ledger d WHERE d.lot_id=c.id),0) AS available
   FROM commerce_point_ledger c WHERE c.user_id=$1 AND c.game_id=$2 AND c.units>0 AND (c.expires_at IS NULL OR c.expires_at>now()) ORDER BY c.created_at,c.id`,[userId,gameId])).rows;}
 export async function spendGamePoints(userId:string,quantity:string,eventKey:string,rules:GameRules){
   rulesCheck(rules);const wanted=units(quantity),key=idempotency(eventKey),digest=hash(JSON.stringify({userId,quantity,gameId:rules.gameId,version:rules.version,spendOrder:rules.spendOrder}));

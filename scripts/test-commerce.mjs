@@ -23,11 +23,22 @@ class TestPool{
   async query(sql,values=[]){if(databaseUnavailable)throw new Error('IsolatedDatabaseOutage');const release=await acquire();try{return await database.query(sql,values);}finally{release();}}
   async connect(){const release=await acquire();return {query:(sql,values=[])=>database.query(sql,values),release};}
 }
+let workerClients=0,workerEnds=0,adapterLoads=0;
+const workerTrace=[];
+const fixtureWorkerEnv={HYPERDRIVE_COMMERCE:{connectionString:'postgres://workers-fixture-only'},KARUU_HYPERDRIVE_CACHING_DISABLED:'true'};
+class TestWorkerClient{
+  constructor(config){assert.equal(config.connectionString,fixtureWorkerEnv.HYPERDRIVE_COMMERCE.connectionString);this.id=++workerClients;}
+  async connect(){this.release=await acquire();}
+  async query(sql,values=[]){workerTrace.push({id:this.id,sql});return database.query(sql,values);}
+  async end(){if(this.release){this.release();this.release=null;}workerEnds++;}
+}
 const cookieJar=new Map(),sessions=new Map(),charges=new Map(),taxRates=new Map(),refunds=new Map(),mail=[];
 let createCalls=0,storageAvailable=true,lastRange;
 let databaseUnavailable=false;
 const realStripe=new RealStripe('sk_test_isolated_fixture_key');
 class TestStripe{
+  static createFetchHttpClient(){return RealStripe.createFetchHttpClient();}
+  static createSubtleCryptoProvider(){return RealStripe.createSubtleCryptoProvider();}
   webhooks=realStripe.webhooks;
   taxRates={retrieve:async id=>{if(!taxRates.has(id))throw new Error('MissingTestTaxRate');return taxRates.get(id);}};
   checkout={sessions:{create:async(params,options)=>{
@@ -42,8 +53,9 @@ class TestStripe{
 }
 const originalLoad=Module._load,originalResolve=Module._resolveFilename;
 Module._load=function(name,parent,isMain){
-  if(name==='pg')return {Pool:TestPool};
+  if(name==='pg')return {Pool:TestPool,Client:TestWorkerClient};
   if(name==='stripe')return TestStripe;
+  if(name==='@opennextjs/cloudflare'){adapterLoads++;return {getCloudflareContext:()=>({env:fixtureWorkerEnv})};}
   if(name==='next/headers')return {cookies:()=>({get:key=>cookieJar.has(key)?{value:cookieJar.get(key)}:undefined})};
   return originalLoad.call(this,name,parent,isMain);
 };
@@ -54,7 +66,7 @@ Module._resolveFilename=function(name,parent,...rest){
 Module._extensions['.ts']=function(module,filename){const code=ts.transpileModule(fs.readFileSync(filename,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,esModuleInterop:true}}).outputText;module._compile(code,filename);};
 const require=Module.createRequire(import.meta.url);
 const core=require('../src/lib/server/core.ts'),auth=require('../src/lib/server/auth.ts'),commerce=require('../src/lib/server/commerce.ts'),admin=require('../src/lib/server/admin.ts'),inquiries=require('../src/lib/server/inquiries.ts'),payments=require('../src/lib/server/payments.ts'),delivery=require('../src/lib/server/delivery.ts'),http=require('../src/lib/server/http.ts');
-Object.assign(process.env,{KARUU_DATABASE_URL:'postgres://isolated-fixture-only',KARUU_SITE_ORIGIN:'https://karuu.test',KARUU_MAIL_ENDPOINT:'https://mail.karuu.test/send',KARUU_MAIL_TOKEN:'isolated-fixture',KARUU_PRIVATE_MEDIA_ORIGIN:'https://private.karuu.test',KARUU_PRIVATE_MEDIA_TOKEN:'isolated-fixture',KARUU_DELIVERY_SIGNING_SECRET:'isolated-fixture-only-signing-secret-123456',STRIPE_SECRET_KEY:'sk_test_isolated_fixture_key',STRIPE_WEBHOOK_SECRET:'whsec_isolated_fixture_only',KARUU_PAYMENTS_ENABLED:'true',KARUU_PAYMENT_MODE:'test',KARUU_TERMS_VERSION:'isolated-test-version'});
+Object.assign(process.env,{KARUU_RUNTIME:'node',KARUU_DATABASE_URL:'postgres://isolated-fixture-only',KARUU_SITE_ORIGIN:'https://karuu.test',KARUU_MAIL_ENDPOINT:'https://mail.karuu.test/send',KARUU_MAIL_TOKEN:'isolated-fixture',KARUU_PRIVATE_MEDIA_ORIGIN:'https://private.karuu.test',KARUU_PRIVATE_MEDIA_TOKEN:'isolated-fixture',KARUU_DELIVERY_SIGNING_SECRET:'isolated-fixture-only-signing-secret-123456',STRIPE_SECRET_KEY:'sk_test_isolated_fixture_key',STRIPE_WEBHOOK_SECRET:'whsec_isolated_fixture_only',KARUU_PAYMENTS_ENABLED:'true',KARUU_PAYMENT_MODE:'test',KARUU_TERMS_VERSION:'isolated-test-version'});
 globalThis.fetch=async(url,options={})=>{
   const parsed=new URL(url);
   if(parsed.hostname==='mail.karuu.test'){mail.push(JSON.parse(options.body));return new Response('{}',{status:202});}
@@ -237,6 +249,23 @@ await test('internal game ledger separates paid/gift lots, preserves original fu
   await database.query(`INSERT INTO commerce_game_funding(id,user_id,game_id,original_funding_id,units,rules_version,status) VALUES('fixture-funding-two',$1,'isolated-game','fixture-original-two',100,'test-rules-1','confirmed')`,[other.id]);
   await assert.rejects(ledger.grantGameFundingReward(other.id,'fixture-funding-two','fixture-campaign',crypto.randomUUID(),rules),{code:'point_budget_exhausted'});
   await assert.rejects(ledger.creditConfirmedGameFunding(user.id,'fixture-funding-one',crypto.randomUUID(),{...rules,approved:false}),{code:'game_rules_unconfirmed'});
+});
+await test('Workers clients are operation scoped, transactions stay on one connection and unconfirmed caching/runtime cannot fall back to Node',async()=>{
+  assert.equal(adapterLoads,0,'The ordinary Node test path must not import/init the Cloudflare adapter');
+  const db=require('../src/lib/server/db.ts'),originalNavigator=Object.getOwnPropertyDescriptor(globalThis,'navigator');
+  const originalRuntime=process.env.KARUU_RUNTIME;process.env.KARUU_RUNTIME='cloudflare';
+  await assert.rejects(db.query('SELECT 1'),{code:'workers_runtime_unconfirmed'});
+  Object.defineProperty(globalThis,'navigator',{configurable:true,value:{userAgent:'Cloudflare-Workers'}});
+  try{
+    assert.equal(await db.databaseConfigured(),true);
+    fixtureWorkerEnv.KARUU_HYPERDRIVE_CACHING_DISABLED='false';await assert.rejects(db.query('SELECT 1'),{code:'database_freshness_unconfirmed'});assert.equal(workerClients,0);
+    fixtureWorkerEnv.KARUU_HYPERDRIVE_CACHING_DISABLED='true';
+    await db.query('SELECT 1 AS isolated');await db.query('SELECT 2 AS isolated');assert.equal(workerClients,2);assert.equal(workerEnds,2);
+    await db.transaction(async client=>{await client.query('SELECT 3');await client.query('SELECT 4');});
+    const tx=workerTrace.filter(entry=>entry.id===3);assert.deepEqual(tx.map(entry=>entry.sql),['BEGIN','SELECT 3','SELECT 4','COMMIT']);
+    await assert.rejects(db.transaction(async client=>{await client.query('SELECT 5');throw new Error('Isolated rollback failure');}),/Isolated rollback failure/);
+    assert.deepEqual(workerTrace.filter(entry=>entry.id===4).map(entry=>entry.sql),['BEGIN','SELECT 5','ROLLBACK']);assert.equal(workerClients,workerEnds);
+  }finally{process.env.KARUU_RUNTIME=originalRuntime;if(originalNavigator)Object.defineProperty(globalThis,'navigator',originalNavigator);else Reflect.deleteProperty(globalThis,'navigator');}
 });
 await database.close();
 if(!path.resolve(directory).startsWith(testRoot+path.sep)||!path.basename(directory).startsWith('isolated-'))throw new Error('Unsafe test cleanup target');

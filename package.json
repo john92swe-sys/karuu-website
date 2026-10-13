@@ -11,9 +11,14 @@
     "test:commerce": "node --test scripts/test-commerce.mjs",
     "test:browser": "node scripts/qa-c-store.mjs",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build:cloudflare": "node scripts/build-cloudflare.mjs",
+    "preview:cloudflare": "opennextjs-cloudflare preview",
+    "check:cloudflare": "wrangler deploy --dry-run --outdir work/cloudflare-dry-run",
+    "deploy:cloudflare:review": "node scripts/deploy-cloudflare-review.mjs"
   },
   "dependencies": {
+    "@opennextjs/cloudflare": "1.20.10",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-aspect-ratio": "^1.1.7",
@@ -46,7 +51,7 @@
     "embla-carousel-react": "^8.5.2",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.468.0",
-    "next": "^14.2.0",
+    "next": "15.5.27",
     "next-themes": "^0.4.4",
     "pg": "^8.23.1",
     "react": "^18.2.0",
@@ -68,8 +73,9 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8.57.0",
-    "eslint-config-next": "^14.2.0",
+    "eslint-config-next": "15.5.27",
     "tailwindcss": "^4.1.11",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "4.148.0"
   }
 }

@@ -20,11 +20,12 @@ export const metadata: Metadata = {
   alternates: { canonical: '/products' },
 };
 
-export default function ProductsPage({
-  searchParams,
+export default async function ProductsPage({
+  searchParams: searchParamsPromise,
 }: {
-  searchParams: { category?: string };
+  searchParams: Promise<{ category?: string }>;
 }) {
+  const searchParams = await searchParamsPromise;
   const categories = getAllCategories().filter(
     (category) => HYDRATION_PUBLICLY_DISCOVERABLE || category.slug !== 'hydration-drinkware'
   );

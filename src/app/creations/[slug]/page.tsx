@@ -8,13 +8,15 @@ import { EditionPurchase } from '@/components/store/edition-purchase';
 
 export const dynamic = 'force-dynamic';
 export async function generateStaticParams() { return (await listPublicCreations()).map((creation) => ({ slug: creation.slug })); }
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const creation = await getPublicCreation(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const creation = await getPublicCreation(slug);
   if (!creation) return { title: (await status()).publicCatalogAvailable ? 'Creation not found' : 'Creation temporarily unavailable', robots: { index: false, follow: true } };
   return { title: creation.title, description: creation.summary || `Explore ${creation.title}${creation.author ? ` by ${creation.author}` : ''}, editions and reading options.`, alternates: { canonical: `/creations/${creation.slug}` }, openGraph: { title: creation.title, ...(creation.cover ? { images: [{ url: creation.cover, alt: creation.coverAlt }] } : {}) } };
 }
-export default async function CreationPage({ params }: { params: { slug: string } }) {
-  const creation = await getPublicCreation(params.slug);
+export default async function CreationPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const creation = await getPublicCreation(slug);
   if (!creation) {
     if (!(await status()).publicCatalogAvailable) return <StoreShell crumbs={[{ label: 'Digital creations', href: '/creations' }]}><section className={styles.panel}><h1 className={styles.detailTitle}>This work is temporarily unavailable.</h1><p className={styles.muted}>Please try again later. Existing external-platform purchases remain with their platform.</p><div className={styles.actions}><Link href="/creations" className={styles.buttonOutline}>Return to the catalogue</Link><Link href="/contact" className={styles.button}>Contact KARUU</Link></div></section></StoreShell>;
     notFound();

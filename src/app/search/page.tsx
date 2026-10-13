@@ -7,7 +7,8 @@ import { listPublicCreations } from '@/lib/server/works';
 import { status } from '@/lib/server/commerce';
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Search', robots: { index: false, follow: true }, alternates: { canonical: '/search' } };
-export default async function SearchPage({ searchParams }: { searchParams: { q?: string } }) {
+export default async function SearchPage({ searchParams: searchParamsPromise }: { searchParams: Promise<{ q?: string }> }) {
+  const searchParams = await searchParamsPromise;
   const [creations, availability] = await Promise.all([listPublicCreations(), status()]);
   const query = (searchParams.q || '').trim().slice(0, 120);
   const physical = query ? getAllProducts().filter(p => `${p.name} ${p.sku} ${p.shortDescription}`.toLowerCase().includes(query.toLowerCase())) : [];

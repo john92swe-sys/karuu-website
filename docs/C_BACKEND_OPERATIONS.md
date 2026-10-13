@@ -2,7 +2,7 @@
 
 ## 验证边界（2026-10-13）
 
-当前生产官网未配置本次交易数据库、商户、私有文件服务或验证邮件服务。下面是同一 Next.js 14 工程内已编码的服务，不代表生产已启用。没有真实文件、发行权、价格、税务、完整成本和商户配置的 SKU 不接受本站付款。原平台购买继续由相应平台履约；没有取得或合并 Amazon / Google / Payhip 顾客、订单或账户。
+当前实际生产域名由 Cloudflare Worker `karuu-production` 承载（主任务核对）。本次 C 分支为兼容当前受支持 OpenNext 1.20.10 升级到 Next.js 15.5.27，仍沿用已有 App Router 工程，未部署替换生产 Worker。现生产仅核到 ASSETS 绑定，未取得本次交易数据库、商户、私有文件服务或验证邮件配置。下面的已编码服务不代表生产已启用。没有真实文件、发行权、价格、税务、完整成本和商户配置的 SKU 不接受本站付款。原平台购买继续由相应平台履约；没有取得或合并 Amazon / Google / Payhip 顾客、订单或账户。
 
 `node --test scripts/test-commerce.mjs` 使用 PGlite 的 PostgreSQL WASM 引擎执行真实 SQL、唯一键、事务与磁盘重开。Stripe 签名验证使用实际 SDK，但 Checkout / refund / 查询、私有文件与邮件网络边界使用隔离 fixture。测试不向客户发邮件、不发生真实或 Stripe sandbox 资金流水、不生成链上记录。此数据库适配器将测试事务串行化，因此不是生产 PostgreSQL 多连接压力 / 锁等待验收。生产服务只使用 `pg` 连接 PostgreSQL，不把 Vercel 本地文件系统当数据库。
 
@@ -64,4 +64,15 @@
 
 迁移前做 PostgreSQL backup；live 后持续数据库与私有对象版本备份。回退部署只回滚应用，不还原旧库覆盖新订单；v1 schema 是增量表，旧官网可继续使用原产品页与邮件草稿。已收款订单须继续保留 webhook/退款/交付 worker 的可用版本，不能因回退页面丢弃资金记录。审计与支付 event IDs 保留，不通过删除 event 来强行重复履约。
 
-技术：Next.js 14 / pg / Stripe SDK / Node crypto；PGlite 为开发测试依赖。没有新增 CMS 托管或数据库付费账户。数据库、支付、邮件、私有流量的实际持续费用未取得经营者账户费率，因此未知。
+技术：沿用 App Router、当前 Next.js 15.5.27 / OpenNext 1.20.10 / pg / Stripe SDK / Node crypto；PGlite 为开发测试依赖。没有新增 CMS 托管或数据库付费账户。数据库、支付、邮件、私有流量的实际持续费用未取得经营者账户费率，因此未知。
+
+## Cloudflare Workers 运行合同
+
+- 使用当前受支持 Next.js 15.5.27 + OpenNext 1.20.10，保留 Node.js routes、CMS 与本来订单事务。没有以退役适配器固定旧版本作正式路径。官方当前 [OpenNext package peerDependencies](https://github.com/opennextjs/opennextjs-cloudflare/blob/main/packages/cloudflare/package.json) 是版本依据；旧 overview 文案提到的 Next.js 14 支持已经滞后。
+- Worker 必须有正确 Node compatibility 和官方 global navigator。runtime var `KARUU_RUNTIME=cloudflare` 存在但 server-global navigator 无法确认 Workers 时直接拒绝数据库，不回普通 Node pool。请求的 User-Agent header 不能改变这个 server-global navigator 判断。无 Worker UA 的正常 Node 测试不导入 OpenNext，也不运行 Wrangler 初始化。
+- future real binding 名称 `HYPERDRIVE_COMMERCE`，Cloudflare 中须真实设置 caching.disabled=true；服务端 `KARUU_HYPERDRIVE_CACHING_DISABLED='true'` 是核查之后的 operator attestation，不是修改 Cloudflare 设置的替代品。缺绑定或 fresh 合同就 503。[Cloudflare 官方说明](https://developers.cloudflare.com/hyperdrive/concepts/query-caching/) 明确写入不会使缓存读取失效，因此认证、会话、权限、退款、已购访问、下架数据都走 fresh 配置。
+- Workers 每次 query / transaction 在当前请求内新建 `pg.Client`，完成后关闭；完整事务维持同一个 Client、现有 user → order 锁顺序，底层池交给 Hyperdrive。普通 Node 本地 / 测试保留现 Pool，不能把它跨请求带进 Workers。[官方 pg 指南](https://developers.cloudflare.com/hyperdrive/examples/connect-to-postgres/postgres-drivers-and-libraries/node-postgres/)，[OpenNext 数据库指导](https://opennext.js.org/cloudflare/howtos/db)。
+- Stripe 使用 `Stripe.createFetchHttpClient()`，webhook raw body 仍原样进入 `constructEventAsync`，显式 SubtleCrypto provider，签名时间容忍/模式/订单/金额/地区/幂等/live 四门不变。[OpenNext Stripe 指导](https://opennext.js.org/cloudflare/howtos/stripeAPI)。async cookies 支持当前 Next.js；未从客户端返回页记账。
+- hash / HMAC / scrypt / random / timingSafeEqual 仍用 Node crypto。[Cloudflare crypto 支持](https://developers.cloudflare.com/workers/runtime-apis/nodejs/crypto/) 覆盖这些 API，但真实 CPU / memory（尤其并发密码计算）须在 workerd 与该账户实际 plan 下测量；不能为追求免费 plan 降低密码安全参数。本轮没有变更账户 plan 或创建付费资源。
+- 私有内容仍按 HTTPS 对象 relay 流式获取并支持单 Range，未把母文件放入 ASSETS 或读写本地持久文件系统。R2 私有 bucket 如果未来实际采用，应增加对应绑定适配器并测权限/range；目前没有假称 R2 已接通。媒体 / 商户 / 邮件需要独立真实服务配置，不由 Cloudflare 托管网站自动产生。
+- 自动测试新增 Worker 生命周期的隔离适配测试：每操作 Client 关闭、同事务单 Client、异常回滚关闭、未核 cache/runtime 不回 Node。此测试仍是绑定/Client fixture，不是现账户 Hyperdrive 联调，也不能替代实际 workerd + provider 验收。无 routes 的 review 配置、构建、本地预览由主任务处理；本 backend 子任务没有部署、域名变更或读取浏览器凭据。

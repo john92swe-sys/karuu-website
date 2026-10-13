@@ -1,21 +1,39 @@
-import { Pool, PoolClient, QueryResultRow } from 'pg';
+import { Client, Pool, PoolClient, QueryResultRow } from 'pg';
 import { fail, uuid } from './core';
+import { commerceHyperdrive } from './cloudflare';
 
-let pool: Pool | undefined;
-export function databaseConfigured() { return Boolean(process.env.KARUU_DATABASE_URL); }
-function connection() {
-  if(!databaseConfigured()) fail(503,'database_not_configured','The secure database is not configured. Please use the published email contact.');
-  if(!pool) pool = new Pool({connectionString:process.env.KARUU_DATABASE_URL,max:3,idleTimeoutMillis:15000,connectionTimeoutMillis:8000});
-  return pool;
+let nodePool: Pool | undefined;
+export type DbClient=Pick<PoolClient,'query'>;
+export async function databaseConfigured() {
+  const hyperdrive=await commerceHyperdrive();
+  return hyperdrive?Boolean(hyperdrive.connectionString):Boolean(process.env.KARUU_DATABASE_URL);
 }
-export async function query<T extends QueryResultRow=QueryResultRow>(sql:string,values:unknown[]=[]):Promise<T[]> { return (await connection().query<T>(sql,values)).rows; }
-export async function transaction<T>(work:(client:PoolClient)=>Promise<T>):Promise<T> {
-  const client=await connection().connect();
+function localConnection(){
+  if(!process.env.KARUU_DATABASE_URL)fail(503,'database_not_configured','The secure database is not configured. Please use the published email contact.');
+  // This pool exists only in ordinary Node.js. Workers never reuse request-owned sockets.
+  if(!nodePool)nodePool=new Pool({connectionString:process.env.KARUU_DATABASE_URL,max:3,idleTimeoutMillis:15000,connectionTimeoutMillis:8000});
+  return nodePool;
+}
+async function workerClient(){
+  const hyperdrive=await commerceHyperdrive();
+  if(!hyperdrive)return null;
+  if(!hyperdrive.connectionString)fail(503,'database_not_configured','The secure Worker database binding is not configured.');
+  if(!hyperdrive.cacheDisabledConfirmed)fail(503,'database_freshness_unconfirmed','Authentication, billing and delivery require a verified cache-disabled database binding.');
+  const client=new Client({connectionString:hyperdrive.connectionString,connectionTimeoutMillis:8000});
+  try{await client.connect();return client;}catch(error){await client.end().catch(()=>{});throw error;}
+}
+export async function query<T extends QueryResultRow=QueryResultRow>(sql:string,values:unknown[]=[]):Promise<T[]> {
+  const client=await workerClient();
+  if(!client)return (await localConnection().query<T>(sql,values)).rows;
+  try{return (await client.query<T>(sql,values)).rows;}finally{await client.end();}
+}
+export async function transaction<T>(work:(client:DbClient)=>Promise<T>):Promise<T> {
+  const worker=await workerClient(),client=worker??await localConnection().connect();
   try { await client.query('BEGIN'); const result=await work(client); await client.query('COMMIT'); return result; }
   catch(error) { await client.query('ROLLBACK'); throw error; }
-  finally { client.release(); }
+  finally { if(worker)await worker.end();else(client as PoolClient).release(); }
 }
-export async function audit(client:PoolClient,actor:string|null,action:string,target:string,reason:string,detail:unknown={}) {
+export async function audit(client:DbClient,actor:string|null,action:string,target:string,reason:string,detail:unknown={}) {
   await client.query('INSERT INTO commerce_audit(id,actor_id,action,target,reason,detail) VALUES($1,$2,$3,$4,$5,$6)',[uuid(),actor,action,target,reason,JSON.stringify(detail)]);
 }
 export async function limit(key:string,max:number,seconds:number) {

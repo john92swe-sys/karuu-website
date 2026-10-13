@@ -33,7 +33,7 @@ export async function passwordMatches(password:string,stored:string) {
   return expected.length===actual.length && timingSafeEqual(expected,actual);
 }
 export async function currentUser():Promise<User|null> {
-  const token=cookies().get(cookieName)?.value;
+  const token=(await cookies()).get(cookieName)?.value;
   if(!token || !/^[a-f0-9]{64}$/.test(token)) return null;
   const rows=await query<User>(`SELECT u.id,u.email,u.role,u.brands FROM commerce_sessions s JOIN commerce_users u ON u.id=s.user_id
     WHERE s.token_hash=$1 AND s.expires_at>now() AND u.verified_at IS NOT NULL`,[hash(token)]);
@@ -86,7 +86,7 @@ export async function login(input:Record<string,unknown>) {
   return response;
 }
 export async function logout() {
-  const token=cookies().get(cookieName)?.value;
+  const token=(await cookies()).get(cookieName)?.value;
   if(token) await query('DELETE FROM commerce_sessions WHERE token_hash=$1',[hash(token)]);
   const response=NextResponse.json({signedOut:true});response.cookies.set(cookieName,'',{httpOnly:true,path:'/',maxAge:0});return response;
 }

@@ -6,14 +6,19 @@
 
 | 对象 | 本次实际发现 | 状态 / 边界 |
 | --- | --- | --- |
+| KARUU 主站现行部署 | 本次 Cloudflare 后台已核：Worker `karuu-production`，active 显示标识 `5abbde92`，Ready / 100%；部署者 Wrangler，界面显示 `25d ago`；自定义域名 `www.karuu.net`、`karuu.net`；workers.dev `https://karuu-production.john92swe.workers.dev` | 现网归属已确认是 Cloudflare，撤回此前将 Vercel 记录当成现网对应关系的结论；尚未取得该 Worker 版本对应源码提交及可恢复部署制品 |
+| 现行 Worker 运行配置 | 仅有 `ASSETS` binding；没有环境变量 / 数据库 binding；compatibility date `2026-09-17`；没有 `nodejs_compat` | 不能据此认定新 Next.js 服务端、PostgreSQL、支付回调或私有交付可以直接运行；本次 C 源码已实现动态 Workers 适配并通过 OpenNext 构建、dry-run 与本地 workerd；远程预览、真实服务配置及正式部署仍未完成 |
+| 同账号 Cloudflare Pages | `karuu-website`：`No Git`、界面显示 `25d ago`；`karuu-digital-store`：`No Git`、显示 `2d ago` | 数字 Pages 当前域名、部署及公开内容已另行读回，详见下一行；两个 Pages 名称不证明与主站 Worker 使用同一制品或 Git 提交 |
+| 数字 Pages 当前生产部署 | deployment `eab7a056-9701-44b4-abee-713bfcef96c4`，Success；后台显示 `Oct 10, 9:27 AM`，UI 时区未核；生产仅 `karuu-digital-store.pages.dev`；6 个静态 assets（404、favicon、index、release、robots、sitemap）；环境变量 0 | 已读到 16 条公开作品记录，主线内容与历史 Netlify 副本一致；该部署没有订单数据库。未取得源码提交对应、平台客户资料或订单导出资格，不推断外平台无订单 |
+| 本次升级 Git 起点 | `john92swe-sys/karuu-website`；Git 基线 `5994198f63e840cceb0d2226b1f15214ee5a522c`；隔离分支 `codex/karuu-c-store-20261013` | `5994198` 仅证明现有 Git 工程起点，尚未证明对应 Cloudflare active 版本；旧 Vercel 部署记录不能代替该对应核验 |
 | https://discover.karuu.net/ | 本机 HTTP 200，HTML title `Europe–China Market Access · KARUU`；JS `/assets/index-BflE123c.js`、CSS `/assets/index-BM40w8Vi.css` | 当前是欧洲—中国市场服务 SPA，不能当作数字作品商店整站替换或全部重定向 |
-| https://karuu-digital-store.netlify.app/ | 本机 HTTP 200；title `KARUU Digital Store — Books, Audio & Xiaoju World`；页面内商品 JSON version `1.0.1`、mode `public-platform-store`、`paymentsEnabled: false` | 当前真正可读数字作品站；英文/中文内容，平台购买入口、筛选、搜索和本机收藏 |
+| https://karuu-digital-store.netlify.app/ | 本机 HTTP 200；title `KARUU Digital Store — Books, Audio & Xiaoju World`；页面内商品 JSON version `1.0.1`、mode `public-platform-store`、`paymentsEnabled: false` | 历史部署的当前可访问副本，提供英文/中文内容、平台入口、筛选、搜索和本机收藏；本次迁移资料来源之一，不再认定为当前正式数字站部署 |
 | 数字站原源码位置 | JOHN 原机 `D:\KARUU_Data\Projects\karuu-digital-store` | 来源为已恢复 `PUBLICATION_RECORD.json` 读回；本机没有把该路径冒充当前已拉取 Git 工程 |
-| Netlify 原部署记录 | project `karuu-digital-store`，site_id `b1eabea7-6381-49a6-9103-fc25274c337d`，release `1.0.1` | 当前公网页面版本一致；本次未操作 Netlify 账号，GitHub 搜索未定位此名称仓库 |
-| 账户 / 历史订单 | 旧站公开说明无注册、无本站收款；Saved 使用 localStorage 保存当前浏览器书签 | 书签不能迁移为已购权益；没有从 Amazon、Google、Payhip 取得用户/订单数据，不假设不存在其他平台订单 |
+| Netlify 原部署记录 | project `karuu-digital-store`，site_id `b1eabea7-6381-49a6-9103-fc25274c337d`，release `1.0.1` | 与本次可读历史副本页面版本一致；本次未操作 Netlify 账号，GitHub 搜索未定位此名称仓库；不是 Cloudflare 新 Pages 当前源码/发布证据 |
+| 账户 / 历史订单 | Netlify 历史副本公开说明无注册、无本站收款；Saved 使用 localStorage 保存当前浏览器书签。当前 Cloudflare 数字 Pages 已核为静态部署、没有订单数据库 | 书签不能迁移为已购权益；没有取得 Amazon、Google、Payhip 客户订单数据或其导出资格，不推断外平台不存在历史订单 |
 | 旧站外链问题 | 页面 JSON 有 Amazon / Fanqie / Ximalaya 条目，但脚本 safeExternal 仅允许 Google / YouTube / Payhip | 内容数据存在不等于现有每个按钮可工作；迁移应逐条核身份及新 allowlist |
 
-来源：`D:\KARUU_Workspace\References\Media-Recovery\JOHN\20261012-original-record-readback.txt`、`20261012-media-source-locations.json`，及上述两站本次 HTTP/JSON 读回。
+来源：本会话 Cloudflare 后台及当前数字 Pages 公网页面实际读回、`D:\KARUU_Workspace\References\Media-Recovery\JOHN\20261012-original-record-readback.txt`、`20261012-media-source-locations.json`，及上述历史副本本次 HTTP/JSON 读回。下文“旧站”商品资料主要指初次读取的 Netlify 历史副本；当前数字 Pages 的 16 条公开记录已确认主线内容一致。工作副本合并了 12 项适用作品，同书电子书/音频按格式归并，开发/未来项目不变成可售 SKU；仍需完成逐记录来源及旧 URL 对照，不移入不存在的本站订单库或未经许可的平台客户资料。
 
 ## 2. 已复制的网站真实素材
 
@@ -104,6 +109,8 @@ Harbor Unity 的 `KruWallet.cs` 是本地 long Balance + KruEntry Ledger（Tutor
 
 | 缺项 | 影响 | 提供/确认者 | 精确下一步 |
 | --- | --- | --- | --- |
+| 当前 Cloudflare Worker 版本对应源码、可恢复制品及 Next.js 服务端运行路径 | 主站准确续作、Cloudflare 预览/发布与可执行回退 | 原站维护者/经营者 | 从 `karuu-production` active `5abbde92` 核部署制品与来源；保留域名/流量/配置快照；已在独立审查工程完成服务端适配与本地验证，仍需核实当前源码制品、真实服务和数据库/环境绑定；不能把 Git `5994198` 当现网版本 |
+| 当前数字 Pages 源码制品与逐记录映射 | 可复现数字迁移、完整旧入口对应 | 原站维护者/经营者 | 域名、deployment ID、16 条公开记录和无订单数据库已核；取得当前部署制品及源码对应，完成同书格式合并和开发/未来项目的逐记录映射；外平台订单须另取得合法导出资格 |
 | 每书当前发行版、KDP Select状态/期限、站外销售条件与素材授权档案 | 本站电子书直售及平台准确版本对齐 | 经营者/媒体负责人 | 对照现有完整EPUB哈希、当前书架及有效合同，记录可售语言/版本/期限；无需重复制作现有完整书 |
 | Key完整母音频/站外授权；Last Room音频正式SKU | 本站音频、读听组合收款履约 | 媒体负责人 | 从合法母文件与许可记录定位，上传私有存储；缺项期间保留Google合法购买试听 |
 | Key Kindle准确ASIN | Key View on Kindle按钮 | 出版负责人 | 对照当前KDP书架/精确公开页，不能用搜索页替代 |
@@ -111,6 +118,6 @@ Harbor Unity 的 `KruWallet.cs` 是本地 long Balance + KruEntry Ledger（Tutor
 | 音乐直售母文件/署名/发行许可/既有投稿回执 | 音乐包收费、下载许可 | 音乐负责人 | 不重复投稿，核原平台许可与记录；两首YouTube可独立线上收听 |
 | 真实游戏账户、服务器grant/query/refund签名合同和生产endpoint | 游戏充值/点数发放 | 各游戏负责人 | 在既有隔离项目服务上实现，不能由官网伪发本地余额 |
 | KRU市场/供应商/签名治理/可用预算与报价规则 | 链上奖励、KRU付款/兑换 | 经营者/KRU负责人 | 复用已核Mint，补规则后测试隔离环境；钱包连接不算收款完成 |
-| 旧站原源码/部署权限及旧账户平台导出资格 | 实际切域/替换旧站与订单迁移 | 经营者/原站维护者 | 从JOHN原工程核Git与部署提交；本次已读公网JSON但没取得平台用户订单；discover当前另有真实业务需保留 |
+| 历史数字副本原源码、现行数字站部署源码对应及平台导出资格 | 实际切域/替换数字站与适用平台订单迁移 | 经营者/原站维护者 | 从 JOHN 原工程核 Git，与已核 Cloudflare Pages deployment/域名对应；两公开目录已读取、当前 Pages 无订单数据库，但尚未取得平台客户订单；discover 当前另有真实业务需保留 |
 
-以上为已核实、待配置与待外部材料的资产/接口清单，不能替代网站同提交业务测试或生产发布验收。
+以上区分已核实素材、工作副本已实现、待配置与待外部材料。当前数字 Pages 的域名/部署、16 条公开目录和无订单数据库已核；Cloudflare 适配和本地 Workers 验证已完成；现网源码提交映射、数字记录/旧 URL 完整映射、远程预览及生产发布未完成。本清单不能替代网站同提交业务测试或正式部署验收。

@@ -21,6 +21,10 @@ work/
 .nuxt
 .turbo
 .vercel
+.open-next/
+.wrangler/
+.dev.vars
+.dev.vars.*
 .parcel-cache
 .cache
 coverage
