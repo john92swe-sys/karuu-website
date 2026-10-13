@@ -1,34 +1,89 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, BookOpen, Headphones, Music2, Gamepad2, Sparkles, Leaf } from 'lucide-react';
-import { getFeaturedProducts } from '@/lib/products';
+import { ArrowRight, ChevronRight, Headphones, Leaf } from 'lucide-react';
+import type { Creation } from '@/data/creations';
 import { listPublicCreations } from '@/lib/server/works';
 import { status } from '@/lib/server/commerce';
+import { HomeExplore } from '@/components/store/home-explore';
+
 export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { title: 'Products for life. Stories to explore.', description: 'Explore KARUU women’s activewear, JKJ-Plus collaboration, and original books, audio, music and games. Physical products and digital creations from Sweden.', alternates: { canonical: '/' } };
+export const metadata: Metadata = {
+  title: 'Products for life. Stories to explore.',
+  description: 'Explore KARUU women’s activewear, JKJ-Plus collaboration, and original books, audio, music and games. Physical products and digital creations from Sweden.',
+  alternates: { canonical: '/' },
+};
+
+function FeaturedBook({ book }: { book: Creation }) {
+  const kindle = book.links.find((link) => /amazon\.[^/]+\/dp\//.test(link.url));
+  const platform = kindle || book.links.find((link) => link.format === 'Ebook');
+  const platformLabel = kindle ? 'View on Kindle' : platform?.url.includes('play.google.com/') ? 'View on Google Play' : platform?.label || 'View edition';
+  return <article className="hc-featured-book">
+    <Link className="hc-book-cover" href={`/creations/${book.slug}`} aria-label={`Explore ${book.title}`}>
+      {book.cover ? <Image src={book.cover} alt={book.coverAlt} fill sizes="(max-width: 700px) 110px, 155px" /> : <span>{book.title}</span>}
+    </Link>
+    <h3><Link href={`/creations/${book.slug}`}>{book.title}</Link></h3>
+    <Link href={`/creations/${book.slug}`} className="hc-button hc-button-small">Explore book <ArrowRight size={14} aria-hidden="true" /></Link>
+    {platform && <a className="hc-platform-link" href={platform.url} target="_blank" rel="noopener noreferrer">{platformLabel}<span className="sr-only"> (opens a new tab)</span></a>}
+  </article>;
+}
+
 export default async function HomePage() {
   const [allCreations, availability] = await Promise.all([listPublicCreations(), status()]);
-  const featuredCreations = allCreations.filter(book => book.featured && book.categories.includes('ebooks')).slice(0, 2);
-  const music = allCreations.find(work => work.slug === 'kitchen-floor-gravity');
-  const game = allCreations.find(work => work.slug === 'nordic-rush-aurora-relay');
-  const product = getFeaturedProducts(1)[0];
-  return <div className="c-home">{!availability.publicCatalogAvailable && <div className="c-container pt-5"><p className="c-form-error" role="status">Digital creation information is temporarily unavailable. Please try again later. Physical product pages remain available.</p></div>}<section className="c-hero c-container" aria-labelledby="home-title">
-    <div className="c-hero-copy"><span className="c-eyebrow"><span /> FROM SWEDEN, WITH CURIOSITY</span><h1 id="home-title">Products for life.<br />Stories to explore.</h1><p>Physical products and original<br className="c-desktop-break" /> digital creations from KARUU.</p><div className="c-button-row"><Link href="/physical" className="c-btn">Explore products <ArrowRight size={18} /></Link><Link href="/creations" className="c-btn c-btn-outline">Explore creations <ArrowRight size={18} /></Link></div><span className="c-hero-note"><Leaf size={16} /> For everyday movement. For curious minds.</span></div>
-    <div className="c-hero-art" aria-label="KARUU activewear and original books"><div className="c-hero-orbit" /><span className="c-art-note">A more active life.<br />A richer imagination.</span>
-      {product && <Link href={`/products/${product.slug}`} className="c-hero-product"><Image src={product.gallery[0].src} alt={product.gallery[0].alt} fill sizes="(max-width: 650px) 240px, 330px" priority /><span>MOVE THROUGH LIFE ↗</span></Link>}
-      <div className="c-hero-books">{featuredCreations.slice(0, 2).map((book, index) => <Link href={`/creations/${book.slug}`} key={book.slug} className={`c-hero-book c-hero-book-${index}`} aria-label={book.title}>{book.cover ? <Image src={book.cover} alt={`${book.title} cover`} fill sizes="180px" priority /> : <span>{book.title}</span>}</Link>)}</div><div className="c-hero-sticker"><BookOpen size={20} /><span>A new chapter<br /><strong>starts here.</strong></span></div>
-    </div></section>
-    <section className="c-container c-business-grid" aria-label="Explore our two businesses">
-      <div className="c-panel c-physical-panel"><div className="c-panel-heading"><div><span className="c-eyebrow">MADE FOR EVERYDAY LIFE</span><h2>Physical products</h2><p>Thoughtful design. Practical partnerships.</p></div><Link href="/physical" className="c-round-link" aria-label="Explore physical products"><ArrowRight /></Link></div><div className="c-physical-cards"><Link href="/products" className="c-activewear-card">{product && <Image src={product.gallery[0].src} alt={product.gallery[0].alt} fill sizes="(max-width: 650px) 45vw, 280px" />}<div><span>THE KARUU COLLECTION</span><h3>Women’s<br />activewear</h3><p>OEM / ODM &amp; private label</p><strong>Explore activewear <ArrowRight size={16} /></strong></div></Link><Link href="/physical/jkj-plus" className="c-jkj-card"><div className="c-jkj-symbol"><span>JKJ</span><span>PLUS</span></div><span>BRAND COLLABORATION</span><h3>JKJ-Plus<br />drinkware</h3><p>Explore a separate brand’s cup and bottle collaboration.</p><strong>Explore collaboration <ArrowRight size={16} /></strong></Link></div><Link href="/contact" className="c-panel-bottom-link">Have a collection in mind? <strong>Start a project <ArrowRight size={16} /></strong></Link></div>
-      <div className="c-panel c-digital-panel"><div className="c-panel-heading"><div><span className="c-eyebrow">ORIGINAL WORLDS TO DISCOVER</span><h2>Digital creations</h2><p>Stories to read. Worlds to explore.</p></div><Link href="/creations" className="c-round-link" aria-label="Explore digital creations"><ArrowRight /></Link></div><div className="c-featured-books">{featuredCreations.slice(0, 2).map(book => <article key={book.slug}><Link className="c-book-cover" href={`/creations/${book.slug}`}>{book.cover ? <Image src={book.cover} alt={`${book.title} cover`} fill sizes="(max-width: 650px) 38vw, 180px" /> : <span>{book.title}</span>}</Link><h3><Link href={`/creations/${book.slug}`}>{book.title}</Link></h3><p>By {book.author}</p><Link href={`/creations/${book.slug}`} className="c-btn c-btn-small">Explore book <ArrowRight size={15} /></Link></article>)}</div><Link href="/creations?category=bundles" className="c-panel-bottom-link"><Headphones size={18} /> Discover books &amp; audio <ArrowRight size={16} /></Link></div>
+  const books = allCreations.filter((work) => work.featured && work.categories.includes('ebooks')).slice(0, 2);
+  return <div className="hc-home">
+    <section className="hc-hero" aria-labelledby="home-title">
+      <div className="hc-hero-scene" aria-hidden="true" />
+      <div className="hc-hero-copy">
+        <h1 id="home-title">Products for life.<br />Stories to explore.</h1>
+        <p>Physical products and original digital creations from KARUU.</p>
+        <div className="hc-hero-actions">
+          <Link href="/physical" className="hc-button">Explore products <ArrowRight size={17} aria-hidden="true" /></Link>
+          <Link href="/creations" className="hc-button hc-button-outline">Explore creations <ArrowRight size={17} aria-hidden="true" /></Link>
+        </div>
+      </div>
+      <p className="hc-hero-handwriting" aria-hidden="true">A more<br />active life.<br />A richer<br />tomorrow.</p>
+      <span className="hc-hero-disclosure">AI-created brand illustration.</span>
     </section>
-    <section className="c-container c-explore-section"><div className="c-section-heading"><div><span className="c-eyebrow">FOLLOW YOUR CURIOSITY</span><h2>More to explore</h2></div><Link href="/creations" className="c-text-link">Explore all creations <ArrowRight size={17} /></Link></div><div className="c-explore-grid">{[
-      { icon: BookOpen, title: 'Books', text: 'Original fiction by K. R. Gannet.', link: '/creations?category=ebooks', label: 'Find your next read', cls: 'c-explore-books' },
-      { icon: Headphones, title: 'Books & audio', text: 'Explore a story in another way.', link: '/creations?category=bundles', label: 'Explore reading & listening', cls: 'c-explore-audio' },
-      { icon: Music2, title: music?.title || 'Music', text: music?.summary || 'Explore the current music catalogue.', link: music ? `/creations/${music.slug}` : '/creations?category=music', label: music ? 'Explore this track' : 'Explore music', cls: 'c-explore-music' },
-      { icon: Gamepad2, title: game?.title || 'Games', text: game ? 'Explore the actual v0.1.0 game prototype. In development.' : 'Explore the current game projects.', link: game ? `/creations/${game.slug}` : '/creations?category=games', label: game ? 'Meet the project' : 'Explore games', cls: 'c-explore-games' },
-    ].map(item => <Link href={item.link} key={item.title} className={`c-explore-card ${item.cls}`}><item.icon size={29} strokeWidth={1.5} /><h3>{item.title}</h3><p>{item.text}</p><strong>{item.label} <ArrowRight size={16} /></strong></Link>)}</div></section>
-    <section className="c-container"><Link href="/member-benefits" className="c-member-strip"><div className="c-member-icon"><Sparkles size={28} /></div><div><h2>Your creations, together.</h2><p>Explore your library, reading and listening options, and member information.</p></div><span className="c-btn c-btn-outline c-btn-small">Member benefits <ArrowRight size={16} /></span></Link></section>
+
+    <div className="hc-content">
+      <section className="hc-businesses" aria-label="Explore our two businesses">
+        <section className="hc-business hc-physical" aria-labelledby="physical-title">
+          <header className="hc-business-heading">
+            <div><h2 id="physical-title">Physical products</h2><p>Thoughtful design for everyday life.</p></div>
+            <Link href="/contact" className="hc-project-button">Start a project <ArrowRight size={15} aria-hidden="true" /></Link>
+            <Link href="/physical" className="hc-mobile-section-link" aria-label="Explore physical products"><ChevronRight size={22} aria-hidden="true" /></Link>
+          </header>
+          <div className="hc-physical-grid">
+            <Link href="/products" className="hc-physical-card hc-activewear">
+              <Image src="/images/products/kr01-0004/02-light-pink-lifestyle.webp" alt="Published KARUU light-pink activewear lifestyle photograph" fill sizes="(max-width: 700px) 48vw, 290px" className="hc-activewear-image" />
+              <div className="hc-physical-card-copy"><h3>Women’s <br />activewear</h3><p>OEM / ODM &amp; private label.</p><span className="hc-card-button">Explore activewear <ArrowRight size={14} aria-hidden="true" /></span></div>
+            </Link>
+            <Link href="/physical/jkj-plus" className="hc-physical-card hc-drinkware">
+              <Image src="/images/lifestyle/c-drinkware-concept.webp" alt="Brand collaboration illustration of drinkware; not an identified sale model" fill sizes="(max-width: 700px) 48vw, 290px" />
+              <div className="hc-physical-card-copy"><h3>JKJ-Plus <br />drinkware</h3><p>Cups and bottles for your project.</p><span className="hc-card-button">Explore collaboration <ArrowRight size={14} aria-hidden="true" /></span></div>
+              <span className="hc-illustration-caption">Collaboration illustration</span>
+            </Link>
+          </div>
+          <div className="hc-mobile-physical-footer"><p>Women’s activewear and JKJ-Plus drinkware</p><Link href="/contact">Start a project <ArrowRight size={14} aria-hidden="true" /></Link></div>
+        </section>
+
+        <section className="hc-business hc-digital" aria-labelledby="digital-title">
+          <header className="hc-business-heading"><div><h2 id="digital-title">Digital creations</h2><p>Original stories, music and games for curious minds.</p></div><Link href="/creations" className="hc-all-books">Explore all books <ArrowRight size={14} aria-hidden="true" /></Link><Link href="/creations" className="hc-mobile-section-link" aria-label="Explore digital creations"><ChevronRight size={22} aria-hidden="true" /></Link></header>
+          {!availability.publicCatalogAvailable && <p className="hc-service-notice" role="status">Digital creation information is temporarily unavailable. Please try again later.</p>}
+          <div className="hc-digital-grid">
+            {books.map((book) => <FeaturedBook key={book.slug} book={book} />)}
+            <Link href="/creations?category=audiobooks" className="hc-audio-entry">
+              <div className="hc-audio-copy"><h3>Books &amp; audio</h3><p>Read or listen,<br />wherever you are.</p></div>
+              <div className="hc-audio-image"><Image src="/images/lifestyle/c-books-audio.webp" alt="Reading and listening lifestyle illustration with books and headphones" fill sizes="(max-width: 700px) 85px, 165px" /><span className="hc-audio-symbol"><Headphones size={19} aria-hidden="true" /></span></div>
+              <span className="hc-card-button">Explore reading<br />&amp; listening <ArrowRight size={14} aria-hidden="true" /></span>
+            </Link>
+          </div>
+        </section>
+      </section>
+
+      <HomeExplore creations={allCreations} available={availability.publicCatalogAvailable} />
+      <Link href="/member-benefits" className="hc-member-strip"><span className="hc-member-mark">KRU</span><div><h2>Member benefits</h2><p>{availability.kru.enabled ? 'Explore the programme information for your market.' : 'Programme information. Rewards are not active.'}</p></div><span className="hc-member-note"><Leaf size={25} aria-hidden="true" />More to explore. A richer everyday.</span><span className="hc-member-button">Learn more <ArrowRight size={15} aria-hidden="true" /></span></Link>
+    </div>
   </div>;
 }

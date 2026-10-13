@@ -1,0 +1,109 @@
+{
+  "date": "2026-10-13",
+  "tool": "built-in image_gen; no CLI or separate API key",
+  "purpose": "Illustrative brand/category atmosphere, never actual product SKU or published cover",
+  "assets": [
+    {
+      "destination": "public/images/lifestyle/c-lakeside-hero-desktop.webp",
+      "source": "C:/Users/Administrator/.codex/generated_images/01a132cd-9095-79c0-b526-8d6dfc7c85b4/exec-c21aae99-9c5d-4c7d-ac4f-8c2a19f30dc0.png",
+      "tool": "built-in image_gen",
+      "meaning": "AI brand atmosphere; not a real product or photographed model",
+      "width": 2172,
+      "height": 724,
+      "bytes": 224576,
+      "sha256": "ececafb8009c932fb3279ba1ee82d6e0fed967be77f0e9c53dbf13590ba22b91",
+      "processing": "WebP encoding only; no compositional editing",
+      "sourceSha256": "3b1e437f5b9efeec3e54a1143f249688f1dd055dd304a97d4758b190e8fb3cbf",
+      "finalPrompt": "Use case: photorealistic-natural. Asset type: full-bleed landscape website hero background photo ONLY, no interface. Create a bright Nordic lakeside lifestyle scene, extremely wide horizontal panoramic composition 3:1, ideally 2400x800 or 3072x1024. Sparkling pale blue lake, distant mountain ridge, subtle soft clouds, sunlight, natural editorial photography, airy blue-white-mint palette. An adult athletic woman wearing a modest sage green sports bra and leggings seated comfortably on a shoreline rock in the RIGHT third (around 73% across), relaxed side-profile face with tied-up dark hair, head entirely visible, white trainers. A simple unbranded sage water bottle beside her to her right. The LEFT 55% must remain readable open sky and distant lake/mountains, low visual clutter, but not blank white: continuous actual scenic background edge-to-edge. Woman full body largely visible, no extreme close-up; she occupies about 80% image height. Light midday mood, not dull, not sunset, not dramatic darkness. No words, labels, logos, watermark, book covers, floating collage, borders, arches, graphics or UI. This is illustrative brand atmosphere, not a claim about a real product. Intended for HTML title/buttons placed on left separately.",
+      "encoding": {
+        "library": "sharp 0.35.5",
+        "format": "webp",
+        "quality": 84,
+        "effort": 5,
+        "resize": false
+      }
+    },
+    {
+      "destination": "public/images/lifestyle/c-drinkware-concept.webp",
+      "source": "C:/Users/Administrator/.codex/generated_images/01a132cd-9095-79c0-b526-8d6dfc7c85b4/exec-0b0017d8-4449-4098-9e2d-5dd92eb3b3d4.png",
+      "tool": "built-in image_gen",
+      "meaning": "AI category concept; unbranded generic objects; not a JKJ sellable SKU",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 121530,
+      "sha256": "6522e9340e6e03b1191dbc0f948abe79fd4f0c71630d8ece9b3e6b7d7347149f",
+      "processing": "WebP encoding only; no compositional editing",
+      "sourceSha256": "b7103cfc9a52f7910ac99d685c292f9ab8195f0aae589f0e03f4ce5a156c3562",
+      "finalPrompt": "Use case: product-mockup. Asset type: editorial collaboration concept photograph for a drinkware category card. Portrait-ish square composition, a matte sage green reusable water bottle with simple loop cap and a cream stainless travel tumbler on pale sunlit stone, both completely UNBRANDED and generic. Bright soft natural daylight from left, leafy olive tree bokeh and hint of blue lake outside, pale mint/white natural palette. Large objects occupy middle-upper 70%, enough light quiet space lower 25% for separately rendered HTML. Realistic material textures and shadows, elegant clean lifestyle photography consistent with a bright Nordic lakeside store. This is a conceptual category illustration, not an actual sellable SKU or actual JKJ product. No logos, no KARUU or JKJ lettering, no invented certifications, no claims, no text, no UI, no border.",
+      "encoding": {
+        "library": "sharp 0.35.5",
+        "format": "webp",
+        "quality": 84,
+        "effort": 5,
+        "resize": false
+      }
+    },
+    {
+      "destination": "public/images/lifestyle/c-books-audio.webp",
+      "source": "C:/Users/Administrator/.codex/generated_images/01a132cd-9095-79c0-b526-8d6dfc7c85b4/exec-3d422206-6300-4a2e-90f9-6b8a1b5761fe.png",
+      "tool": "built-in image_gen",
+      "meaning": "AI listening atmosphere; not a published cover or sellable headphone",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 98312,
+      "sha256": "6ba5b8a5031198f67e346e711ec688e4eb1951c527f457e3fde391ad7e4f96c4",
+      "processing": "WebP encoding only; no compositional editing",
+      "sourceSha256": "30f85fb44226256f3fdebc199d84b15f2de0e034e41c37a1a93c07eeee42f697",
+      "finalPrompt": "Use case: photorealistic-natural. Asset type: photo-only website Books & audio category card. A pair of simple dark navy over-ear headphones resting on two closed neutral-cover books on a pale wood desk by a bright window; background softly defocused sage plant and pale blue daylight. Friendly Scandinavian natural still life, clean realistic editorial photograph with large headphones and books, square composition, focus around middle and bottom, light quiet background upper 25% for HTML copy rendered separately. No recognizable brand, no book titles, no fabricated published cover, no words, no UI, no icons, no play button, no watermark. Bright not moody; palette navy, warm cream, pale blue and mint.",
+      "encoding": {
+        "library": "sharp 0.35.5",
+        "format": "webp",
+        "quality": 84,
+        "effort": 5,
+        "resize": false
+      }
+    },
+    {
+      "destination": "public/images/lifestyle/c-lakeside-hero-mobile.webp",
+      "source": "C:/Users/Administrator/.codex/generated_images/01a132cd-9095-79c0-b526-8d6dfc7c85b4/exec-493aa71c-0baa-40c1-93de-1624dabb0183.png",
+      "tool": "built-in image_gen",
+      "meaning": "AI responsive atmosphere variant; mobile subject framing is separate from desktop",
+      "width": 1448,
+      "height": 1086,
+      "bytes": 209546,
+      "sha256": "bc1e19698f486e30253c6b1248e4a6edc42e4823792074d1015a7adf4cdfe780",
+      "processing": "WebP encoding only; no compositional editing",
+      "sourceSha256": "8d3ec7d6541fc67178743e41a37f714b2b8ee93e9db063d3d1a83f441e95a94d",
+      "finalPrompt": "Use case: compositing / responsive photo variant. Edit this lakeside atmosphere photo into a separate mobile website hero photograph, 4:3 landscape ratio (about 1536x1152). Keep the same adult woman, face identity, tied-up dark hair, sage outfit, natural sunny blue lake/mountain/light atmosphere and generic water bottle. Recompose so the woman sits at the extreme RIGHT, her whole head fully visible at around x=85% and y=15%, torso/knees visible on right third, bottle near far-right bottom. The LEFT 60% remains bright pale blue sky, lake and soft distant mountains, uncluttered for HTML heading, description and two stacked buttons. Head and face must never enter left text area. Do not merely crop the current wide image, reframe it naturally for a 390x300px web display. Bright, clean natural midday editorial mood. No text, no logo, no UI, no border, no floating elements. This is illustrative brand atmosphere, not real product photography.",
+      "encoding": {
+        "library": "sharp 0.35.5",
+        "format": "webp",
+        "quality": 84,
+        "effort": 5,
+        "resize": false
+      },
+      "referencedImagePath": "C:/Users/Administrator/.codex/generated_images/01a132cd-9095-79c0-b526-8d6dfc7c85b4/exec-c21aae99-9c5d-4c7d-ac4f-8c2a19f30dc0.png"
+    },
+    {
+      "destination": "public/images/lifestyle/c-music-landscape.webp",
+      "source": "C:/Users/Administrator/.codex/generated_images/01a132cd-9095-79c0-b526-8d6dfc7c85b4/exec-68d273fb-0e42-4a4f-a4e8-f9fcfa127ec4.png",
+      "tool": "built-in image_gen",
+      "meaning": "AI neutral atmospheric browsing illustration; not a published music cover",
+      "width": 1672,
+      "height": 941,
+      "bytes": 340274,
+      "sha256": "06fb36fd4485f52d8476fbe816d17a9849a3d80ec1166c66958e3a884d990d63",
+      "processing": "WebP encoding only; no compositional editing",
+      "sourceSha256": "6733dcaa060744f35ba4129707f57df80c952b36317a3b17af48f7647a1c17df",
+      "finalPrompt": "Use case: precise-object-edit. Make a landscape photo-only browsing thumbnail from this same bright Nordic lake scene. Remove the person and the water bottle entirely. Keep continuous sunlit turquoise-blue lake, distant blue mountain ridge, pale sky and some shoreline stones/greenery, matching the same clean natural daylight palette. Wide 16:9 landscape scenic editorial image, no text, no play icons, no logos, no UI. This is neutral atmospheric browsing artwork for a music category, not a published album cover.",
+      "encoding": {
+        "library": "sharp 0.35.5",
+        "format": "webp",
+        "quality": 84,
+        "effort": 5,
+        "resize": false
+      },
+      "referencedImagePath": "C:/Users/Administrator/.codex/generated_images/01a132cd-9095-79c0-b526-8d6dfc7c85b4/exec-c21aae99-9c5d-4c7d-ac4f-8c2a19f30dc0.png"
+    }
+  ]
+}

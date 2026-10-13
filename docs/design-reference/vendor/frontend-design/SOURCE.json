@@ -1,0 +1,32 @@
+{
+  "resource": "anthropics/skills frontend-design",
+  "repository": "https://github.com/anthropics/skills",
+  "commit": "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
+  "commitDateUtc": "2026-10-09T18:45:49Z",
+  "vendoredAtUtc": "2026-10-13T04:12:00.380123+00:00",
+  "license": "Apache-2.0",
+  "licenseScope": "The exact skills/frontend-design/LICENSE.txt at this commit; no repository-wide license is substituted.",
+  "licenseFilename": "LICENSE.txt (preserved to match the unchanged SKILL frontmatter)",
+  "files": [
+    {
+      "file": "SKILL.md",
+      "upstreamPath": "skills/frontend-design/SKILL.md",
+      "url": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/frontend-design/SKILL.md",
+      "rawUrl": "https://raw.githubusercontent.com/anthropics/skills/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/frontend-design/SKILL.md",
+      "sha256": "d91970639e9f5c37682ac7ab60094d35f1c7c1f38d731bd56396563aee10c1d3",
+      "bytes": 9390,
+      "verbatim": true
+    },
+    {
+      "file": "LICENSE.txt",
+      "upstreamPath": "skills/frontend-design/LICENSE.txt",
+      "url": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/frontend-design/LICENSE.txt",
+      "rawUrl": "https://raw.githubusercontent.com/anthropics/skills/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/frontend-design/LICENSE.txt",
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+      "bytes": 10174,
+      "verbatim": true
+    }
+  ],
+  "installation": "Project documentation reference only; no global skill, plugin, runtime or hook installation.",
+  "applicationPriority": "User-approved C reference and correction instructions take precedence over general aesthetic recommendations."
+}

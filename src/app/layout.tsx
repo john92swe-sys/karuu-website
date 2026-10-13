@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import './creative-store.css';
+import './c-navigation.css';
+import './home-c.css';
 import { SiteLayout } from '@/components/site-layout';
 
 export const metadata: Metadata = {

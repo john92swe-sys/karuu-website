@@ -1,13 +1,15 @@
-# AGENTS.md — KARUU AB B2B Activewear Website
+# AGENTS.md — KARUU AB Creative Life Store
 
 ## Scope and current project
 
 These instructions apply to this repository. The production site is
-`https://www.karuu.net`, KARUU AB's women's activewear OEM/ODM and private-label
-website. It is separate from the consumer store at `discover.karuu.net`.
+`https://www.karuu.net`, served by Cloudflare Worker `karuu-production`. This
+branch implements the approved C creative life store and an isolated review
+Worker. `discover.karuu.net` has its separate market-access business and must
+not be treated as the current consumer catalogue.
 
 Use the current branch, source and `package.json` as engineering evidence. The
-application uses Next.js 14 App Router, React 18, TypeScript and Tailwind CSS 4;
+application uses Next.js 15 App Router, React 18, TypeScript and Tailwind CSS 4;
 it is not the historical native-static single-page template. Preserve the
 existing design and features unless the requested change requires otherwise.
 

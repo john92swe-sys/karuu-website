@@ -1,0 +1,64 @@
+{
+  "createdAtUtc": "2026-10-13T04:12:00.380123+00:00",
+  "sourceFile": "C-approved-desktop-mobile-20261013.png",
+  "sourceSha256": "0b2d9f74aa5bc18c2cb58100318d27ce25942b7a523125a142f16b1b8119b5c6",
+  "sourceDimensions": {
+    "width": 1536,
+    "height": 1152
+  },
+  "method": "Pillow crop only; right/lower bounds exclusive; no resize, redraw, recoloring or original-file modification",
+  "boundsRationale": "Use the inner webpage rectangles; trim the exterior frame while excluding the Chinese poster heading and bottom caption.",
+  "purpose": "Reference-only preparation for separately comparing real desktop and mobile screenshots; not a raster website implementation or product-image edit.",
+  "crops": [
+    {
+      "region": "desktop",
+      "file": "reference-desktop.png",
+      "pillowBoxLeftUpperRightLower": [
+        31,
+        116,
+        1136,
+        1118
+      ],
+      "width": 1105,
+      "height": 1002,
+      "sha256": "bf62131230fa198056b06e261fc2436e5073ac5bf0538fa29b642e5456470fe1",
+      "resized": false,
+      "repainted": false,
+      "pixelCopyVerified": true,
+      "visualInspection": {
+        "status": "passed",
+        "tool": "view_image",
+        "checkedAtUtc": "2026-10-13T04:13:09.645293+00:00",
+        "chinesePosterTitleExcluded": true,
+        "bottomChineseCaptionExcluded": true,
+        "exteriorFrameExcluded": true,
+        "navigationHeroBusinessSectionsAndKruRetained": true
+      }
+    },
+    {
+      "region": "mobile",
+      "file": "reference-mobile.png",
+      "pillowBoxLeftUpperRightLower": [
+        1168,
+        116,
+        1505,
+        1118
+      ],
+      "width": 337,
+      "height": 1002,
+      "sha256": "4ff0c03ae8a73510efa166ad24de03a9e41b91cc824b9320465c3743b91b3ddf",
+      "resized": false,
+      "repainted": false,
+      "pixelCopyVerified": true,
+      "visualInspection": {
+        "status": "passed",
+        "tool": "view_image",
+        "checkedAtUtc": "2026-10-13T04:13:09.645293+00:00",
+        "chinesePosterTitleExcluded": true,
+        "bottomChineseCaptionExcluded": true,
+        "exteriorFrameExcluded": true,
+        "navigationHeroBusinessSectionsAndKruRetained": true
+      }
+    }
+  ]
+}

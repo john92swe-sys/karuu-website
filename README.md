@@ -1,10 +1,30 @@
-# KARUU AB — B2B Activewear Website
+# KARUU AB — Creative Life Store
 
-## Quick Deploy to Vercel
+## Current engineering and review deployment
 
-1. Upload the entire project folder to Vercel
-2. Vercel will auto-detect Next.js and build automatically
-3. No additional configuration needed
+The current application uses Next.js 15.5.27, React 18, Tailwind 4 and OpenNext
+1.20.10 for Cloudflare Workers. The production domains are served by the separate
+`karuu-production` Worker; its active source-to-Git correspondence has not been
+recovered. This checkout and its deploy script target only the isolated
+`karuu-c-review-20261013` Worker. See `docs/C_RELEASE_HANDOFF.md` for verified
+deployment evidence and the boundary between preview and production.
+
+Run `npm test`, `npm run build:cloudflare` and `npm run check:cloudflare` before a
+review upload. With the existing official Wrangler authorization, use
+`npm run deploy:cloudflare:review`. That command validates the review name and
+closed commercial flags; it does not route production traffic.
+
+The approved C image and its separate desktop/phone crops are kept in
+`docs/design-reference/`. `scripts/qa-c-visual.mjs` captures the required five
+CSS viewports in actual Edge; `npm run test:visual` compares against the
+manually reviewed C implementation in `docs/design-reference/visual-baselines/`.
+The existing bundled Playwright can be supplied through `PLAYWRIGHT_MODULE`;
+no new global tool or scaffold is required. Baselines use Windows/Edge and
+Segoe UI and must not be updated to conceal a failed design review.
+
+Account, database, merchant, email, private-media and KRU services remain gated
+until their real configuration and acceptance are complete. Published platform
+editions and genuine activewear inquiries remain distinct business paths.
 
 ## Project Structure
 

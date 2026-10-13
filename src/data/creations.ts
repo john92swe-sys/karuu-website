@@ -25,7 +25,7 @@ export const creations: Creation[] = [
   {
     id: 'key', slug: 'the-key-returned-at-low-tide',
     title: 'The Key Returned at Low Tide', author: 'K. R. Gannet',
-    publisher: 'KARUU AB', language: 'English', summary: 'Nell Calder returns to a coastal town to settle her aunt’s repair shop. An old key draws her into a murder investigation. The first Gannetwick mystery.', cover: '/images/creations/low-tide-cover.jpg',
+    publisher: 'KARUU AB', language: 'English', summary: 'Nell Calder returns to a coastal town to settle her aunt’s repair shop. An old key draws her into a murder investigation. The first Gannetwick mystery.', cover: '/images/creations/low-tide-cover.webp',
     aiDisclosure: 'The text and cover were created using generative AI.',
     coverAlt: 'The Key Returned at Low Tide — publication cover',
     categories: ['ebooks', 'audiobooks', 'bundles'], featured: true,
@@ -44,7 +44,7 @@ export const creations: Creation[] = [
   {
     id: 'last-room', slug: 'the-last-room-on-the-register',
     title: 'The Last Room on the Register', author: 'K. R. Gannet', publisher: 'KARUU AB',
-    language: 'English (UK)', summary: 'Iris Marlow returns to close a coastal hotel. A visitor writes a dead woman’s name in the register, reopening an old fire and a statement Iris once signed.', cover: '/images/creations/last-room-cover.png',
+    language: 'English (UK)', summary: 'Iris Marlow returns to close a coastal hotel. A visitor writes a dead woman’s name in the register, reopening an old fire and a statement Iris once signed.', cover: '/images/creations/last-room-cover.webp',
     aiDisclosure: 'Text and cover were made using generative AI with subsequent revision.',
     coverAlt: 'The Last Room on the Register — publication cover',
     categories: ['ebooks', 'bundles'], featured: true,

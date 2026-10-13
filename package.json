@@ -10,6 +10,7 @@
     "test": "node --test scripts/test-hydration.mjs scripts/test-commerce.mjs",
     "test:commerce": "node --test scripts/test-commerce.mjs",
     "test:browser": "node scripts/qa-c-store.mjs",
+    "test:visual": "node scripts/run-c-visual-regression.mjs",
     "start": "next start",
     "lint": "next lint",
     "build:cloudflare": "node scripts/build-cloudflare.mjs",
