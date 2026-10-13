@@ -1,24 +1,24 @@
 import Stripe from 'stripe';
 import { allocate, costResult, CostInputs, fail, hash, idempotency, text, uuid } from './core';
 import { audit, databaseConfigured, DbClient, query, transaction } from './db';
-import { User } from './auth';
+import { mailConfigured, User } from './auth';
+import { privateMediaConfigured } from './private-media';
 
 export type Asset={id:string,work_slug:string,title:string,format:string,language:string,object_key:string,edition_version:string,content_sha256:string|null,rights_verified:boolean,delivery_verified:boolean};
 export type Sku={id:string,slug:string,title:string,kind:string,status:string,currency:string,price_minor:number|null,promotion_price_minor:number|null,promotion_start:string|null,promotion_end:string|null,rights_verified:boolean,markets:string[],components:{assetId:string,allocationBps:number}[],tax_by_market:Record<string,Record<string,{rate:number,stripeTaxRateId:string}>>,upgrade_prices:Record<string,number>,sale_start:string|null,sale_end:string|null};
 function sellingSku(sku:Sku):Sku{return sku.promotion_price_minor&&sku.promotion_start&&sku.promotion_end&&Date.parse(sku.promotion_start)<=Date.now()&&Date.parse(sku.promotion_end)>Date.now()?{...sku,price_minor:sku.promotion_price_minor}:sku;}
 export type OrderSnapshot={skuId:string,title:string,priceMinor:number,components:{assetId:string,title:string,format:string,language:string,editionVersion:string,contentSha256:string,amountMinor:number,taxRate:number,stripeTaxRateId:string}[]}[];
-export function mediaConfigured(){return Boolean(process.env.KARUU_PRIVATE_MEDIA_ORIGIN?.startsWith('https://') && process.env.KARUU_PRIVATE_MEDIA_TOKEN && (process.env.KARUU_DELIVERY_SIGNING_SECRET?.length??0)>=32);}
+export const mediaConfigured = privateMediaConfigured;
 export function paymentsConfigured(){
   const live=process.env.KARUU_PAYMENT_MODE==='live';
   const launchApproved=!live||['KARUU_LIVE_COMMERCE_APPROVED','KARUU_TAX_CONFIG_APPROVED','KARUU_DISTRIBUTION_APPROVED','KARUU_LEGAL_APPROVED'].every(key=>process.env[key]==='true');
   const keyModeMatches=(live?/^(sk|rk)_live_/:/^(sk|rk)_test_/).test(process.env.STRIPE_SECRET_KEY??'');
   return Boolean(launchApproved&&keyModeMatches&&process.env.KARUU_PAYMENTS_ENABLED==='true' && process.env.STRIPE_WEBHOOK_SECRET && process.env.KARUU_SITE_ORIGIN && process.env.KARUU_TERMS_VERSION && ['test','live'].includes(process.env.KARUU_PAYMENT_MODE??''));
 }
-export function stripeClient(){
-  if(!paymentsConfigured()) fail(503,'payments_not_configured','Direct checkout is not enabled. Verified prices, rights, files, merchant and tax settings are required.');
-  const key=process.env.STRIPE_SECRET_KEY!;
-  const live=process.env.KARUU_PAYMENT_MODE==='live';
-  if(!(live?/^(sk|rk)_live_/:/^(sk|rk)_test_/).test(key)) fail(503,'payment_mode_mismatch','The merchant key does not match the configured payment environment.');
+export function stripeClient({existingPayments=false}:{existingPayments?:boolean}={}){
+  if(!existingPayments&&!paymentsConfigured()) fail(503,'payments_not_configured','Direct checkout is not enabled. Verified prices, rights, files, merchant and tax settings are required.');
+  const key=process.env.STRIPE_SECRET_KEY??'',mode=process.env.KARUU_PAYMENT_MODE;
+  if(!['test','live'].includes(mode??'')||!(mode==='live'?/^(sk|rk)_live_/:/^(sk|rk)_test_/).test(key)) fail(503,'payment_mode_mismatch','The merchant key does not match the configured payment environment.');
   return new Stripe(key,{maxNetworkRetries:2,timeout:15000,httpClient:Stripe.createFetchHttpClient()});
 }
 export async function status(){
@@ -27,13 +27,14 @@ export async function status(){
   if(configured) {try{ready=Boolean((await query('SELECT version FROM commerce_schema WHERE version=1'))[0]);}catch{ready=false;}}
   let publicCatalogAvailable=!configured;
   if(ready){try{await query('SELECT slug FROM commerce_creations LIMIT 1');publicCatalogAvailable=true;}catch{publicCatalogAvailable=false;}}
-  return {database:ready,publicCatalogAvailable,accounts:ready&&Boolean(process.env.KARUU_MAIL_ENDPOINT&&process.env.KARUU_MAIL_TOKEN&&process.env.KARUU_SITE_ORIGIN),payments:ready&&paymentsConfigured(),privateMedia:mediaConfigured(),inquiries:ready,kru:{enabled:false,reason:'KRU requires verified market eligibility, legal approval, network, mint, budgets and controlled signing. Ordinary content purchases do not require KRU.'}};
+  return {database:ready,publicCatalogAvailable,accounts:ready&&await mailConfigured(),payments:ready&&paymentsConfigured(),privateMedia:await mediaConfigured(),inquiries:ready,kru:{enabled:false,reason:'KRU requires verified market eligibility, legal approval, network, mint, budgets and controlled signing. Ordinary content purchases do not require KRU.'}};
 }
 export async function catalog(){
   if(!(await databaseConfigured())) return {items:[]};
   const skus=await query<Sku>('SELECT * FROM commerce_skus WHERE status=$1 ORDER BY updated_at DESC',['active']);
   const assets=await query<Asset>('SELECT * FROM commerce_assets');
   const costs=await query<{sku_id:string,inputs:CostInputs}>('SELECT sku_id,inputs FROM commerce_costs');
+  const mediaReady = await mediaConfigured();
   return {items:skus.map(rawSku=>{const sku=sellingSku(rawSku);
     const components=sku.components.map(c=>assets.find(a=>a.id===c.assetId));
     const inputs=costs.find(c=>c.sku_id===sku.id)?.inputs;
@@ -43,7 +44,7 @@ export async function catalog(){
       const effectiveTax=sku.price_minor/sku.components.reduce((sum,c,i)=>sum+allocations[i]/(1+taxes[c.assetId].rate),0)-1;
       const result=costResult(sku.price_minor,{...inputs,vatRate:effectiveTax});return result.complete&&result.targetMet;
     });
-    const available=sku.rights_verified&&sku.price_minor!==null&&sku.kind!=='game'&&components.length>0&&components.every(a=>a?.rights_verified&&a?.delivery_verified)&&marketReady&&(!sku.sale_start||Date.parse(sku.sale_start)<=Date.now())&&(!sku.sale_end||Date.parse(sku.sale_end)>Date.now())&&paymentsConfigured()&&mediaConfigured();
+    const available=sku.rights_verified&&sku.price_minor!==null&&sku.kind!=='game'&&components.length>0&&components.every(a=>a?.rights_verified&&a?.delivery_verified)&&marketReady&&(!sku.sale_start||Date.parse(sku.sale_start)<=Date.now())&&(!sku.sale_end||Date.parse(sku.sale_end)>Date.now())&&paymentsConfigured()&&mediaReady;
     return {id:sku.id,slug:sku.slug,title:sku.title,kind:sku.kind,currency:sku.currency,priceMinor:available?sku.price_minor:null,normalPriceMinor:available?rawSku.price_minor:null,promotion:available&&sku.price_minor!==rawSku.price_minor,components:components.filter((a):a is Asset=>Boolean(a)).map(a=>({id:a.id,title:a.title,format:a.format,language:a.language})),available,unavailableReason:available?null:'Direct purchase is awaiting verified price, distribution rights, delivery files and merchant configuration.'};
   })};
 }
@@ -87,7 +88,7 @@ async function snapshotFor(client:DbClient,skuIds:string[],user:User,market:stri
 }
 export async function checkout(user:User,input:Record<string,unknown>,keyValue:unknown){
   const stripe=stripeClient();
-  if(!mediaConfigured()) fail(503,'delivery_not_configured','Private content delivery is not configured.');
+  if(!await mediaConfigured()) fail(503,'delivery_not_configured','Private content delivery is not configured.');
   if(input.immediateDeliveryConsent!==true) fail(400,'delivery_consent_required','Confirm the disclosed immediate digital-content delivery terms before paying.');
   const key=idempotency(keyValue),market=text(input.market,2).toUpperCase();
   if(!/^[A-Z]{2}$/.test(market)) fail(400,'market_required','Select the actual billing country.');
@@ -99,8 +100,12 @@ export async function checkout(user:User,input:Record<string,unknown>,keyValue:u
     await client.query('SELECT id FROM commerce_users WHERE id=$1 FOR UPDATE',[user.id]);
     const old=await client.query('SELECT * FROM commerce_orders WHERE user_id=$1 AND idempotency_key=$2 FOR UPDATE',[user.id,key]);
     if(old.rows[0]){if(old.rows[0].request_hash!==digest)fail(409,'idempotency_conflict','This checkout key was already used for another bag.');return old.rows[0];}
+    const pending=await client.query(`SELECT * FROM commerce_orders WHERE user_id=$1 AND status IN ('pending','review','refund_pending')`,[user.id]);
+    // A reload or another browser can lose its request key. An identical pending quote
+    // still resumes the same order and provider key; it never creates another charge.
+    const resumable=pending.rows.find(row=>row.status==='pending'&&row.request_hash===digest);
+    if(resumable)return resumable;
     const snapshot=await snapshotFor(client,skuIds,user,market),assetIds=snapshot.flatMap(s=>s.components.map(c=>c.assetId));
-    const pending=await client.query(`SELECT id,snapshot FROM commerce_orders WHERE user_id=$1 AND status IN ('pending','review','refund_pending')`,[user.id]);
     if(pending.rows.some(row=>(row.snapshot as OrderSnapshot).some(item=>item.components.some(c=>assetIds.includes(c.assetId))))) fail(409,'checkout_pending','A checkout or payment review for this content is already open. View your orders or contact support before starting another payment.');
     const id=uuid(),total=snapshot.reduce((sum,item)=>sum+item.priceMinor,0);
     const currency=(await client.query('SELECT currency FROM commerce_skus WHERE id=$1',[skuIds[0]])).rows[0].currency;
@@ -110,9 +115,26 @@ export async function checkout(user:User,input:Record<string,unknown>,keyValue:u
   });
   if(order.status!=='pending') return {orderId:order.id,url:null,status:order.status};
   if(order.checkout_url) return {orderId:order.id,url:order.checkout_url,status:'pending'};
+  // Stripe retains idempotency keys for at least 24h. Leave a margin and require
+  // reconciliation afterwards: a provider session may exist despite a failed DB save.
+  const checkRecoveryWindow=()=>{
+    const quoteAge=Date.now()-new Date(order.created_at).getTime();
+    if(!order.stripe_session_id&&(!Number.isFinite(quoteAge)||quoteAge< -60_000||quoteAge>=23*60*60*1000)) fail(409,'checkout_recovery_required',`KARUU must check the original payment session before continuing order ${order.id}. Contact support with this reference; do not start another payment.`);
+  };
+  checkRecoveryWindow();
   const snapshot=order.snapshot as OrderSnapshot;
+  if(!order.stripe_session_id){
+    const currentQuote=await transaction(async client=>{
+      await client.query('SELECT id FROM commerce_users WHERE id=$1 FOR UPDATE',[user.id]);
+      return snapshotFor(client,snapshot.map(item=>item.skuId),user,market);
+    });
+    // JSONB reorders object keys. Compare ordered commercial identities, preserving
+    // the old display titles while rejecting changed price, edition or tax inputs.
+    const identity=(quote:OrderSnapshot)=>JSON.stringify(quote.map(item=>[item.skuId,item.priceMinor,item.components.map(c=>[c.assetId,c.format,c.language,c.editionVersion,c.contentSha256,c.amountMinor,c.taxRate,c.stripeTaxRateId])]));
+    if(identity(currentQuote)!==identity(snapshot)) fail(409,'checkout_quote_changed',`The price or contents of order ${order.id} have changed. Contact KARUU to check the original checkout before continuing.`);
+  }
   // Confirm merchant tax-rate objects rather than trusting a staff-entered identifier.
-  for(const item of snapshot)for(const component of item.components){
+  if(!order.stripe_session_id)for(const item of snapshot)for(const component of item.components){
     const rate=await stripe.taxRates.retrieve(component.stripeTaxRateId);
     if(!rate.active||!rate.inclusive||Math.abs((rate.percentage??-1)/100-component.taxRate)>0.000001||rate.country!==market) fail(503,'tax_configuration_mismatch','The configured tax rate does not match the merchant tax setting and billing market.');
   }
@@ -123,10 +145,19 @@ export async function checkout(user:User,input:Record<string,unknown>,keyValue:u
   // SDK defaults to its current API version; random-letter suffix is stable per order.
   const letters=order.id.replace(/-/g,'').slice(0,8).split('').map((x:string)=>String.fromCharCode(97+parseInt(x,16))).join('');
   params.integration_identifier=`karuu_creative_store_${letters}`;
-  const session=await stripe.checkout.sessions.create(params,{idempotencyKey:`checkout-${order.id}`});
+  checkRecoveryWindow();
+  const session=order.stripe_session_id?await stripe.checkout.sessions.retrieve(order.stripe_session_id):await stripe.checkout.sessions.create(params,{idempotencyKey:`checkout-${order.id}`});
   if(session.livemode!==(process.env.KARUU_PAYMENT_MODE==='live')) fail(503,'payment_mode_mismatch','The payment session has an unexpected mode.');
-  await query('UPDATE commerce_orders SET stripe_session_id=$1,checkout_url=$2,updated_at=now() WHERE id=$3',[session.id,session.url,order.id]);
-  return {orderId:order.id,url:session.url,status:'pending'};
+  if(!session.id||session.client_reference_id!==order.id||session.metadata?.orderId!==order.id||session.metadata?.userId!==user.id||session.amount_total!==order.total_minor||session.currency?.toUpperCase()!==order.currency) fail(503,'checkout_session_mismatch','The merchant session does not match the original order. Contact KARUU before continuing payment.');
+  return transaction(async client=>{
+    await client.query('SELECT id FROM commerce_users WHERE id=$1 FOR UPDATE',[user.id]);
+    const current=(await client.query('SELECT * FROM commerce_orders WHERE id=$1 AND user_id=$2 FOR UPDATE',[order.id,user.id])).rows[0];
+    if(!current) fail(409,'order_not_found','The original checkout order could not be found.');
+    if(current.stripe_session_id&&current.stripe_session_id!==session.id) fail(409,'checkout_session_conflict','A different merchant session is already linked to this order. Contact KARUU before continuing.');
+    if(current.status!=='pending') return {orderId:current.id,url:null,status:current.status};
+    await client.query('UPDATE commerce_orders SET stripe_session_id=$1,checkout_url=$2,updated_at=now() WHERE id=$3',[session.id,session.url,order.id]);
+    return {orderId:order.id,url:session.url,status:'pending'};
+  });
 }
 export async function orders(user:User){
   const rows=await query('SELECT id,status,currency,total_minor,created_at,snapshot FROM commerce_orders WHERE user_id=$1 ORDER BY created_at DESC LIMIT 100',[user.id]);

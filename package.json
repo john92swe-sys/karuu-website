@@ -7,7 +7,9 @@
     "dev": "next dev",
     "build": "next build",
     "check:public-safety": "node scripts/check-public-product-safety.mjs",
-    "test": "node --test scripts/test-hydration.mjs scripts/test-commerce.mjs",
+    "test": "node --test scripts/test-hydration.mjs scripts/test-commerce.mjs scripts/test-commerce-admin-bootstrap.mjs scripts/test-private-media.mjs scripts/test-private-upload.mjs scripts/test-commerce-schema.mjs scripts/test-mail-provider.mjs scripts/test-notifications.mjs scripts/test-commerce-runtime-role.mjs scripts/test-checkout-recovery.mjs scripts/test-notification-scheduled.mjs scripts/test-payment-reconciliation.mjs",
+    "test:admin-bootstrap": "node --test scripts/test-commerce-admin-bootstrap.mjs",
+    "test:commerce-schema": "node --test scripts/test-commerce-schema.mjs",
     "test:commerce": "node --test scripts/test-commerce.mjs",
     "test:browser": "node scripts/qa-c-store.mjs",
     "test:visual": "node scripts/run-c-visual-regression.mjs",
@@ -16,7 +18,9 @@
     "build:cloudflare": "node scripts/build-cloudflare.mjs",
     "preview:cloudflare": "opennextjs-cloudflare preview",
     "check:cloudflare": "wrangler deploy --dry-run --outdir work/cloudflare-dry-run",
-    "deploy:cloudflare:review": "node scripts/deploy-cloudflare-review.mjs"
+    "deploy:cloudflare:review": "node scripts/deploy-cloudflare-review.mjs",
+    "test:commerce-runtime-role": "node --test scripts/test-commerce-runtime-role.mjs",
+    "test:payment-reconciliation": "node --test scripts/test-payment-reconciliation.mjs"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "1.20.10",

@@ -1,5 +1,6 @@
 # Server-only names. No value below is a credential or a commercial configuration.
 KARUU_DATABASE_URL=
+KARUU_DATABASE_SCHEMA=karuu_commerce
 KARUU_RUNTIME=cloudflare
 # Workers: real HYPERDRIVE_COMMERCE binding plus verified Cloudflare caching.disabled=true.
 # This server flag is an operator attestation, not an API switch that changes Hyperdrive settings.
@@ -7,13 +8,23 @@ KARUU_HYPERDRIVE_CACHING_DISABLED=false
 KARUU_SITE_ORIGIN=
 KARUU_MAIL_ENDPOINT=
 KARUU_MAIL_TOKEN=
+KARUU_MAIL_PROVIDER=relay
+KARUU_MAIL_FROM=
+KARUU_MAIL_IDEMPOTENCY_CONFIRMED=false
 KARUU_INQUIRY_EMAIL=
 JKJ_INQUIRY_EMAIL=
 JKJ_MAIL_ENDPOINT=
 JKJ_MAIL_TOKEN=
+JKJ_MAIL_PROVIDER=relay
+JKJ_MAIL_FROM=
+JKJ_MAIL_IDEMPOTENCY_CONFIRMED=false
 KARUU_NOTIFICATION_JOB_SECRET=
+KARUU_NOTIFICATIONS_SCHEDULED_ENABLED=false
 KARUU_PRIVATE_MEDIA_ORIGIN=
 KARUU_PRIVATE_MEDIA_TOKEN=
+KARUU_PRIVATE_MEDIA_PROVIDER=relay
+# Native Workers alternatives require real KARUU_PRIVATE_MEDIA R2 and KARUU_EMAIL/JKJ_EMAIL bindings.
+# Cloudflare email to arbitrary account-verification recipients requires an eligible Workers Paid plan.
 KARUU_DELIVERY_SIGNING_SECRET=
 KARUU_PAYMENTS_ENABLED=false
 KARUU_PAYMENT_MODE=test

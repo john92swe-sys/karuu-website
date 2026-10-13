@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { fail, hash, text, uuid } from './core';
 import { limit, query, transaction } from './db';
+import { brandMailConfigured, sendBrandMail } from './mail';
 
 const scrypt=promisify(scryptCallback);
 const cookieName='karuu_session';
@@ -13,13 +14,9 @@ export function email(value:unknown) {
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(result)) fail(400,'invalid_email','Provide a valid email address.');
   return result;
 }
-export function mailConfigured() { return Boolean(process.env.KARUU_MAIL_ENDPOINT && process.env.KARUU_MAIL_TOKEN && process.env.KARUU_SITE_ORIGIN); }
+export async function mailConfigured() { return Boolean(process.env.KARUU_SITE_ORIGIN)&&await brandMailConfigured('karuu'); }
 export async function sendMail(to:string,subject:string,message:string,brand='karuu',deliveryKey?:string) {
-  const endpoint=brand==='jkj-plus'?process.env.JKJ_MAIL_ENDPOINT:process.env.KARUU_MAIL_ENDPOINT;
-  const token=brand==='jkj-plus'?process.env.JKJ_MAIL_TOKEN:process.env.KARUU_MAIL_TOKEN;
-  if(!endpoint || !token || !endpoint.startsWith('https://')) fail(503,'mail_not_configured','The email delivery service is not configured.');
-  const result=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`,...(deliveryKey?{'Idempotency-Key':deliveryKey}:{})},body:JSON.stringify({to,subject,text:message,brand}),signal:AbortSignal.timeout(10000)});
-  if(!result.ok) fail(503,'mail_delivery_unavailable','The email provider could not accept the message. Please retry later.');
+  return sendBrandMail(to,subject,message,brand,deliveryKey);
 }
 async function passwordHash(password:string) {
   const salt=randomBytes(16).toString('hex');
@@ -42,7 +39,7 @@ export async function currentUser():Promise<User|null> {
 export async function requireUser():Promise<User> { const user=await currentUser(); if(!user) fail(401,'authentication_required','Sign in to your verified KARUU account.'); return user; }
 export async function requireAdmin():Promise<User> {const user=await requireUser();if(user.role!=='admin') fail(403,'admin_required','Administrator access is required.');return user;}
 export async function register(input:Record<string,unknown>) {
-  if(!mailConfigured()) fail(503,'accounts_not_configured','Account email verification is not configured yet.');
+  if(!(await mailConfigured())) fail(503,'accounts_not_configured','Account email verification is not configured yet.');
   const address=email(input.email),password=typeof input.password==='string'?input.password:'';
   if(password.length<12 || password.length>128) fail(400,'password_length','Use a password containing 12–128 characters.');
   await limit(`register:${hash(address)}`,3,3600);
@@ -91,7 +88,7 @@ export async function logout() {
   const response=NextResponse.json({signedOut:true});response.cookies.set(cookieName,'',{httpOnly:true,path:'/',maxAge:0});return response;
 }
 export async function requestPasswordReset(input:Record<string,unknown>){
-  if(!mailConfigured())fail(503,'accounts_not_configured','Account email delivery is not configured.');
+  if(!(await mailConfigured()))fail(503,'accounts_not_configured','Account email delivery is not configured.');
   const address=email(input.email);await limit(`reset:${hash(address)}`,3,3600);await limit('reset:global',200,3600);
   const user=(await query<{id:string}>('SELECT id FROM commerce_users WHERE email=$1 AND verified_at IS NOT NULL',[address]))[0];
   if(user){

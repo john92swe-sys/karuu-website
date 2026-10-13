@@ -1,6 +1,7 @@
 import { fail, hash, idempotency, text, uuid } from './core';
 import { email } from './auth';
 import { audit, limit, transaction } from './db';
+import { brandMailConfigured } from './mail';
 
 const fields=['productSku','productName','productSlug','inquiryType','companyName','contactName','businessEmail','countryRegion','businessType','intendedUse','instructorStaffWear','memberRetail','teacherTraining','privateLabel','phone','estimatedQuantity','preferredProductCategories','representativeStyles','selectedColor','numberOfColors','sizeRequirements','customLogo','customLabel','customPackaging','brandingRequirement','preferredTradeTerm','requiredDeliveryDate','targetLaunchDate','message'];
 export async function receiveInquiry(input:Record<string,unknown>,keyValue:unknown) {
@@ -19,7 +20,7 @@ export async function receiveInquiry(input:Record<string,unknown>,keyValue:unkno
   const digest=hash(JSON.stringify(data));
   return transaction(async client=>{
     const id=uuid(),reference=`${brand==='karuu'?'KARUU':'JKJ'}-${id.slice(0,8).toUpperCase()}`;
-    const configured=Boolean(brand==='karuu'?process.env.KARUU_MAIL_ENDPOINT&&process.env.KARUU_MAIL_TOKEN:process.env.JKJ_MAIL_ENDPOINT&&process.env.JKJ_MAIL_TOKEN);
+    const configured=await brandMailConfigured(brand);
     const created=await client.query(`INSERT INTO commerce_inquiries(id,reference,brand,idempotency_key,request_hash,data,notification_status) VALUES($1,$2,$3,$4,$5,$6,$7)
       ON CONFLICT(brand,idempotency_key) DO NOTHING RETURNING *`,[id,reference,brand,key,digest,JSON.stringify(data),configured?'queued':'not_configured']);
     if(!created.rows[0]) {

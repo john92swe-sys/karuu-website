@@ -44,12 +44,12 @@ class TestStripe{
   checkout={sessions:{create:async(params,options)=>{
     if(sessions.has(options.idempotencyKey))return sessions.get(options.idempotencyKey);
     createCalls++;const id=`cs_test_${createCalls}`,amount=params.line_items.reduce((sum,item)=>sum+item.price_data.unit_amount,0);
-    const session={id,livemode:false,metadata:params.metadata,client_reference_id:params.client_reference_id,amount_total:amount,currency:params.line_items[0].price_data.currency,payment_status:'unpaid',payment_intent:`pi_test_${createCalls}`,customer_details:{address:{country:'SE'}},url:`https://checkout.stripe.test/${id}`};
+    const session={id,mode:'payment',livemode:false,metadata:params.metadata,client_reference_id:params.client_reference_id,amount_total:amount,currency:params.line_items[0].price_data.currency,payment_status:'unpaid',payment_intent:`pi_test_${createCalls}`,customer_details:{address:{country:'SE'}},url:`https://checkout.stripe.test/${id}`};
     sessions.set(id,session);sessions.set(options.idempotencyKey,session);return session;
-  },retrieve:async id=>sessions.get(id)}};
+  },retrieve:async id=>sessions.get(id),list:async({payment_intent})=>({data:[...new Map([...sessions.values()].filter(s=>s.payment_intent===payment_intent).map(s=>[s.id,s])).values()],has_more:false})}};
   charges={retrieve:async id=>charges.get(id)};
-  paymentIntents={retrieve:async id=>({id,metadata:{orderId:[...sessions.values()].find(s=>s.payment_intent===id)?.metadata.orderId}})};
-  refunds={create:async(params,options)=>{if(refunds.has(options.idempotencyKey))return refunds.get(options.idempotencyKey);const value={id:'re_test_one',status:'pending',...params};refunds.set(options.idempotencyKey,value);return value;}};
+  paymentIntents={retrieve:async id=>{const session=[...sessions.values()].find(s=>s.payment_intent===id),record=[...charges.values()].find(c=>c.payment_intent===id),charge={id:record?.id??`ch_${id}`,livemode:false,paid:true,captured:true,amount:session.amount_total,amount_captured:session.amount_total,currency:session.currency,payment_intent:id,...record};return {id,livemode:false,status:'succeeded',amount:session.amount_total,amount_received:session.amount_total,currency:session.currency,metadata:{orderId:session.metadata.orderId},latest_charge:charge};}};
+  refunds={create:async(params,options)=>{if(refunds.has(options.idempotencyKey))return refunds.get(options.idempotencyKey);const session=[...sessions.values()].find(s=>s.payment_intent===params.payment_intent),value={id:'re_test_one',status:'pending',charge:`ch_${params.payment_intent}`,currency:session.currency,...params};refunds.set(options.idempotencyKey,value);return value;},retrieve:async id=>[...refunds.values()].find(r=>r.id===id),list:async({payment_intent})=>{const confirmed=[...charges.values()].find(c=>c.payment_intent===payment_intent&&c.refunded);if(confirmed)return {data:[{id:`re_confirmed_${payment_intent}`,payment_intent,charge:confirmed.id,currency:confirmed.currency,amount:confirmed.amount_refunded,status:'succeeded'}],has_more:false};return {data:[...refunds.values()].filter(r=>r.payment_intent===payment_intent),has_more:false};}};
 }
 const originalLoad=Module._load,originalResolve=Module._resolveFilename;
 Module._load=function(name,parent,isMain){
@@ -146,7 +146,8 @@ await test('checkout snapshots prices/components, blocks duplicate content and r
   const key=crypto.randomUUID();bundleOrder=await commerce.checkout(user,{skuIds:['test-bundle'],market:'SE',immediateDeliveryConsent:true},key);
   const duplicate=await commerce.checkout(user,{skuIds:['test-bundle'],market:'SE',immediateDeliveryConsent:true},key);
   assert.equal(bundleOrder.orderId,duplicate.orderId);assert.equal(createCalls,1);
-  await assert.rejects(commerce.checkout(user,{skuIds:['test-bundle'],market:'SE',immediateDeliveryConsent:true},crypto.randomUUID()),{code:'checkout_pending'});
+  const reloaded=await commerce.checkout(user,{skuIds:['test-bundle'],market:'SE',immediateDeliveryConsent:true},crypto.randomUUID());
+  assert.equal(reloaded.orderId,bundleOrder.orderId);assert.equal(reloaded.url,bundleOrder.url);assert.equal(createCalls,1);
   bundleSession=[...sessions.values()][0];
   await admin.adminAction(operator,{action:'save_cost',reason,skuId:'test-bundle',inputs:{...fixtureCosts,royalty:null}});
   await assert.rejects(commerce.checkout(other,{skuIds:['test-bundle'],market:'SE',immediateDeliveryConsent:true},crypto.randomUUID()),{code:'pricing_not_approved'});
@@ -209,10 +210,10 @@ await test('an ordered edition cannot silently change its language, format or co
   await assert.rejects(admin.adminAction(operator,{action:'save_asset',reason,asset}),{code:'edition_immutable'});
   await assert.rejects(admin.adminAction(operator,{action:'save_asset',reason,asset:{...asset,language:'en',contentSha256:'a'.repeat(64)}}),{code:'edition_immutable'});
 });
-await test('aging pending and paid market-review orders prevent another debit until merchant-confirmed closure',async()=>{
+await test('aging pending orders reuse their merchant checkout while paid market-review orders prevent another debit',async()=>{
   const pending=await commerce.checkout(user,{skuIds:['test-bundle'],market:'SE',immediateDeliveryConsent:true},crypto.randomUUID()),session=[...sessions.values()].find(s=>s.metadata.orderId===pending.orderId);
   await database.query("UPDATE commerce_orders SET created_at=now()-interval '3 days' WHERE id=$1",[pending.orderId]);
-  await assert.rejects(commerce.checkout(user,{skuIds:['test-bundle'],market:'SE',immediateDeliveryConsent:true},crypto.randomUUID()),{code:'checkout_pending'});
+  const before=createCalls,resumed=await commerce.checkout(user,{skuIds:['test-bundle'],market:'SE',immediateDeliveryConsent:true},crypto.randomUUID());assert.equal(resumed.orderId,pending.orderId);assert.equal(resumed.url,pending.url);assert.equal(createCalls,before);
   await assert.rejects(admin.adminAction(operator,{action:'close_expired_checkout',orderId:pending.orderId,reason}),{code:'checkout_not_expired'});
   session.status='expired';await signedWebhook(event('checkout.session.expired','evt_cancelled',session));assert.equal((await commerce.orders(user)).orders.find(o=>o.id===pending.orderId).status,'cancelled');
   const review=await commerce.checkout(user,{skuIds:['test-bundle'],market:'SE',immediateDeliveryConsent:true},crypto.randomUUID()),reviewSession=[...sessions.values()].find(s=>s.metadata.orderId===review.orderId);reviewSession.customer_details.address.country='NO';reviewSession.payment_status='paid';
@@ -262,9 +263,9 @@ await test('Workers clients are operation scoped, transactions stay on one conne
     fixtureWorkerEnv.KARUU_HYPERDRIVE_CACHING_DISABLED='true';
     await db.query('SELECT 1 AS isolated');await db.query('SELECT 2 AS isolated');assert.equal(workerClients,2);assert.equal(workerEnds,2);
     await db.transaction(async client=>{await client.query('SELECT 3');await client.query('SELECT 4');});
-    const tx=workerTrace.filter(entry=>entry.id===3);assert.deepEqual(tx.map(entry=>entry.sql),['BEGIN','SELECT 3','SELECT 4','COMMIT']);
+    const tx=workerTrace.filter(entry=>entry.id===3);assert.deepEqual(tx.map(entry=>entry.sql),['SET search_path TO "public", pg_catalog, pg_temp','BEGIN','SELECT 3','SELECT 4','COMMIT']);
     await assert.rejects(db.transaction(async client=>{await client.query('SELECT 5');throw new Error('Isolated rollback failure');}),/Isolated rollback failure/);
-    assert.deepEqual(workerTrace.filter(entry=>entry.id===4).map(entry=>entry.sql),['BEGIN','SELECT 5','ROLLBACK']);assert.equal(workerClients,workerEnds);
+    assert.deepEqual(workerTrace.filter(entry=>entry.id===4).map(entry=>entry.sql),['SET search_path TO "public", pg_catalog, pg_temp','BEGIN','SELECT 5','ROLLBACK']);assert.equal(workerClients,workerEnds);
   }finally{process.env.KARUU_RUNTIME=originalRuntime;if(originalNavigator)Object.defineProperty(globalThis,'navigator',originalNavigator);else Reflect.deleteProperty(globalThis,'navigator');}
 });
 await database.close();

@@ -4,6 +4,7 @@ import { audit, query, transaction } from './db';
 import { status, stripeClient } from './commerce';
 import { entitledAsset } from './delivery';
 import { saveCreation } from './works';
+import { requestFullRefund } from './payments';
 
 function karuuAdmin(user:User){if(!user.brands.includes('karuu'))fail(403,'brand_denied','This administrator cannot manage KARUU digital commerce.');}
 export async function adminView(user:User,view:string){
@@ -89,24 +90,16 @@ export async function adminAction(user:User,input:Record<string,unknown>){
     await transaction(client=>audit(client,user.id,action,assetId,reason,{userId}));return {reissued:true,message:'Existing access is active. The customer can generate a fresh short-term link from My creations.'};
   }
   if(action==='request_refund'){
-    const stripe=stripeClient(),id=text(input.orderId,40);
-    const order=await transaction(async client=>{
-      const row=(await client.query('SELECT * FROM commerce_orders WHERE id=$1 FOR UPDATE',[id])).rows[0];
-      if(!row||!row.stripe_payment_intent||!['paid','refund_pending','review'].includes(row.status))fail(409,'refund_unavailable','This order has no refundable confirmed payment.');
-      await client.query("UPDATE commerce_orders SET status='refund_pending',updated_at=now() WHERE id=$1",[id]);
-      await client.query("UPDATE commerce_kru_records SET state='cancelled' WHERE order_id=$1 AND state IN ('eligibility_pending','pending','retry')",[id]);
-      await audit(client,user.id,action,id,reason,{amountMinor:row.total_minor-row.refunded_minor});return row;
-    });
-    const refund=await stripe.refunds.create({payment_intent:order.stripe_payment_intent,amount:order.total_minor-order.refunded_minor,metadata:{orderId:id}},{idempotencyKey:`full-refund-${id}`});
-    return {orderId:id,status:'refund_pending',providerStatus:refund.status,message:'Access changes when the signed merchant event confirms the refund. Previously downloaded files cannot be erased remotely.'};
+    return requestFullRefund(user,text(input.orderId,40),reason);
   }
   if(action==='close_expired_checkout'){
-    const stripe=stripeClient(),id=text(input.orderId,40);
-    const existing=(await query('SELECT stripe_session_id,status FROM commerce_orders WHERE id=$1',[id]))[0];
+    const stripe=stripeClient({existingPayments:true}),id=text(input.orderId,40);
+    const existing=(await query('SELECT id,user_id,total_minor,currency,stripe_session_id,status FROM commerce_orders WHERE id=$1',[id]))[0];
     if(!existing?.stripe_session_id||existing.status!=='pending')fail(409,'checkout_not_pending','This order has no linked pending checkout.');
     const session=await stripe.checkout.sessions.retrieve(existing.stripe_session_id);
+    if(session.id!==existing.stripe_session_id||session.mode!=='payment'||session.livemode!==(process.env.KARUU_PAYMENT_MODE==='live')||session.client_reference_id!==id||session.metadata?.orderId!==id||session.metadata?.userId!==existing.user_id||session.amount_total!==existing.total_minor||session.currency?.toUpperCase()!==existing.currency)fail(409,'checkout_session_mismatch','The merchant session does not match this order. Reconciliation is required.');
     if(session.status!=='expired'||session.payment_status!=='unpaid')fail(409,'checkout_not_expired','The merchant has not confirmed that this checkout is expired and unpaid.');
-    return transaction(async client=>{await client.query("UPDATE commerce_orders SET status='cancelled',updated_at=now() WHERE id=$1 AND status='pending'",[id]);await audit(client,user.id,action,id,reason,{source:'merchant_query',sessionId:session.id});return {orderId:id,status:'cancelled'};});
+    return transaction(async client=>{await client.query('SELECT id FROM commerce_users WHERE id=$1 FOR UPDATE',[existing.user_id]);const current=(await client.query('SELECT stripe_session_id,status FROM commerce_orders WHERE id=$1 FOR UPDATE',[id])).rows[0];if(current?.status!=='pending'||current.stripe_session_id!==session.id)fail(409,'checkout_not_pending','This order changed during the merchant query. Check its current receipt.');await client.query("UPDATE commerce_orders SET status='cancelled',updated_at=now() WHERE id=$1",[id]);await audit(client,user.id,action,id,reason,{source:'merchant_query',sessionId:session.id});return {orderId:id,status:'cancelled'};});
   }
   fail(400,'unsupported_action','This operation is not available. KRU issuance and game credits remain disabled until their external prerequisites are verified.');
 }

@@ -4,6 +4,11 @@ import { commerceHyperdrive } from './cloudflare';
 
 let nodePool: Pool | undefined;
 export type DbClient=Pick<PoolClient,'query'>;
+export function commerceSchema() {
+  const schema=process.env.KARUU_DATABASE_SCHEMA || 'public';
+  if(!/^[a-z][a-z0-9_]{0,62}$/.test(schema)) fail(503,'database_schema_invalid','The database schema configuration is invalid.');
+  return schema;
+}
 export async function databaseConfigured() {
   const hyperdrive=await commerceHyperdrive();
   return hyperdrive?Boolean(hyperdrive.connectionString):Boolean(process.env.KARUU_DATABASE_URL);
@@ -11,7 +16,7 @@ export async function databaseConfigured() {
 function localConnection(){
   if(!process.env.KARUU_DATABASE_URL)fail(503,'database_not_configured','The secure database is not configured. Please use the published email contact.');
   // This pool exists only in ordinary Node.js. Workers never reuse request-owned sockets.
-  if(!nodePool)nodePool=new Pool({connectionString:process.env.KARUU_DATABASE_URL,max:3,idleTimeoutMillis:15000,connectionTimeoutMillis:8000});
+  if(!nodePool)nodePool=new Pool({connectionString:process.env.KARUU_DATABASE_URL,options:`-c search_path=${commerceSchema()},pg_catalog,pg_temp`,max:3,idleTimeoutMillis:15000,connectionTimeoutMillis:8000});
   return nodePool;
 }
 async function workerClient(){
@@ -20,7 +25,12 @@ async function workerClient(){
   if(!hyperdrive.connectionString)fail(503,'database_not_configured','The secure Worker database binding is not configured.');
   if(!hyperdrive.cacheDisabledConfirmed)fail(503,'database_freshness_unconfirmed','Authentication, billing and delivery require a verified cache-disabled database binding.');
   const client=new Client({connectionString:hyperdrive.connectionString,connectionTimeoutMillis:8000});
-  try{await client.connect();return client;}catch(error){await client.end().catch(()=>{});throw error;}
+  try{
+    await client.connect();
+    // Request-owned connections select only this site's schema; no public fallback.
+    await client.query(`SET search_path TO "${commerceSchema()}", pg_catalog, pg_temp`);
+    return client;
+  }catch(error){await client.end().catch(()=>{});throw error;}
 }
 export async function query<T extends QueryResultRow=QueryResultRow>(sql:string,values:unknown[]=[]):Promise<T[]> {
   const client=await workerClient();

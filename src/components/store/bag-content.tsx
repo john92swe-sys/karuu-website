@@ -32,9 +32,21 @@ export function BagContent({ cancelled = false }: { cancelled?: boolean }) {
   async function checkout() {
     if (!allowed || !consent || !market) return;
     setBusy(true); setError('');
-    if (!key.current) key.current = crypto.randomUUID();
+    const requestIdentity = JSON.stringify({ skuIds: [...bag.ids].sort(), market });
+    const storageKey = `karuu-checkout-v1:${requestIdentity}`;
+    if (!key.current) {
+      try {
+        const saved = window.localStorage.getItem(storageKey);
+        key.current = saved && /^[a-zA-Z0-9_-]{16,80}$/.test(saved) ? saved : crypto.randomUUID();
+        window.localStorage.setItem(storageKey, key.current);
+      } catch { key.current ||= crypto.randomUUID(); }
+    }
     try {
-      const result = await commerceRequest<{ url: string | null; orderId: string }>('/api/checkout', { method: 'POST', headers: { 'Idempotency-Key': key.current }, body: JSON.stringify({ skuIds: bag.ids, market, immediateDeliveryConsent: consent }) });
+      const result = await commerceRequest<{ url: string | null; orderId: string; status?: string }>('/api/checkout', { method: 'POST', headers: { 'Idempotency-Key': key.current }, body: JSON.stringify({ skuIds: bag.ids, market, immediateDeliveryConsent: consent }) });
+      if (result.status && result.status !== 'pending') {
+        key.current = '';
+        try { window.localStorage.removeItem(storageKey); } catch { /* The settled response also clears the in-memory key. */ }
+      }
       if (!result.url) { window.location.assign(`/account?checkout=return&order=${encodeURIComponent(result.orderId)}`); return; }
       const url = new URL(result.url);
       if (url.protocol !== 'https:') throw new Error('The payment page could not be verified. Please contact KARUU.');

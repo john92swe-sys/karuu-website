@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "karuu-c-review-20261013",
-  "main": ".open-next/worker.js",
+  "main": "cloudflare/worker.mjs",
   "compatibility_date": "2026-09-17",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "workers_dev": true,
@@ -18,6 +18,7 @@
   ],
   "vars": {
     "KARUU_RUNTIME": "cloudflare",
+    "KARUU_DATABASE_SCHEMA": "karuu_commerce",
     "KARUU_DEPLOYMENT_ENV": "preview",
     "KARUU_PAYMENTS_ENABLED": "false",
     "KARUU_PAYMENT_MODE": "test",
@@ -25,6 +26,7 @@
     "KARUU_TAX_CONFIG_APPROVED": "false",
     "KARUU_DISTRIBUTION_APPROVED": "false",
     "KARUU_LEGAL_APPROVED": "false",
-    "KARUU_HYPERDRIVE_CACHING_DISABLED": "false"
+    "KARUU_HYPERDRIVE_CACHING_DISABLED": "false",
+    "KARUU_NOTIFICATIONS_SCHEDULED_ENABLED": "false"
   }
 }
