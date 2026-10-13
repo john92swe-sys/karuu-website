@@ -21,7 +21,7 @@
     "KARUU_DATABASE_SCHEMA": "karuu_commerce",
     "KARUU_DEPLOYMENT_ENV": "preview",
     "KARUU_PAYMENTS_ENABLED": "false",
-    "KARUU_PAYMENT_MODE": "test",
+    "KARUU_PAYMENT_MODE": "live",
     "KARUU_LIVE_COMMERCE_APPROVED": "false",
     "KARUU_TAX_CONFIG_APPROVED": "false",
     "KARUU_DISTRIBUTION_APPROVED": "false",

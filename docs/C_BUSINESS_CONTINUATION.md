@@ -1,4 +1,4 @@
-# C 方案业务续作实际回执（2026-10-13）
+# C 方案业务续作实际回执（2026-10-14）
 
 用户已明确授权真实收款。本文记录实际完成与接通缺口，不把源码、授权或本地测试当成已发生真实交易。
 
@@ -8,8 +8,9 @@
 - 官方迁移 `karuu_private_commerce_v1_20261013` 已建立私有 `karuu_commerce`：22表、22RLS、schema version 1。
 - 官方迁移 `karuu_private_runtime_role_v1_20261013` 已建立 `karuu_web`：NOLOGIN、NOBYPASSRLS、NOINHERIT，无创建数据库/角色/超级用户权限，连接上限10；56策略仅授该角色。
 - 最新官方SQL读回：既有 public 4表、private 1表不变；运行角色对既有业务表有效权限0、外部可执行SECURITY DEFINER 0、outbound组0；anon/authenticated对官网schema USAGE=false。未导入客户、价格、商品或资金记录。
-- Stripe正式商户为 `acct_1UDS18JtfLuLpt8R`。用户已完成开户提交；官方页面上下文确认账户为 Karuu AB、livemode=true，当前Radar方案为Lite。尚未读到charges-enabled的API证明，也未创建或保存live密钥或收款。官网专用的7项受限权限已准备，停在创建按钮前等待具体凭据授权。
-- Cloudflare已登录账号的R2页面确认尚未订阅，当前应付$0、含免费额度、超额按量收费及自动续订；已停在订阅确认按钮前等待用户办理。本页事实不证明R2桶已经建立。
+- Stripe正式商户为 `acct_1UDS18JtfLuLpt8R`。用户已完成开户提交、正式凭据授权及本人验证。10月13日15:31 UTC服务器API已核charges_enabled/payouts_enabled/details_submitted=true。7项权限的受限live密钥已创建；live密钥与Webhook签名Secret已实际保存到审查和正式Worker，正式Worker保持暂存、未激活。
+- 10月14日（柏林）已创建 `karuu-c-review-commerce-live` 接收端：Your account/Live/Snapshot，API `2026-09-30.endive`，8项Checkout/退款事件。接收端保持暂停，等待数据库与交付验收。审查站已激活匹配的live模式与两项Secret；本地签署的无业务检查事件返回200并忽略，错误签名返回400。不是Stripe实际事件交付、订单或扣款验收。
+- 10月14日重新核对Cloudflare登录账号，R2仍未订阅，当前应付$0、含免费额度、超额按量收费及自动续订；订阅确认仍待用户办理。Hyperdrive与数据库口令尚未接通。
 
 ## 已实现的业务代码
 
@@ -23,7 +24,7 @@
 
 ## 实際验证与边界
 
-最终 `npm test` 131/131；TypeScript与ESLint通过；Cloudflare OpenNext构建通过。此前业务版本Wrangler dry-run与真实Edge五尺寸的C视觉基线回归5/5通过；末次币种修正未改变视觉资产。
+10月13日业务代码 `npm test` 131/131、TypeScript、ESLint与OpenNext构建通过；真实Edge五尺寸C视觉基线5/5通过。10月14日配置恢复后的Wrangler dry-run与Secret辅助脚本PowerShell语法解析通过。接续只同步live配置与回执，未改变业务代码或视觉资产；未重标历史浏览器验收。
 
 数据库行为使用隔离PGlite真实SQL和专用角色，R2读写使用本地Miniflare实际存储，Stripe签名使用真实SDK；商户/邮件网络为fixture。没有真实sandbox/live扣款、退款、客户邮件、链上操作或生产域名切换。线上绑定与provider端到端验收须另行记录。
 
@@ -32,7 +33,7 @@
 1. 专用数据库角色口令/LOGIN、Hyperdrive实际连接及缓存禁用；数据库结构已存在，Worker仍未接到该角色。
 2. R2订阅、私有桶、Worker绑定、真实母文件上传；大于32MiB的全本音频上传路径。
 3. 邮件发件域/通道、通知job Secret与实际cron、用户验证邮件及首管理员实际初始化。
-4. Stripe商户charges-enabled的API证明、live受限密钥与Webhook Secret、必需事件订阅、真实provider联调；用户开户提交已完成。
+4. Stripe受限live密钥、签名Secret及8项事件接收端已经配置；尚待数据库/履约接通后启用接收端、测试环境实际付款/退款联调以及正式生产兼容发布。签名入口检查不替代这些验收。
 5. 首批实际本站SKU的发行依据、正式价格、地区、税率、完整成本和组合/升级价；示例49SEK不作为售价。详见 [准备矩阵](C_BUSINESS_READINESS.md)。
 6. 真实游戏服务器适配和KRU受控签名/预算/发放仍未实现，不影响将来具备条件的普通法币图书购买。
 

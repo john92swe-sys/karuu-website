@@ -4,13 +4,15 @@ param(
     [ValidateSet('STRIPE_SECRET_KEY','STRIPE_WEBHOOK_SECRET','KARUU_DELIVERY_SIGNING_SECRET','KARUU_NOTIFICATION_JOB_SECRET')]
     [string]$Name,
     [ValidateSet('test','live')]
-    [string]$PaymentMode = 'test'
+    [string]$PaymentMode
 )
 
 $ErrorActionPreference = 'Stop'
 $reviewRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $reviewConfigPath = Join-Path $reviewRoot 'wrangler.jsonc'
 $reviewConfig = Get-Content -LiteralPath $reviewConfigPath -Raw | ConvertFrom-Json
+if (-not $PSBoundParameters.ContainsKey('PaymentMode')) { $PaymentMode = $reviewConfig.vars.KARUU_PAYMENT_MODE }
+if ($PaymentMode -notin @('test','live')) { throw 'The review configuration must explicitly select test or live mode.' }
 if ($reviewConfig.name -ne 'karuu-c-review-20261013' -or $reviewConfig.routes) {
     throw 'This helper only accepts the isolated KARUU review Worker.'
 }
