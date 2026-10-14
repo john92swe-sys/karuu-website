@@ -7,12 +7,14 @@ import { saveCreation } from './works';
 import { requestFullRefund } from './payments';
 import { confirmPrivateR2Object, privateBucket } from './private-media';
 import { automaticTaxPreparationGaps, commerceTaxMode, normalizeAutomaticTaxPreparation } from './global-tax';
+import { taxReadiness } from './tax-readiness';
 
 function karuuAdmin(user:User){if(!user.brands.includes('karuu'))fail(403,'brand_denied','This administrator cannot manage KARUU digital commerce.');}
 export async function adminView(user:User,view:string){
   if(view==='status')return {items:[await status()]};
   if(view==='inquiries')return {items:await query('SELECT id,reference,brand,data,status,notification_status,created_at FROM commerce_inquiries WHERE brand=ANY($1::text[]) ORDER BY created_at DESC LIMIT 200',[user.brands])};
   karuuAdmin(user);
+  if(view==='tax_readiness')return taxReadiness(user);
   if(view==='orders')return {items:await query('SELECT id,user_id,status,currency,total_minor,market,snapshot,refunded_minor,created_at FROM commerce_orders ORDER BY created_at DESC LIMIT 200')};
   if(view==='catalog')return {items:await query('SELECT * FROM commerce_skus ORDER BY updated_at DESC')};
   if(view==='works')return {items:await query('SELECT slug,publication_status,data,updated_at FROM commerce_creations ORDER BY updated_at DESC')};
