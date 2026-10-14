@@ -30,10 +30,12 @@ function fixture(){
 const controller={cron:'fixture-only-not-configured',scheduledTime:0};
 const errorCode=code=>error=>error.message===code&&!error.message.includes(fixtureSecret);
 
-await test('actual Wrangler target uses custom entry while real cron remains absent and scheduling off',()=>{
+await test('actual isolated review target enables five-minute scheduling while all commerce gates stay closed',()=>{
   const config=JSON.parse(fs.readFileSync(path.join(root,'wrangler.jsonc'),'utf8'));
-  assert.equal(config.main,'cloudflare/worker.mjs');assert.equal(config.vars.KARUU_NOTIFICATIONS_SCHEDULED_ENABLED,'false');
-  assert.equal(config.triggers,undefined);assert.equal(config.routes,undefined);
+  assert.equal(config.name,'karuu-c-review-20261013');assert.equal(config.main,'cloudflare/worker.mjs');
+  assert.equal(config.vars.KARUU_DEPLOYMENT_ENV,'preview');assert.equal(config.vars.KARUU_NOTIFICATIONS_SCHEDULED_ENABLED,'true');
+  assert.deepEqual(config.triggers,{crons:['*/5 * * * *']});assert.equal(config.routes,undefined);
+  for(const gate of ['KARUU_PAYMENTS_ENABLED','KARUU_LIVE_COMMERCE_APPROVED','KARUU_TAX_CONFIG_APPROVED','KARUU_DISTRIBUTION_APPROVED','KARUU_LEGAL_APPROVED'])assert.equal(config.vars[gate],'false');
   assert.equal(config.services.find(s=>s.binding==='WORKER_SELF_REFERENCE').service,config.name);
 });
 await test('generated fetch, default handlers and all named Durable Object exports are retained',async()=>{

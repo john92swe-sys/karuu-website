@@ -29,6 +29,9 @@
       "jurisdiction": "eu"
     }
   ],
+  "triggers": {
+    "crons": ["*/5 * * * *"]
+  },
   "vars": {
     "KARUU_RUNTIME": "cloudflare",
     "KARUU_DATABASE_SCHEMA": "karuu_commerce",
@@ -45,6 +48,6 @@
     "KARUU_DISTRIBUTION_APPROVED": "false",
     "KARUU_LEGAL_APPROVED": "false",
     "KARUU_HYPERDRIVE_CACHING_DISABLED": "true",
-    "KARUU_NOTIFICATIONS_SCHEDULED_ENABLED": "false"
+    "KARUU_NOTIFICATIONS_SCHEDULED_ENABLED": "true"
   }
 }
