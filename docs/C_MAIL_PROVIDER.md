@@ -24,7 +24,7 @@ SMTP 固定为 `mail.privateemail.com:465`、隐式 TLS，验证服务器证书�
 
 接受回执必须同时有指定的唯一收件人、无拒收，以及 DATA 的终结250回复。客户端 Message-ID 不证明送达或提供者去重；超时/不明确接受继续人工复核，不能自动重发。SMTP 通常不自动写 webmail Sent，收件验收独立核对。
 
-`verifyPrivateEmailSmtp()` 无参数仅执行 TLS/EHLO/QUIT；明确传入服务器账户才检查 AUTH。两种模式均不发送邮件，且没有公开验证路由。Nodemailer10.1.0 固定依赖。真实 workerd 无凭据握手已通过；认证和最终收件仍须真实配置证明，不能用 fixture 或能力布尔值替代。
+`verifyPrivateEmailSmtp()` 无参数仅执行 TLS/EHLO/QUIT；明确传入服务器账户才检查 AUTH。两种模式均不发送邮件，且没有公开验证路由。Nodemailer10.1.0 固定依赖。早期真实workerd无凭据握手已通过；2026-10-14正常注册邮件已由用户实际收到并通过验证，`john@karuu.net`真实验证状态及登录已核。这是一次指定邮箱的注册链路验收，不冒称所有客户邮箱或购买邮件送达已验证。
 
 Cloudflare 原生向任意收件人发信需要 Workers Paid；复用既有邮箱不以这个套餐为前提。但邮箱额度与 Workers CPU/其他限额仍需实际测量，不能宣称全站永远零费用。[Email Service 价格](https://developers.cloudflare.com/email-service/platform/pricing/)
 

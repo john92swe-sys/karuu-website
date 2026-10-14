@@ -2,7 +2,7 @@
 
 最初核对日期：2026-10-13；2026-10-14补正：审查站已接通 PrivateEmail SMTP、私有 R2 和数据库，`john@karuu.net` 已完成注册验证并真实登录管理员后台，job Secret 已保存到服务器。root 已通过官方 remote `--test-scheduled` 在实际 self binding 上执行空 outbox 处理成功；该探针没有生成或发送业务邮件，也没有发布或改变当时活动版本。
 
-本轮仅把审查站配置改为 `KARUU_NOTIFICATIONS_SCHEDULED_ENABLED=true`、`triggers.crons=["*/5 * * * *"]`，供 root 统一发布。**配置文件中的启用不证明 Cron 已在云端生效；正式 Cron 传播和定时事件实测仍须 root 发布后核验。** 当前线上版本、发布结果及凭据接通状态见最新回执。
+审查站配置 `KARUU_NOTIFICATIONS_SCHEDULED_ENABLED=true`、`triggers.crons=["*/5 * * * *"]` 已由root通过官方命令行发布。Cloudflare Cron Events实际记录 `2026-10-14T02:20:02Z`、`Success`、CPU `93.913ms`；这是正常定时触发，不是前述远程预览。空队列任务证明私有认证、self binding和数据库链路，未产生购买邮件。账号仍Free，单次成功不证明其持续CPU/负载容量。当前精确活动版本及证据见最新回执。
 
 ## 实现与边界
 
@@ -22,4 +22,4 @@
 
 `node --test scripts/test-notification-scheduled.mjs` 本轮 **10/10 通过**，使用实际 wrapper 源码和隔离 OpenNext/service fixtures，验证审查站精确目标、每 5 分钟 Cron 配置、五个商业开关关闭，以及 fetch 与 named exports、disabled/缺绑定/非法 secret、固定路径及 Bearer、无外网/重定向/内部重试、generic error、job count contract 和 review 状态。该测试加入 package test 列表。测试没有读取真实 process secrets，也不执行真实数据库或邮件接口。
 
-root 负责本轮发布及正式读回：核对 self binding 精确指向部署本体、数据库/R2/品牌邮件与 job Secret 均保留、五个商业开关继续关闭，再检查 Cron 配置传播及真实定时事件的成功/失败记录。空 outbox 远程 scheduled 探针已通过，但它不证明付款后交付邮件、定时事件传播或实际邮件送达；这些仍需要各自受控实测和回执。**本子任务没有执行部署、浏览器、数据库或凭据操作。** 两个 Worker 的现有资源边界与正式站原版本仍以正式读回为准。
+root已完成官方发布、五项Secret与数据库/R2/self binding读回，并核对正常Cron事件Success。支付五门仍false，正式站流量保持原版本。远程空任务与正常空队列定时成功不能替代付款后的通知、任意客户域名投递或持续容量；这些仍须受控实测。两份不同触发方式的证据保留原时间与版本，不相互冒充。

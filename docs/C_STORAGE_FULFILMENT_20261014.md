@@ -2,6 +2,8 @@
 
 核对日期：2026-10-14。这里只记录实际资源与已核版本；不把文件入库、提供者接受邮件或本地测试记为真实收费完成。
 
+最新接通：主审查Worker已绑定EU私有R2、受限Hyperdrive和PrivateEmail SMTP，五项服务器Secret保留。用户正常注册并实际收到验证邮件，`john@karuu.net`已验证；数据库所有者按精确UUID核对后记录首管理员审计、撤销旧会话，重新登录后台成功。通知每5分钟配置已由官方命令行发布，真实远程空队列执行已通过；Cron定时事件记录仍单独核验。正式站仍未切换，新收款门禁继续关闭。当前精确版本见最新回执。
+
 ## 已落地资源
 
 - 用户已完成 R2 订阅。官网审查私有桶 `karuu-c-review-private-20261014` 位于 EU jurisdiction、Standard，公开访问 Disabled；没有启用 r2.dev 或公开域名。
@@ -18,7 +20,7 @@
 
 ## 首批配置
 
-私有 `karuu_commerce` 中已登记两个 assets、两个 ebook draft SKU、两个 draft 作品与两份成本记录，附两条 bootstrap 审计。完整文件交付核验为 true；发行权最终核验保持 false，SKU/作品仍 draft，市场列表空、税规则空，各项未知成本为 null。没有新增公开作品、订单、用户或假管理员，也没有改变原 C 首页内容。
+私有 `karuu_commerce` 中已登记两个 assets、两个 ebook draft SKU、两个 draft 作品与两份成本记录。完整文件交付核验为 true。10月14日将人类署名确认、非独家发布指令、KDP Select=false及Google精确EPUB绑定资料与实际SHA逐一匹配后，这两份固定EPUB的发行依据核验为true，出版商补为KARUU AB，并逐资产记录审计；不能外推旧书、音频或全球税务。SKU/作品仍draft，市场和税规则空。当前不含奖励或链上执行，其对应两项成本为0，其余11项真实成本仍null。已创建一个正常验证的真实管理员，没有新增公开作品、订单或伪造用户。
 
 电子书 USD 1.99、音频 USD 2.99 与非独家广发意图来自媒体项目 `current-publishing-plan.json` 的用户确认（2026-10-13T12:28:29.607927+00:00）。英文正式 EPUB 对应 KDP ASIN B0HMWV1X5Z、KDP Select=false，平台核验时间2026-10-13T13:22:39.094157+00:00。该依据不能外推旧 Key / Last Room / Witness 的排他状态；整体平台/许可核验仍未完整。
 
@@ -36,10 +38,12 @@
 
 ## 待接通项
 
-首位管理员邮箱已由用户选为 `john@karuu.net`；邮件尚未接通，因此账号注册/验证及精确 UUID 的管理员初始化尚未执行。密码由用户设置，没有默认密码或绕过验证的账户。
+首位管理员 `john@karuu.net` 已按正常流程注册并验证，真实角色、审计和重新登录后台已核。用户本人设置密码；没有默认密码、绕过邮箱验证或公共提权入口。一次指定邮箱送达不代表所有客户域名的送达率或负载已通过。
 
 Cloudflare 原生 Email Service 向任意顾客发信要求 Workers Paid；Free 只支持账号中已验证的收件地址。Paid 最低 US$5/月，包含每月3000封，邮件超额US$0.35/1000封，其他 Workers 用量另按套餐计费。它是这个原生通道的条件，不是所有邮件方案都必须新增这笔固定月费。[官方邮件价格](https://developers.cloudflare.com/email-service/platform/pricing/)、[Workers 价格](https://developers.cloudflare.com/workers/platform/pricing/)
 
-用户询问费用必要性后，明确选择先复用现有 PrivateEmail，未完成 Workers Paid 订阅。实际临时 Cloudflare Worker 对 mail.privateemail.com:465 的 TLS、EHLO、QUIT 已成功，没有使用凭据、AUTH 或发邮件；证据 work/private-email-worker-connectivity-proof.json。SMTP 应用认证与真实收件验收尚未执行。保留既有公司邮箱 root MX，不开收件路由来替换公司邮箱。Workers Free 的实际认证/邮件 CPU 等资源限额仍需测量，不能承诺整个业务永远无费用。
+用户询问费用必要性后，明确选择复用现有 PrivateEmail，实际账户仍为Workers Free。早期无凭据TLS/EHLO/QUIT证据保留原日期；后续正常SMTP注册邮件已由用户实际收取并完成验证，未读取密码或验证token。保留既有公司邮箱MX；未新增Workers付费订阅。Free的持续负载、CPU及各客户收件域名仍须继续观察，不能把一次成功当稳定容量证明。
+
+用户已选择全球开放并先做保守测算。测算假设只在交付工作表中供审核，不写入真实成本。全球上线须采用实际税务地点/商品分类/登记依据；当前国家级手工税率模型不能替代州省和邮编税，也不能把无登记的0税额自动认定免税。
 
 真实收款与付款通知接收端仍暂停，KRU/游戏资金入口仍关闭。完整成本与目标结余、市场/税务、最终发行许可/条款、提供者 sandbox 的账户—订单—权益—私有交付—退款联调尚未完成。live 目标已经授权，不重复把同一目标当待许可项。
