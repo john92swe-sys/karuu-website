@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "check:public-safety": "node scripts/check-public-product-safety.mjs",
-    "test": "node --test --test-concurrency=2 scripts/test-hydration.mjs scripts/test-commerce.mjs scripts/test-commerce-admin-bootstrap.mjs scripts/test-private-media.mjs scripts/test-private-upload.mjs scripts/test-private-upload-native.mjs scripts/test-commerce-schema.mjs scripts/test-mail-provider.mjs scripts/test-smtp-mail.mjs scripts/test-notifications.mjs scripts/test-commerce-runtime-role.mjs scripts/test-checkout-recovery.mjs scripts/test-notification-scheduled.mjs scripts/test-payment-reconciliation.mjs scripts/test-global-tax-preparation.mjs scripts/test-tax-readiness.mjs",
+    "test": "node --test --test-concurrency=2 scripts/test-hydration.mjs scripts/test-commerce.mjs scripts/test-commerce-admin-bootstrap.mjs scripts/test-private-media.mjs scripts/test-private-upload.mjs scripts/test-private-upload-native.mjs scripts/test-commerce-schema.mjs scripts/test-mail-provider.mjs scripts/test-smtp-mail.mjs scripts/test-notifications.mjs scripts/test-commerce-runtime-role.mjs scripts/test-checkout-recovery.mjs scripts/test-notification-scheduled.mjs scripts/test-payment-reconciliation.mjs scripts/test-global-tax-preparation.mjs scripts/test-tax-readiness.mjs scripts/test-fulfillment-chain.mjs",
     "test:admin-bootstrap": "node --test scripts/test-commerce-admin-bootstrap.mjs",
     "test:commerce-schema": "node --test scripts/test-commerce-schema.mjs",
     "test:commerce": "node --test scripts/test-commerce.mjs",
@@ -20,7 +20,8 @@
     "check:cloudflare": "wrangler deploy --dry-run --outdir work/cloudflare-dry-run",
     "deploy:cloudflare:review": "node scripts/deploy-cloudflare-review.mjs",
     "test:commerce-runtime-role": "node --test scripts/test-commerce-runtime-role.mjs",
-    "test:payment-reconciliation": "node --test scripts/test-payment-reconciliation.mjs"
+    "test:payment-reconciliation": "node --test scripts/test-payment-reconciliation.mjs",
+    "test:fulfillment-chain": "node --test --test-concurrency=1 scripts/test-fulfillment-chain.mjs"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "1.20.10",
