@@ -8,7 +8,10 @@
   "preview_urls": false,
   "keep_vars": true,
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
-  "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "karuu-production" }],
+  "services": [
+    { "binding": "WORKER_SELF_REFERENCE", "service": "karuu-production" },
+    { "binding": "KARUU_INQUIRY_SERVICE", "service": "karuu-c-review-20261013" }
+  ],
   "hyperdrive": [{ "binding": "HYPERDRIVE_COMMERCE", "id": "dc1f294919fa401db0a5ff90d969eb04" }],
   "r2_buckets": [{ "binding": "KARUU_PRIVATE_MEDIA", "bucket_name": "karuu-c-review-private-20261014", "jurisdiction": "eu" }],
   "triggers": { "crons": [] },
