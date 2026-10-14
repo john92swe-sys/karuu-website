@@ -6,6 +6,7 @@ import { entitledAsset } from './delivery';
 import { saveCreation } from './works';
 import { requestFullRefund } from './payments';
 import { confirmPrivateR2Object, privateBucket } from './private-media';
+import { automaticTaxPreparationGaps, commerceTaxMode, normalizeAutomaticTaxPreparation } from './global-tax';
 
 function karuuAdmin(user:User){if(!user.brands.includes('karuu'))fail(403,'brand_denied','This administrator cannot manage KARUU digital commerce.');}
 export async function adminView(user:User,view:string){
@@ -36,6 +37,9 @@ function validatedSku(input:unknown){
   const normalized=components.map(c=>{const v=object(c);return {assetId:identifier(v.assetId),allocationBps:amount(v.allocationBps)!};});
   if(new Set(normalized.map(c=>c.assetId)).size!==normalized.length||normalized.some(c=>!c.allocationBps)||normalized.reduce((sum,c)=>sum+c.allocationBps,0)!==10000)fail(400,'invalid_components','Each asset must appear once and allocations must total 10000 basis points.');
   const tax=object(value.taxByMarket??{}),upgrades=object(value.upgradePrices??{});
+  const taxMode=value.taxMode==null?undefined:commerceTaxMode(value.taxMode);
+  const automaticTax=taxMode==='stripe_automatic'?normalizeAutomaticTaxPreparation(value.automaticTaxPreparation,normalized.map(component=>component.assetId)):null;
+  if(taxMode==='stripe_automatic'&&Object.keys(tax).length)fail(400,'mixed_tax_modes','Automatic-tax preparation cannot include manual tax-rate objects.');
   for(const [country,rateSet] of Object.entries(tax)){
     if(!markets.includes(country))fail(400,'invalid_tax_market','Tax settings must belong to an allowed billing market.');
     for(const [assetId,rateData] of Object.entries(object(rateSet))){const rate=object(rateData);if(!normalized.some(c=>c.assetId===assetId)||typeof rate.rate!=='number'||!Number.isFinite(rate.rate)||rate.rate<0||rate.rate>=1||!/^txr_[a-zA-Z0-9]+$/.test(text(rate.stripeTaxRateId)))fail(400,'invalid_tax','Provide the applicable rate and real inclusive Stripe tax-rate identifier per component.');}
@@ -45,7 +49,7 @@ function validatedSku(input:unknown){
   const start=date(value.saleStart),end=date(value.saleEnd);if(start&&end&&Date.parse(end)<=Date.parse(start))fail(400,'invalid_date','The sale end must follow its start.');
   const promotionPrice=amount(value.promotionPriceMinor,true),promotionStart=date(value.promotionStart),promotionEnd=date(value.promotionEnd);
   if(promotionPrice!=null&&(!promotionStart||!promotionEnd||Date.parse(promotionEnd)<=Date.parse(promotionStart)||promotionPrice<=0||price==null||promotionPrice>=price))fail(400,'invalid_promotion','An activity price needs a lower confirmed normal price and a valid, explicit start and end.');
-  return {id,slug,title,kind:value.kind,status:value.status,currency,price,rights:value.rightsVerified===true,markets,components:normalized,tax,upgrades,start,end,promotionPrice,promotionStart,promotionEnd};
+  return {id,slug,title,kind:value.kind,status:value.status,currency,price,rights:value.rightsVerified===true,markets,components:normalized,tax,upgrades,start,end,promotionPrice,promotionStart,promotionEnd,taxMode,automaticTax};
 }
 export async function adminAction(user:User,input:Record<string,unknown>){
   const action=text(input.action,60),reason=text(input.reason,1000);if(reason.length<10)fail(400,'reason_required','Record a reason of at least 10 characters for this operation.');
@@ -80,12 +84,17 @@ export async function adminAction(user:User,input:Record<string,unknown>){
   if(action==='save_sku'){
     const sku=validatedSku(input.sku);
     return transaction(async client=>{
+      const existing=(await client.query('SELECT * FROM commerce_skus WHERE id=$1 FOR UPDATE',[sku.id])).rows[0];
+      if(existing?.tax_mode==='stripe_automatic'&&sku.taxMode==null)fail(409,'tax_mode_confirmation_required','Confirm the stored tax integration explicitly before editing this automatic-tax preparation.');
+      const taxSchema=sku.taxMode!=null?(await client.query('SELECT version FROM commerce_schema WHERE version=3')).rows.length>0:false;
+      if(sku.taxMode==='stripe_automatic'&&!taxSchema)fail(503,'automatic_tax_schema_pending','The reviewed tax-preparation migration has not been applied. No product change was saved.');
       const assets=await client.query('SELECT id FROM commerce_assets WHERE id=ANY($1::text[])',[sku.components.map(c=>c.assetId)]);
       if(assets.rows.length!==sku.components.length)fail(400,'assets_required','Create every included asset before saving its product.');
       await client.query(`INSERT INTO commerce_skus(id,slug,title,kind,status,currency,price_minor,rights_verified,markets,components,tax_by_market,upgrade_prices,sale_start,sale_end) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
         ON CONFLICT(id) DO UPDATE SET slug=EXCLUDED.slug,title=EXCLUDED.title,kind=EXCLUDED.kind,status=EXCLUDED.status,currency=EXCLUDED.currency,price_minor=EXCLUDED.price_minor,rights_verified=EXCLUDED.rights_verified,markets=EXCLUDED.markets,components=EXCLUDED.components,tax_by_market=EXCLUDED.tax_by_market,upgrade_prices=EXCLUDED.upgrade_prices,sale_start=EXCLUDED.sale_start,sale_end=EXCLUDED.sale_end,updated_at=now()`,[sku.id,sku.slug,sku.title,sku.kind,sku.status,sku.currency,sku.price,sku.rights,sku.markets,JSON.stringify(sku.components),JSON.stringify(sku.tax),JSON.stringify(sku.upgrades),sku.start,sku.end]);
       await client.query('UPDATE commerce_skus SET promotion_price_minor=$2,promotion_start=$3,promotion_end=$4 WHERE id=$1',[sku.id,sku.promotionPrice,sku.promotionStart,sku.promotionEnd]);
-      await audit(client,user.id,action,sku.id,reason,{status:sku.status,priceMinor:sku.price,currency:sku.currency,components:sku.components});return {saved:true,id:sku.id};
+      if(taxSchema)await client.query('UPDATE commerce_skus SET tax_mode=$2,automatic_tax_config=$3 WHERE id=$1',[sku.id,sku.taxMode,JSON.stringify(sku.automaticTax??{})]);
+      await audit(client,user.id,action,sku.id,reason,{status:sku.status,priceMinor:sku.price,currency:sku.currency,components:sku.components,taxMode:sku.taxMode??existing?.tax_mode??'manual_verified',automaticTaxCheckoutEnabled:false,taxPreparationGaps:sku.automaticTax?automaticTaxPreparationGaps(sku.automaticTax,sku.components.map(component=>component.assetId)):[]});return {saved:true,id:sku.id};
     });
   }
   if(action==='save_cost'){

@@ -3,8 +3,9 @@ import { fail, uuid } from './core';
 import { audit, DbClient, query, transaction } from './db';
 import { OrderSnapshot, stripeClient } from './commerce';
 import { User } from './auth';
+import { assertManualCheckout, type CommerceTaxMode } from './global-tax';
 
-type PaymentOrder={id:string,user_id:string,status:string,currency:string,total_minor:number,market:string,snapshot:OrderSnapshot,stripe_session_id:string|null,stripe_payment_intent:string|null,refunded_minor:number,receipt_version:string};
+type PaymentOrder={id:string,user_id:string,status:string,currency:string,total_minor:number,market:string,snapshot:OrderSnapshot,stripe_session_id:string|null,stripe_payment_intent:string|null,refunded_minor:number,receipt_version:string,tax_mode?:CommerceTaxMode};
 type PaymentState={session:Stripe.Checkout.Session,intent:Stripe.PaymentIntent,charge:Stripe.Charge,refunds:Stripe.Refund[],confirmedMinor:number,pending:boolean,failed:boolean};
 const objectId=(value:string|{id:string}|null|undefined)=>typeof value==='string'?value:value?.id;
 const live=()=>process.env.KARUU_PAYMENT_MODE==='live';
@@ -95,6 +96,10 @@ export async function processPaymentEvent(event:Stripe.Event){
   }
   await assertRefundFreshness(client,order,state);
   const reconciled=await reconcileRefundState(client,order,state,null,{eventId:event.id});if(reconciled)return reconciled;
+  // Preparation data cannot grant access. The complete automatic-tax checkout,
+  // pre-capture jurisdiction control and receipt persistence are not released.
+  assertManualCheckout(order.tax_mode);
+  if(currentSession.automatic_tax?.enabled===true) fail(409,'manual_tax_receipt_mismatch','A manual-tax order cannot be fulfilled using an automatic-tax merchant receipt. Reconciliation is required.');
   if(['refunded','refund_pending','review'].includes(order.status))return {received:true,fulfillmentSkipped:true};
   if(currentSession.customer_details?.address?.country!==order.market){await client.query("UPDATE commerce_orders SET status='review',updated_at=now() WHERE id=$1",[order.id]);await audit(client,null,'payment_market_review',order.id,'Verified billing country differs from quoted tax market',{quotedMarket:order.market});return {received:true,reviewRequired:true};}
   if(order.status==='paid')return {received:true,alreadyFulfilled:true};

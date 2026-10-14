@@ -3,9 +3,10 @@ import { allocate, costResult, CostInputs, fail, hash, idempotency, text, uuid }
 import { audit, databaseConfigured, DbClient, query, transaction } from './db';
 import { mailConfigured, User } from './auth';
 import { privateMediaConfigured } from './private-media';
+import { assertManualCheckout, automaticTaxCheckoutImplemented, type AutomaticTaxPreparation, type CommerceTaxMode } from './global-tax';
 
 export type Asset={id:string,work_slug:string,title:string,format:string,language:string,object_key:string,edition_version:string,content_sha256:string|null,rights_verified:boolean,delivery_verified:boolean};
-export type Sku={id:string,slug:string,title:string,kind:string,status:string,currency:string,price_minor:number|null,promotion_price_minor:number|null,promotion_start:string|null,promotion_end:string|null,rights_verified:boolean,markets:string[],components:{assetId:string,allocationBps:number}[],tax_by_market:Record<string,Record<string,{rate:number,stripeTaxRateId:string}>>,upgrade_prices:Record<string,number>,sale_start:string|null,sale_end:string|null};
+export type Sku={id:string,slug:string,title:string,kind:string,status:string,currency:string,price_minor:number|null,promotion_price_minor:number|null,promotion_start:string|null,promotion_end:string|null,rights_verified:boolean,markets:string[],components:{assetId:string,allocationBps:number}[],tax_by_market:Record<string,Record<string,{rate:number,stripeTaxRateId:string}>>,upgrade_prices:Record<string,number>,sale_start:string|null,sale_end:string|null,tax_mode?:CommerceTaxMode,automatic_tax_config?:AutomaticTaxPreparation};
 function sellingSku(sku:Sku):Sku{return sku.promotion_price_minor&&sku.promotion_start&&sku.promotion_end&&Date.parse(sku.promotion_start)<=Date.now()&&Date.parse(sku.promotion_end)>Date.now()?{...sku,price_minor:sku.promotion_price_minor}:sku;}
 export type OrderSnapshot={skuId:string,title:string,priceMinor:number,components:{assetId:string,title:string,format:string,language:string,editionVersion:string,contentSha256:string,amountMinor:number,taxRate:number,stripeTaxRateId:string}[]}[];
 export const mediaConfigured = privateMediaConfigured;
@@ -27,7 +28,7 @@ export async function status(){
   if(configured) {try{ready=Boolean((await query('SELECT version FROM commerce_schema WHERE version=1'))[0]);}catch{ready=false;}}
   let publicCatalogAvailable=!configured;
   if(ready){try{await query('SELECT slug FROM commerce_creations LIMIT 1');publicCatalogAvailable=true;}catch{publicCatalogAvailable=false;}}
-  return {database:ready,publicCatalogAvailable,accounts:ready&&await mailConfigured(),payments:ready&&paymentsConfigured(),privateMedia:await mediaConfigured(),inquiries:ready,kru:{enabled:false,reason:'KRU requires verified market eligibility, legal approval, network, mint, budgets and controlled signing. Ordinary content purchases do not require KRU.'}};
+  return {database:ready,publicCatalogAvailable,accounts:ready&&await mailConfigured(),payments:ready&&paymentsConfigured(),privateMedia:await mediaConfigured(),inquiries:ready,automaticTax:{checkoutImplemented:automaticTaxCheckoutImplemented,collectionEnabled:false},kru:{enabled:false,reason:'KRU requires verified market eligibility, legal approval, network, mint, budgets and controlled signing. Ordinary content purchases do not require KRU.'}};
 }
 export async function catalog(){
   if(!(await databaseConfigured())) return {items:[]};
@@ -38,14 +39,15 @@ export async function catalog(){
   return {items:skus.map(rawSku=>{const sku=sellingSku(rawSku);
     const components=sku.components.map(c=>assets.find(a=>a.id===c.assetId));
     const inputs=costs.find(c=>c.sku_id===sku.id)?.inputs;
-    const marketReady=sku.markets.some(market=>{
+    const manualTax=sku.tax_mode==null||sku.tax_mode==='manual_verified';
+    const marketReady=manualTax&&sku.markets.some(market=>{
       const taxes=sku.tax_by_market[market];if(!taxes||!sku.price_minor||!inputs||!sku.components.every(c=>typeof taxes[c.assetId]?.rate==='number'&&/^txr_/.test(taxes[c.assetId]?.stripeTaxRateId??'')))return false;
       const allocations=allocate(sku.price_minor,sku.components.map(c=>c.allocationBps));
       const effectiveTax=sku.price_minor/sku.components.reduce((sum,c,i)=>sum+allocations[i]/(1+taxes[c.assetId].rate),0)-1;
       const result=costResult(sku.price_minor,{...inputs,vatRate:effectiveTax});return result.complete&&result.targetMet;
     });
     const available=sku.rights_verified&&sku.price_minor!==null&&sku.kind!=='game'&&components.length>0&&components.every(a=>a?.rights_verified&&a?.delivery_verified)&&marketReady&&(!sku.sale_start||Date.parse(sku.sale_start)<=Date.now())&&(!sku.sale_end||Date.parse(sku.sale_end)>Date.now())&&paymentsConfigured()&&mediaReady;
-    return {id:sku.id,slug:sku.slug,title:sku.title,kind:sku.kind,currency:sku.currency,priceMinor:available?sku.price_minor:null,normalPriceMinor:available?rawSku.price_minor:null,promotion:available&&sku.price_minor!==rawSku.price_minor,components:components.filter((a):a is Asset=>Boolean(a)).map(a=>({id:a.id,title:a.title,format:a.format,language:a.language})),available,unavailableReason:available?null:'Direct purchase is awaiting verified price, distribution rights, delivery files and merchant configuration.'};
+    return {id:sku.id,slug:sku.slug,title:sku.title,kind:sku.kind,currency:sku.currency,taxMode:sku.tax_mode??'manual_verified',priceMinor:available?sku.price_minor:null,normalPriceMinor:available?rawSku.price_minor:null,promotion:available&&sku.price_minor!==rawSku.price_minor,components:components.filter((a):a is Asset=>Boolean(a)).map(a=>({id:a.id,title:a.title,format:a.format,language:a.language})),available,unavailableReason:available?null:manualTax?'Direct purchase is awaiting verified price, distribution rights, delivery files and merchant configuration.':'Direct purchase is awaiting a verified international tax and payment integration.'};
   })};
 }
 async function snapshotFor(client:DbClient,skuIds:string[],user:User,market:string):Promise<OrderSnapshot> {
@@ -58,6 +60,7 @@ async function snapshotFor(client:DbClient,skuIds:string[],user:User,market:stri
   if(currencies.size!==1) fail(400,'mixed_currency','Check out products in the same currency together.');
   for(const skuId of skuIds){
     const sku=sellingSku(rows.rows.find(s=>s.id===skuId)!);
+    assertManualCheckout(sku.tax_mode);
     if(sku.status!=='active'||!sku.rights_verified||!sku.price_minor||!sku.markets.includes(market)||!sku.components.length||sku.kind==='game'||(sku.sale_start&&Date.parse(sku.sale_start)>Date.now())||(sku.sale_end&&Date.parse(sku.sale_end)<Date.now())) fail(503,'sku_unavailable',`${sku.title} is not available for direct purchase in this market.`);
     const already=sku.components.filter(c=>owned.has(c.assetId)).map(c=>c.assetId).sort();
     const offered=sku.components.filter(c=>!owned.has(c.assetId));
@@ -113,8 +116,14 @@ export async function checkout(user:User,input:Record<string,unknown>,keyValue:u
       VALUES($1,$2,$3,$4,'pending',$5,$6,$7,$8,$9,now()) RETURNING *`,[id,user.id,key,digest,currency,total,market,JSON.stringify(snapshot),process.env.KARUU_TERMS_VERSION]);
     await audit(client,user.id,'checkout_created',id,'Customer requested direct purchase',{skuIds,market,totalMinor:total,currency});return result.rows[0];
   });
+  assertManualCheckout(order.tax_mode);
   if(order.status!=='pending') return {orderId:order.id,url:null,status:order.status};
-  if(order.checkout_url) return {orderId:order.id,url:order.checkout_url,status:'pending'};
+  if(order.checkout_url) {
+    if(!order.stripe_session_id) fail(409,'checkout_session_mismatch','The saved checkout page has no confirmed merchant session.');
+    const savedSession=await stripe.checkout.sessions.retrieve(order.stripe_session_id);
+    if(savedSession.id!==order.stripe_session_id||savedSession.mode!=='payment'||savedSession.livemode!==(process.env.KARUU_PAYMENT_MODE==='live')||savedSession.client_reference_id!==order.id||savedSession.metadata?.orderId!==order.id||savedSession.metadata?.userId!==user.id||savedSession.amount_total!==order.total_minor||savedSession.currency?.toUpperCase()!==order.currency||savedSession.automatic_tax?.enabled===true) fail(503,'checkout_session_mismatch','The saved merchant session does not match the original manual-tax order.');
+    return {orderId:order.id,url:order.checkout_url,status:'pending'};
+  }
   // Stripe retains idempotency keys for at least 24h. Leave a margin and require
   // reconciliation afterwards: a provider session may exist despite a failed DB save.
   const checkRecoveryWindow=()=>{
@@ -150,7 +159,7 @@ export async function checkout(user:User,input:Record<string,unknown>,keyValue:u
   checkRecoveryWindow();
   const session=order.stripe_session_id?await stripe.checkout.sessions.retrieve(order.stripe_session_id):await stripe.checkout.sessions.create(params,{idempotencyKey:`checkout-${order.id}`});
   if(session.livemode!==(process.env.KARUU_PAYMENT_MODE==='live')) fail(503,'payment_mode_mismatch','The payment session has an unexpected mode.');
-  if(!session.id||session.client_reference_id!==order.id||session.metadata?.orderId!==order.id||session.metadata?.userId!==user.id||session.amount_total!==order.total_minor||session.currency?.toUpperCase()!==order.currency) fail(503,'checkout_session_mismatch','The merchant session does not match the original order. Contact KARUU before continuing payment.');
+  if(!session.id||session.client_reference_id!==order.id||session.metadata?.orderId!==order.id||session.metadata?.userId!==user.id||session.amount_total!==order.total_minor||session.currency?.toUpperCase()!==order.currency||session.automatic_tax?.enabled===true) fail(503,'checkout_session_mismatch','The merchant session does not match the original order. Contact KARUU before continuing payment.');
   return transaction(async client=>{
     await client.query('SELECT id FROM commerce_users WHERE id=$1 FOR UPDATE',[user.id]);
     const current=(await client.query('SELECT * FROM commerce_orders WHERE id=$1 AND user_id=$2 FOR UPDATE',[order.id,user.id])).rows[0];

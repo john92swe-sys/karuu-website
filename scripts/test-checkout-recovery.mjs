@@ -28,7 +28,7 @@ class FixtureStripe{
     createRequests.push(options.idempotencyKey);
     if(createFailure==='before'){createFailure='';throw new Error('Isolated provider timeout before creation');}
     let session=providerSessions.get(options.idempotencyKey);
-    if(!session){session={id:`cs_test_fixture_${providerSessions.size+1}`,livemode:false,client_reference_id:params.client_reference_id,metadata:params.metadata,
+    if(!session){session={id:`cs_test_fixture_${providerSessions.size+1}`,mode:'payment',livemode:false,client_reference_id:params.client_reference_id,metadata:params.metadata,
       amount_total:params.line_items.reduce((sum,item)=>sum+item.price_data.unit_amount,0),currency:params.line_items[0].price_data.currency,url:'https://checkout.stripe.example.test/fixture'};
       providerSessions.set(options.idempotencyKey,session);
     }
