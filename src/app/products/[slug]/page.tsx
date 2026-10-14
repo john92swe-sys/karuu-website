@@ -22,7 +22,7 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-const siteUrl = 'https://karuu.net';
+const siteUrl = 'https://www.karuu.net';
 
 export function generateStaticParams() {
   return getAllProducts().map((product) => ({ slug: product.slug }));

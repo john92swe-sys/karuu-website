@@ -1,0 +1,12 @@
+import { spawnSync } from 'node:child_process';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { reviewCloudflarePackagingEnv } from './lib/review-cloudflare-packaging-env.mjs';
+const target = JSON.parse(readFileSync('wrangler.production.jsonc', 'utf8'));
+const gates = ['KARUU_PAYMENTS_ENABLED','KARUU_LIVE_COMMERCE_APPROVED','KARUU_TAX_CONFIG_APPROVED','KARUU_DISTRIBUTION_APPROVED','KARUU_LEGAL_APPROVED'];
+if (target.name !== 'karuu-production' || target.routes || target.vars.KARUU_SITE_ORIGIN !== 'https://www.karuu.net' || target.vars.KARUU_DEPLOYMENT_ENV !== 'production' || gates.some(name => target.vars[name] !== 'false') || target.triggers.crons.length || target.services[0].service !== 'karuu-production') throw Error('Production information-site target is not the approved closed-commerce configuration.');
+const env = reviewCloudflarePackagingEnv(target, {...process.env, SKIP_NEXT_APP_BUILD:'false', KARUU_DEPLOYMENT_ENV:'production', VERCEL_ENV:'production', NODE_OPTIONS: process.env.NODE_OPTIONS || '--max-old-space-size=1536'});
+const result = spawnSync(process.execPath, ['node_modules/@opennextjs/cloudflare/dist/cli/index.js','build','--config','wrangler.production.jsonc'], {stdio:'inherit',env});
+if (result.error) throw result.error;
+if (result.status !== 0) process.exit(result.status ?? 1);
+const source = spawnSync('git', ['rev-parse','HEAD'], {encoding:'utf8'}).stdout.trim();
+writeFileSync('production-artifact-proof.json', JSON.stringify({sourceCommit:source,builtAtUtc:new Date().toISOString(),target:'karuu-production',siteOrigin:target.vars.KARUU_SITE_ORIGIN,productionIndexing:true,commerceEnabled:false,privateSecretsIncluded:false},null,2)+'\n');

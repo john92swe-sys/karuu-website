@@ -33,6 +33,14 @@ async function runNotificationJob(env) {
 
 const worker = {
   ...openNextWorker,
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+    if (env?.KARUU_DEPLOYMENT_ENV === 'production' && url.hostname === 'karuu.net') {
+      url.protocol = 'https:'; url.host = 'www.karuu.net';
+      return Response.redirect(url.toString(), 308);
+    }
+    return openNextWorker.fetch(request, env, ctx);
+  },
   async scheduled(_controller, env, ctx) {
     if (env?.KARUU_NOTIFICATIONS_SCHEDULED_ENABLED !== 'true') return;
     const task = runNotificationJob(env);
