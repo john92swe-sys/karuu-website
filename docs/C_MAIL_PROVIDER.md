@@ -1,12 +1,14 @@
 # C 业务邮件适配：实现与配置边界
 
-核验日期：2026-10-13。已新增可选 Cloudflare 原生邮件适配器，保留 HTTPS endpoint/token relay 默认路径。当前 Wrangler 配置、邮件服务、DNS、计划和秘密均未修改，没有发送真实邮件；运行中的 review/production 不因本次未部署的代码而开通邮件。
+核验日期：2026-10-14。保留 HTTPS relay 和 Cloudflare 原生通道，新增现有 PrivateEmail 的加密 SMTP 适配。用户明确选择先复用公司邮箱，审查配置采用 SMTP；实际应用密码、认证、收件和当前部署证据以[本轮记录](C_STORAGE_FULFILMENT_20261014.md)及最新回执为准。没有升级 Workers 付费计划或改公司邮箱 MX。
 
 ## 品牌独立配置
 
 | 配置 | KARUU | JKJ-Plus |
 | --- | --- | --- |
 | 选择原生提供者 | `KARUU_MAIL_PROVIDER=cloudflare` | `JKJ_MAIL_PROVIDER=cloudflare` |
+| 选择现有邮箱 | `KARUU_MAIL_PROVIDER=smtp` | `JKJ_MAIL_PROVIDER=smtp` |
+| SMTP 邮箱与应用密码 | `KARUU_SMTP_USER` + `KARUU_SMTP_PASSWORD` Secret | `JKJ_SMTP_USER` + `JKJ_SMTP_PASSWORD` Secret |
 | 精确发件地址 | `KARUU_MAIL_FROM` | `JKJ_MAIL_FROM` |
 | 原生绑定名称 | `KARUU_EMAIL` | `JKJ_EMAIL` |
 | 默认 relay | `KARUU_MAIL_ENDPOINT` + `KARUU_MAIL_TOKEN` | `JKJ_MAIL_ENDPOINT` + `JKJ_MAIL_TOKEN` |
@@ -16,7 +18,17 @@
 
 `brandMailConfigured(brand)` 是异步配置能力检查：查提供者、对应品牌值和绑定的 `send` 方法，不发送探测邮件，不核验实际计划/DNS/收件箱。`auth.mailConfigured()`、注册/重置、询盘排队及 `commerce.status().accounts` 已使用其异步结果。实际配置就绪与真实发信验收分别记录。
 
-## 官方原生接口与后续前提
+## 现有 PrivateEmail 通道
+
+SMTP 固定为 `mail.privateemail.com:465`、隐式 TLS，验证服务器证书和域名；发件地址必须等于对应品牌邮箱。KARUU 使用 karuu.net，JKJ 使用 jkjplus.com；独立应用密码只保存服务器，不借用另一品牌。每请求创建独享连接、不使用共享连接池，十秒总期限结束时关闭实际 socket。没有关闭证书校验或通过明文端口25退化发信。[Namecheap 参数](https://www.namecheap.com/support/knowledgebase/article.aspx/1179/2175/general-private-email-configuration-for-mail-clients-and-mobile-devices/)、[Workers TLS](https://developers.cloudflare.com/workers/runtime-apis/nodejs/tls/)
+
+接受回执必须同时有指定的唯一收件人、无拒收，以及 DATA 的终结250回复。客户端 Message-ID 不证明送达或提供者去重；超时/不明确接受继续人工复核，不能自动重发。SMTP 通常不自动写 webmail Sent，收件验收独立核对。
+
+`verifyPrivateEmailSmtp()` 无参数仅执行 TLS/EHLO/QUIT；明确传入服务器账户才检查 AUTH。两种模式均不发送邮件，且没有公开验证路由。Nodemailer10.1.0 固定依赖。真实 workerd 无凭据握手已通过；认证和最终收件仍须真实配置证明，不能用 fixture 或能力布尔值替代。
+
+Cloudflare 原生向任意收件人发信需要 Workers Paid；复用既有邮箱不以这个套餐为前提。但邮箱额度与 Workers CPU/其他限额仍需实际测量，不能宣称全站永远零费用。[Email Service 价格](https://developers.cloudflare.com/email-service/platform/pricing/)
+
+## 原生提供者接口
 
 本次依据 Cloudflare 新 Email Service 的结构化 `send({from,to,subject,text})`，成功返回 `messageId`；没有采用 legacy `EmailMessage` 路由方式。当前官方接口没有列出提供者幂等参数，适配器不添加自行假定的 idempotency 字段。[Workers API](https://developers.cloudflare.com/email-service/api/send-emails/workers-api/)（页面更新2026-09-16）。
 

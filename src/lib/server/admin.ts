@@ -5,6 +5,7 @@ import { status, stripeClient } from './commerce';
 import { entitledAsset } from './delivery';
 import { saveCreation } from './works';
 import { requestFullRefund } from './payments';
+import { confirmPrivateR2Object, privateBucket } from './private-media';
 
 function karuuAdmin(user:User){if(!user.brands.includes('karuu'))fail(403,'brand_denied','This administrator cannot manage KARUU digital commerce.');}
 export async function adminView(user:User,view:string){
@@ -63,8 +64,14 @@ export async function adminAction(user:User,input:Record<string,unknown>){
     const version=text(asset.editionVersion,100)||'1',digest=text(asset.contentSha256,64)||null;
     if((digest&&!/^[a-f0-9]{64}$/.test(digest))||(asset.deliveryVerified===true&&!digest))fail(400,'file_digest_required','Verified delivery requires the real file SHA-256 digest.');
     if(!text(asset.title)||!text(asset.language)||!['epub','pdf','mp3','m4a','flac','zip'].includes(format)||!key||key.startsWith('/')||key.split('/').some(p=>!p||p==='.'||p==='..')||/[?#\\]/.test(key))fail(400,'invalid_asset','Provide a verified asset format, language and private object key.');
+    if(asset.deliveryVerified===true&&process.env.KARUU_PRIVATE_MEDIA_PROVIDER==='r2'){
+      const store=await privateBucket();if(!store)fail(503,'delivery_not_configured','The actual private R2 binding is required to confirm delivery.');
+      await confirmPrivateR2Object(store,key,digest!);
+    }
     return transaction(async client=>{
+      await client.query('LOCK TABLE commerce_assets IN SHARE ROW EXCLUSIVE MODE');
       const old=(await client.query('SELECT * FROM commerce_assets WHERE id=$1 FOR UPDATE',[id])).rows[0];
+      if((await client.query('SELECT id FROM commerce_assets WHERE object_key=$1 AND id<>$2 LIMIT 1',[key,id])).rows.length)fail(409,'object_key_in_use','Another edition already uses this private object key.');
       const committed=old&&(await client.query('SELECT id FROM commerce_orders WHERE snapshot @> $1::jsonb LIMIT 1',[JSON.stringify([{components:[{assetId:id}]}])])).rows.length>0;
       if(committed&&(old.work_slug!==slug||old.format!==format||old.language!==text(asset.language,50)||old.edition_version!==version||(old.content_sha256&&old.content_sha256!==digest)||(old.object_key!==key&&(!old.content_sha256||old.content_sha256!==digest))))fail(409,'edition_immutable','A quoted or purchased edition cannot be replaced by another work, language, format, version or file. Create a new asset ID. A storage repair must retain the verified content digest.');
       await client.query(`INSERT INTO commerce_assets(id,work_slug,title,format,language,object_key,rights_verified,delivery_verified,edition_version,content_sha256) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)

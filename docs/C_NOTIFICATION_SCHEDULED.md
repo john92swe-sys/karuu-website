@@ -1,6 +1,6 @@
 # Cloudflare 定时询盘通知入口
 
-核对日期：2026-10-13。代码已接入本地构建配置，**没有部署、配置 Cron Trigger、输入真实 job secret 或发送邮件**。
+最初核对日期：2026-10-13；2026-10-14补正：包装已部署审查站，job Secret已新增到服务器版本。Cron仍未配置，开关false，没有实际发送邮件；当前版本和凭据接通状态见最新回执。
 
 ## 实现与边界
 
@@ -12,7 +12,7 @@
 
 请求使用 manual redirect 与 5 分钟超时；不跟随重定向，不在包装入口内重试。`ctx.waitUntil` 记录同一任务，handler 同时等待完成；非 200、非法计数、失败或需人工 review 均为固定 `notification_job_failed`，不日志响应、收件人、品牌内容或密钥。[Cloudflare Scheduled Handler](https://developers.cloudflare.com/workers/runtime-apis/handlers/scheduled/)说明失败任务可在 Cron Past Events 中观察；[HTTP service binding](https://developers.cloudflare.com/workers/runtime-apis/bindings/service-bindings/http/)规定通过绑定 `fetch(Request)` 调用目标，人工新建 Request 必须有完整 URL。
 
-成功只表示该次私有处理的 provider-accepted 计数正常；**不宣称邮箱送达**。没有改 `notifications.ts`：未确认 provider idempotency 的品牌仍只尝试首次，超时/lease 过期后保持人工 review，不随 cron 自动重复发送。支持 dedupe 的品牌仍须自身配置 `MAIL_IDEMPOTENCY_CONFIRMED=true`；header 存在不会自动认定去重能力。
+成功只表示该次私有处理的 provider-accepted 计数正常；**不宣称邮箱送达**。本轮已新增order_delivery并改为逐条认领，旧lease不能写新结果；未确认 provider idempotency 的品牌仍只尝试首次，超时/lease 过期后保持人工 review，不随 cron 自动重复发送。支持 dedupe 的品牌仍须自身配置 `MAIL_IDEMPOTENCY_CONFIRMED=true`；header 存在不会自动认定去重能力。
 
 ## 本地验证与线上缺项
 

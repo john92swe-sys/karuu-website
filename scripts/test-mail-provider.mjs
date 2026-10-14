@@ -12,7 +12,7 @@ import ts from 'typescript';
 const root=path.resolve(import.meta.dirname,'..');
 const plain=value=>JSON.parse(JSON.stringify(value));
 function fixture(env={},workerEnv=null){
-  const settings={...env},relayCalls=[],nativeCalls=[],sqlCalls=[];
+  const settings={...env},relayCalls=[],nativeCalls=[],smtpCalls=[],sqlCalls=[],deadlines=new Map();
   let providerResponse=new Response('{}',{status:202}),fetchFailure=false,contextFailure=false;
   const database={configured:true,ready:true};
   const cache=new Map();
@@ -28,6 +28,7 @@ function fixture(env={},workerEnv=null){
       if(name==='next/server')return {NextResponse:{json:value=>({value,cookies:{set(){}}})}};
       if(name==='./cloudflare')return {cloudflareEnvironment:async()=>{if(contextFailure)throw new Error('Isolated missing context');return workerEnv;}};
       if(name==='./private-media')return {privateMediaConfigured:async()=>false};
+      if(name==='./smtp-mail')return {sendPrivateEmailSmtp:async(account,to,subject,text)=>{smtpCalls.push({account:plain(account),to,subject,text});return {messageId:'fixture-smtp-accepted'};}};
       if(name==='./db')return {
         databaseConfigured:async()=>database.configured,
         query:async(sql,values=[])=>{sqlCalls.push({sql,values});return sql.startsWith('SELECT version')?(database.ready?[{version:1}]:[]):[];},
@@ -42,6 +43,8 @@ function fixture(env={},workerEnv=null){
       throw new Error(`Unapproved fixture dependency ${name}`);
     }
     const context=vm.createContext({module,exports:module.exports,require,process:{env:settings},URL,Response,AbortSignal,Buffer,
+      setTimeout:(callback,milliseconds)=>{const handle={};deadlines.set(handle,{callback,milliseconds});return handle;},
+      clearTimeout:handle=>deadlines.delete(handle),
       fetch:async(url,options)=>{
         const parsed=new URL(url);
         assert.ok(['karuu-mail.example.test','jkj-mail.example.test'].includes(parsed.hostname),'No external network is allowed');
@@ -55,7 +58,8 @@ function fixture(env={},workerEnv=null){
   }
   const mail=load('mail.ts');
   function binding(brand,result={messageId:`fixture-${brand}-accepted`},failure=false){return {send:async message=>{nativeCalls.push({brand,message:plain(message)});if(failure)throw new Error('Sensitive native fixture detail');return result;}};}
-  return {settings,mail,load,relayCalls,nativeCalls,sqlCalls,database,binding,
+  return {settings,mail,load,relayCalls,nativeCalls,smtpCalls,sqlCalls,database,binding,deadlines,
+    expireMailDeadline:()=>{const pending=[...deadlines.values()];assert.equal(pending.length,1);assert.equal(pending[0].milliseconds,10000);pending[0].callback();},
     setWorkerEnv:value=>{workerEnv=value;},setContextFailure:value=>{contextFailure=value;},
     setResponse:value=>{providerResponse=value;},setFetchFailure:value=>{fetchFailure=value;},
   };
@@ -87,6 +91,30 @@ await test('missing JKJ provider never borrows KARUU relay',async()=>{
   assert.equal(await f.mail.brandMailConfigured('jkj-plus'),false);
   await assert.rejects(f.mail.sendBrandMail('buyer@example.test','JKJ subject','Message','jkj-plus'),code('mail_not_configured'));
   assert.equal(f.relayCalls.length,0);
+  assert.equal(f.deadlines.size,0);
+});
+await test('a hanging native send reaches an unknown-result deadline and late acceptance cannot turn it into success',async()=>{
+  const f=fixture(nativeEnv);let accept;
+  const pending=new Promise(resolve=>{accept=resolve;});
+  f.setWorkerEnv({KARUU_EMAIL:{send:message=>{f.nativeCalls.push({brand:'karuu',message:plain(message)});return pending;}}});
+  const sending=f.mail.sendBrandMail('customer@example.test','Native subject','Native message','karuu','native-job');
+  const rejected=assert.rejects(sending,error=>error.code==='mail_delivery_unavailable'&&error.message.includes('unconfirmed'));
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(f.nativeCalls.length,1);f.expireMailDeadline();await rejected;
+  assert.equal(f.deadlines.size,0);
+  accept({messageId:'fixture-late-acceptance'});await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(f.nativeCalls.length,1);
+  await assert.rejects(sending,code('mail_delivery_unavailable'));
+});
+await test('a late native rejection is handled after the same unknown-result deadline',async()=>{
+  const f=fixture(nativeEnv);let rejectLate;
+  const pending=new Promise((_resolve,reject)=>{rejectLate=reject;});
+  f.setWorkerEnv({KARUU_EMAIL:{send:()=>pending}});
+  const sending=f.mail.sendBrandMail('customer@example.test','Native subject','Native message');
+  const rejected=assert.rejects(sending,code('mail_delivery_unavailable'));
+  await new Promise(resolve=>setImmediate(resolve));f.expireMailDeadline();await rejected;
+  rejectLate(new Error('Sensitive delayed rejection'));await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(f.deadlines.size,0);
 });
 await test('JKJ relay and confirmed idempotency are independently configured',async()=>{
   const f=fixture({...relayEnv,JKJ_MAIL_ENDPOINT:'https://jkj-mail.example.test/send',JKJ_MAIL_TOKEN:'isolated-jkj-fixture-only',JKJ_MAIL_IDEMPOTENCY_CONFIRMED:'true'});
@@ -214,5 +242,43 @@ await test('idempotency confirmation is explicit, per-brand and cannot enable na
   for(const provider of ['cloudflare','unknown']){
     f.settings.KARUU_MAIL_PROVIDER=provider;
     assert.equal(f.mail.brandMailSupportsIdempotency('karuu'),false);
+  }
+});
+await test('safe retry configuration follows the actual Worker provider and cannot mistake native sending for a relay',async()=>{
+  const f=fixture({...relayEnv,KARUU_MAIL_PROVIDER:'relay',KARUU_MAIL_IDEMPOTENCY_CONFIRMED:'true'});
+  assert.equal(await f.mail.brandMailRetryConfigured('karuu'),true);
+  f.setWorkerEnv({KARUU_MAIL_PROVIDER:'cloudflare',KARUU_MAIL_FROM:'noreply@karuu.example.test',KARUU_EMAIL:f.binding('karuu')});
+  assert.equal(await f.mail.brandMailRetryConfigured('karuu'),false);
+  assert.equal((await f.mail.sendBrandMail('buyer@example.test','Subject','Message')).providerIdempotency,false);
+  f.setWorkerEnv({KARUU_MAIL_PROVIDER:'relay',KARUU_MAIL_IDEMPOTENCY_CONFIRMED:'false'});
+  assert.equal(await f.mail.brandMailRetryConfigured('karuu'),false);
+  assert.equal((await f.mail.sendBrandMail('buyer@example.test','Subject','Message')).providerIdempotency,false);
+  delete f.settings.KARUU_MAIL_TOKEN;f.setWorkerEnv(null);
+  assert.equal(await f.mail.brandMailRetryConfigured('karuu'),false);
+});
+await test('PrivateEmail SMTP uses its own mailbox and never infers provider idempotency from a job or flag',async()=>{
+  const f=fixture({KARUU_MAIL_PROVIDER:'smtp',KARUU_MAIL_FROM:'john@karuu.net',KARUU_SMTP_USER:'john@karuu.net',KARUU_SMTP_PASSWORD:'fixture-only-karuu-password',KARUU_MAIL_IDEMPOTENCY_CONFIRMED:'true'});
+  assert.equal(await f.mail.brandMailConfigured('karuu'),true);
+  assert.equal(await f.mail.brandMailRetryConfigured('karuu'),false);
+  assert.equal(f.mail.brandMailSupportsIdempotency('karuu'),false);
+  const receipt=await f.mail.sendBrandMail('buyer@example.test','SMTP subject','SMTP message','karuu','same-job-key');
+  assert.deepEqual(plain(receipt),{accepted:true,provider:'smtp',messageId:'fixture-smtp-accepted',providerIdempotency:false});
+  assert.equal(f.smtpCalls.length,1);assert.equal(f.smtpCalls[0].account.brand,'karuu');
+  assert.equal(f.smtpCalls[0].account.from,f.smtpCalls[0].account.user);
+  assert.equal(f.relayCalls.length+f.nativeCalls.length,0);
+});
+await test('SMTP brands require separate credentials and cannot borrow another domain or sender identity',async()=>{
+  const original={KARUU_MAIL_PROVIDER:'smtp',KARUU_MAIL_FROM:'john@karuu.net',KARUU_SMTP_USER:'john@karuu.net',KARUU_SMTP_PASSWORD:'fixture-only-karuu-password',JKJ_MAIL_PROVIDER:'smtp'};
+  const f=fixture(original);
+  await assert.rejects(f.mail.sendBrandMail('buyer@example.test','JKJ subject','Message','jkj-plus'),code('mail_not_configured'));
+  Object.assign(f.settings,{JKJ_MAIL_FROM:'john@karuu.net',JKJ_SMTP_USER:'john@karuu.net',JKJ_SMTP_PASSWORD:'fixture-only-jkj-password'});
+  assert.equal(await f.mail.brandMailConfigured('jkj-plus'),false);
+  Object.assign(f.settings,{JKJ_MAIL_FROM:'jason@jkjplus.com',JKJ_SMTP_USER:'jason@jkjplus.com'});
+  assert.equal((await f.mail.sendBrandMail('buyer@example.test','JKJ subject','Message','jkj-plus')).provider,'smtp');
+  assert.equal(f.smtpCalls.length,1);assert.equal(f.smtpCalls[0].account.brand,'jkj-plus');
+  for(const change of [{KARUU_MAIL_FROM:'noreply@karuu.net'},{KARUU_SMTP_PASSWORD:''},{KARUU_SMTP_PASSWORD:'invalid\npassword'},{KARUU_SMTP_USER:'john@example.test'}]){
+    const bad=fixture({...original,...change});assert.equal(await bad.mail.brandMailConfigured('karuu'),false);
+    await assert.rejects(bad.mail.sendBrandMail('buyer@example.test','Subject','Message'),code('mail_not_configured'));
+    assert.equal(bad.smtpCalls.length,0);
   }
 });

@@ -22,12 +22,24 @@
       "id": "dc1f294919fa401db0a5ff90d969eb04"
     }
   ],
+  "r2_buckets": [
+    {
+      "binding": "KARUU_PRIVATE_MEDIA",
+      "bucket_name": "karuu-c-review-private-20261014",
+      "jurisdiction": "eu"
+    }
+  ],
   "vars": {
     "KARUU_RUNTIME": "cloudflare",
     "KARUU_DATABASE_SCHEMA": "karuu_commerce",
     "KARUU_DEPLOYMENT_ENV": "preview",
     "KARUU_PAYMENTS_ENABLED": "false",
     "KARUU_PAYMENT_MODE": "live",
+    "KARUU_SITE_ORIGIN": "https://karuu-c-review-20261013.john92swe.workers.dev",
+    "KARUU_PRIVATE_MEDIA_PROVIDER": "r2",
+    "KARUU_MAIL_PROVIDER": "smtp",
+    "KARUU_MAIL_FROM": "john@karuu.net",
+    "KARUU_SMTP_USER": "john@karuu.net",
     "KARUU_LIVE_COMMERCE_APPROVED": "false",
     "KARUU_TAX_CONFIG_APPROVED": "false",
     "KARUU_DISTRIBUTION_APPROVED": "false",

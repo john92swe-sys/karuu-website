@@ -100,7 +100,12 @@ export async function processPaymentEvent(event:Stripe.Event){
   if(order.status==='paid')return {received:true,alreadyFulfilled:true};
   const assetIds=order.snapshot.flatMap(item=>item.components.map(component=>component.assetId)),other=await client.query("SELECT asset_id FROM commerce_entitlements WHERE user_id=$1 AND asset_id=ANY($2::text[]) AND order_id<>$3 AND status='active' LIMIT 1",[order.user_id,assetIds,order.id]);
   if(other.rows.length){await client.query("UPDATE commerce_orders SET status='review',updated_at=now() WHERE id=$1",[order.id]);await audit(client,null,'duplicate_paid_content_review',order.id,'Another receipt already grants this exact content',{eventId:event.id});return {received:true,reviewRequired:true};}
-  for(const assetId of assetIds)await client.query("INSERT INTO commerce_entitlements(user_id,asset_id,order_id,status) VALUES($1,$2,$3,'active') ON CONFLICT DO NOTHING",[order.user_id,assetId,order.id]);await client.query("UPDATE commerce_orders SET status='paid',updated_at=now() WHERE id=$1",[order.id]);await audit(client,null,'payment_fulfilled',order.id,'Signed event and current captured merchant receipt confirm unrefunded payment',{eventId:event.id,assetIds});return {received:true};
+  for(const assetId of assetIds)await client.query("INSERT INTO commerce_entitlements(user_id,asset_id,order_id,status) VALUES($1,$2,$3,'active') ON CONFLICT DO NOTHING",[order.user_id,assetId,order.id]);await client.query("UPDATE commerce_orders SET status='paid',updated_at=now() WHERE id=$1",[order.id]);await audit(client,null,'payment_fulfilled',order.id,'Signed event and current captured merchant receipt confirm unrefunded payment',{eventId:event.id,assetIds});
+  await client.query(`INSERT INTO commerce_outbox(id,brand,kind,reference_id,recipient)
+    SELECT $1,'karuu','order_delivery',o.id,u.email FROM commerce_orders o
+    JOIN commerce_users u ON u.id=o.user_id WHERE o.id=$2 AND o.status='paid' AND o.refunded_minor=0
+    ON CONFLICT(kind,reference_id) DO NOTHING`,[uuid(),order.id]);
+  return {received:true};
  });
 }
 

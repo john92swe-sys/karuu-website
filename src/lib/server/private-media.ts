@@ -1,7 +1,7 @@
 import { cloudflareEnvironment } from './cloudflare';
 import { fail } from './core';
 
-type StoredObject = {
+export type StoredObject = {
   size: number;
   etag: string;
   httpEtag: string;
@@ -15,9 +15,10 @@ export type PrivateBucket = {
     onlyIf?: { etagMatches: string };
     range?: { offset: number; length: number };
   }): Promise<StoredObject | null>;
-  put?(key: string, value: ArrayBuffer | ArrayBufferView, options?: {
+  put?(key: string, value: ReadableStream<Uint8Array> | ArrayBuffer | ArrayBufferView, options?: {
     sha256: string;
     httpMetadata: { contentType: string };
+    onlyIf?: Headers;
   }): Promise<StoredObject | null>;
 };
 
@@ -33,6 +34,19 @@ export async function privateMediaConfigured() {
   if (process.env.KARUU_PRIVATE_MEDIA_PROVIDER === 'r2') return Boolean(await privateBucket());
   if (process.env.KARUU_PRIVATE_MEDIA_PROVIDER && process.env.KARUU_PRIVATE_MEDIA_PROVIDER !== 'relay') return false;
   return Boolean(process.env.KARUU_PRIVATE_MEDIA_ORIGIN?.startsWith('https://') && process.env.KARUU_PRIVATE_MEDIA_TOKEN);
+}
+
+export function confirmsPrivateObject(metadata: StoredObject | null, sha256: string, size?: number): metadata is StoredObject {
+  const digest = metadata?.checksums?.sha256;
+  return Boolean(metadata && Number.isSafeInteger(metadata.size) && metadata.size > 0 && metadata.etag &&
+    digest && Buffer.from(digest).toString('hex') === sha256 && (size === undefined || metadata.size === size));
+}
+
+export async function confirmPrivateR2Object(store: PrivateBucket, key: string, sha256: string, size?: number) {
+  const metadata = await store.head(key);
+  if (!confirmsPrivateObject(metadata, sha256, size))
+    fail(503, 'file_integrity_unconfirmed', 'The actual private object, complete SHA-256 and size must be verified before enabling delivery.');
+  return metadata;
 }
 
 export function byteRange(header: string | null, size: number) {
@@ -60,10 +74,7 @@ export async function readPrivateR2(
   expectedSha256: string,
   rangeHeader: string | null,
 ) {
-  const metadata = await store.head(key);
-  const digest = metadata?.checksums?.sha256;
-  if (!metadata || !digest || Buffer.from(digest).toString('hex') !== expectedSha256)
-    fail(503, 'file_integrity_unconfirmed', 'The verified edition is temporarily unavailable. Your purchase remains recorded.');
+  const metadata = await confirmPrivateR2Object(store, key, expectedSha256);
   const range = byteRange(rangeHeader, metadata.size);
   const object = await store.get(key, {
     onlyIf: { etagMatches: metadata.etag },

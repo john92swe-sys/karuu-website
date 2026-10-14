@@ -12,12 +12,14 @@ import {prepareCommerceRuntimeRole} from './lib/commerce-runtime-role.mjs';
 
 const root=path.resolve(process.env.KARUU_TEST_DIR??'work/payment-reconciliation-tests');fs.mkdirSync(root,{recursive:true});const directory=fs.mkdtempSync(path.join(root,'payment-')),db=new PGlite(directory);await db.waitReady;
 const base=fs.readFileSync(new URL('../db/001-commerce.sql',import.meta.url),'utf8');await db.exec('CREATE ROLE anon; CREATE ROLE authenticated');await db.exec(prepareCommerceSchemaMigration(base).sql);await db.exec(prepareCommerceRuntimeRole(base).sql);
+let failOutbox=false;
+async function runtimeQuery(sql,values=[]){if(failOutbox&&sql.startsWith('INSERT INTO commerce_outbox')){failOutbox=false;throw Error('Isolated delivery outbox failure');}return db.query(sql,values);}
 let queue=Promise.resolve();async function acquire(){const previous=queue;let release;queue=new Promise(resolve=>{release=resolve;});await previous;return release;}
 async function enter(){await db.exec('SET SESSION AUTHORIZATION karuu_web; SET search_path TO karuu_commerce,pg_catalog,pg_temp');}
 async function leave(){await db.exec('SET SESSION AUTHORIZATION postgres; RESET ROLE; SET search_path TO pg_catalog,pg_temp');}
 class Pool{
  async query(sql,values=[]){const release=await acquire();try{await enter();return await db.query(sql,values);}finally{await leave();release();}}
- async connect(){const release=await acquire();await enter();return {query:(sql,values=[])=>db.query(sql,values),release:()=>{void leave().then(release);}};}
+ async connect(){const release=await acquire();await enter();return {query:runtimeQuery,release:()=>{void leave().then(release);}};}
 }
 const sessions=new Map(),intents=new Map(),charges=new Map(),refunds=new Map(),requestCache=new Map();let calls=0,createError=false,createStatus='pending',currentUser,listHook,createHook;
 const real=new Stripe('sk_test_signature_fixture_only');
@@ -51,6 +53,20 @@ async function active(f){await queue;return (await db.query("SELECT asset_id FRO
 try{
 await test('sales suspension preserves signed captured-payment reconciliation, exact entitlement and duplicate-event idempotency under karuu_web',async()=>{
  const f=await fixture();assert.equal(commerce.paymentsConfigured(),false);assert.throws(()=>commerce.stripeClient(),{code:'payments_not_configured'});const id='evt_'+randomUUID();await signed('checkout.session.completed',f.session,id);assert.equal((await order(f)).status,'paid');assert.equal(await active(f),1);assert.equal((await signed('checkout.session.completed',f.session,id)).duplicate,true);await signed('checkout.session.async_payment_succeeded',f.session);assert.equal(await active(f),1);
+});
+await test('successful payment queues one delivery notice from the verified account even across distinct event replays',async()=>{
+ const f=await fixture(),eventId='evt_'+randomUUID();await signed('checkout.session.completed',f.session,eventId);await signed('checkout.session.completed',f.session,eventId);await signed('checkout.session.async_payment_succeeded',f.session);
+ await queue;const rows=(await db.query("SELECT kind,brand,recipient FROM karuu_commerce.commerce_outbox WHERE reference_id=$1",[f.id])).rows;
+ assert.equal(rows.length,1);assert.equal(rows[0].kind,'order_delivery');assert.equal(rows[0].brand,'karuu');
+ assert.equal(rows[0].recipient,(await db.query('SELECT email FROM karuu_commerce.commerce_users WHERE id=(SELECT user_id FROM karuu_commerce.commerce_orders WHERE id=$1)',[f.id])).rows[0].email);
+});
+await test('outbox failure rolls back the payment receipt, paid state and rights before a safe event retry',async()=>{
+ const f=await fixture(),eventId='evt_'+randomUUID();failOutbox=true;
+ await assert.rejects(signed('checkout.session.completed',f.session,eventId),/Isolated delivery outbox failure/);
+ assert.equal((await order(f)).status,'pending');assert.equal(await active(f),0);
+ assert.equal((await db.query('SELECT id FROM karuu_commerce.commerce_payment_events WHERE id=$1',[eventId])).rows.length,0);
+ await signed('checkout.session.completed',f.session,eventId);assert.equal((await order(f)).status,'paid');assert.equal(await active(f),1);
+ assert.equal((await db.query('SELECT id FROM karuu_commerce.commerce_outbox WHERE reference_id=$1',[f.id])).rows.length,1);
 });
 await test('refund-first and delayed paid events never grant refunded content, even when the original session binding was lost',async()=>{
  const f=await fixture({bound:false});f.addRefund('succeeded');await signed('charge.refunded',f.charge);assert.equal((await order(f)).status,'refunded');assert.equal((await order(f)).stripe_session_id,f.session.id);await signed('checkout.session.completed',f.session);assert.equal(await active(f),0);

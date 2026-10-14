@@ -50,7 +50,7 @@ try {
     await assert.rejects(upload({...user,role:'customer'},'edition',request(),store),{code:'brand_denied'});
     await assert.rejects(upload({...user,brands:['jkj-plus']},'edition',request(),store),{code:'brand_denied'});
     await assert.rejects(upload(user,'edition',request(bytes,{'X-KARUU-Reason':'short'}),store),{code:'reason_required'});
-    await assert.rejects(upload(user,'edition',request(bytes,{'Content-Length':String(32*1024*1024+1)}),store),{code:'file_too_large'});
+    await assert.rejects(upload(user,'edition',request(bytes,{'Content-Length':String(90*1024*1024+1)}),store),{code:'file_too_large'});
     await assert.rejects(upload(user,'edition',request(Buffer.alloc(0)),store),{code:'empty_file'});
     assert.equal((await store.list()).objects.length,0);
   });
@@ -73,10 +73,11 @@ try {
     await asset('recover','private/recover.epub');updateFails=true;
     await assert.rejects(upload(user,'recover',request(),store),/Isolated commit boundary failure/);
     assert.equal((await database.query("SELECT delivery_verified FROM commerce_assets WHERE id='recover'")).rows[0].delivery_verified,false);
-    assert.equal((await database.query("SELECT count(*)::int AS count FROM commerce_audit WHERE target='recover'")).rows[0].count,0);
+    assert.deepEqual((await database.query("SELECT action FROM commerce_audit WHERE target='recover'")).rows,[{action:'private_file_upload_started'}]);
     assert.ok(await store.head('private/recover.epub'));
     updateFails=false;
-    assert.equal((await upload(user,'recover',request(),store)).deliveryVerified,true);
+    const result=await upload(user,'recover',request(),store);
+    assert.equal(result.deliveryVerified,true);assert.equal(result.recovered,true);
   });
 } finally {
   await mf.dispose();await database.close();

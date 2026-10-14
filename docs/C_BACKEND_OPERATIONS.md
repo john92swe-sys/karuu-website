@@ -29,7 +29,7 @@
 1. 本次私有 schema 与受限 NOLOGIN角色已实际应用，详见 [迁移说明](C_BACKEND_SCHEMA_MIGRATION.md) 和 [角色说明](C_BACKEND_RUNTIME_ROLE.md)。使用 `KARUU_DATABASE_SCHEMA=karuu_commerce`，不得重新对现有 public 执行原始建表文件。接下来配置专用角色凭据、TLS和Hyperdrive缓存禁用，保留既有项目隔离。
 2. 配置验证邮件与公司域名。注册验证邮件仅发送登录/重设所需内容，不订阅营销。测试用独立发送环境及指定测试邮箱。`KARUU_MAIL_ENDPOINT` 是接受 `{to,subject,text,brand}` 的 HTTPS 邮件 relay，Bearer token 鉴权；不是已经存在的已接通服务。provider 应执行 `Idempotency-Key`。
 3. 先注册并验证初始管理账户，再用 [管理员初始化工具](C_BACKEND_ADMIN_BOOTSTRAP.md) dry-run 核对唯一账号/UUID/品牌，受控应用；工具同时记录审计并撤销原会话。没有默认账号、初始密码或公共提权接口。
-4. 在 `/admin` 先维护作品公开资料，再添加 assets 和 draft SKU。新私有文件上传界面及 `/api/admin/assets/[assetId]/file` 已实现，需真实 R2 绑定；服务器核SHA-256、版本不可替换、对象key碰撞和审计，成功只核交付、不自动核发行权。当前单文件32MiB上限；较大全本音频的受控上传路径仍待完成。公开平台有声页不能代替母文件。
+4. 在 `/admin` 先维护作品公开资料，再添加 assets 和 draft SKU。新私有文件上传界面及 `/api/admin/assets/[assetId]/file` 已实现，需真实 R2 绑定；服务器核SHA-256、版本不可替换、对象key碰撞和审计，成功只核交付、不自动核发行权。当前单文件90MiB上限；超过32MiB须预登记真实SHA并用FixedLengthStream直送R2。超过90MiB的multipart仍未实现。公开平台有声页不能代替母文件。
 5. 逐 SKU 确认本站发行权 / KDP Select、语言版次、正常价、套餐组成、活动有效期、适用市场与组件税务。对混合 VAT 包逐 asset 配置 taxByMarket 和 10000 basis points 价格分摊。商户 tax rate 必须 inclusive、active、国家与实际税率匹配；付款时核实际账单国家，不自动对全球套税。
 6. 填完整 costs；可以直接给 per-order 分摊，也可给 contentTotal/contentOrders、operatingTotal/operatingOrders 自动向上分摊。数量 0 被拒绝，缺任何源数据保留未知。`reward` 是奖励内容/服务成本，**不含**另记的 `networkFee`，不得把同一网络费算两次。vatRate 的运行报价取组件实际税率计算有效值；后台单税率测算只是该输入口径。
 7. 配置商户与付款方式及必需 webhook `/api/payments/stripe`，订阅 Checkout completed/async_payment_succeeded/async_payment_failed/expired、charge.refunded、refund.created/updated/failed。暂停新收费保留既有款项核对/退款能力；完整规则见 [付款说明](C_BACKEND_PAYMENT_READINESS.md)。实际 provider 联调仍需独立 sandbox；用户 live 授权已收到，商户与商品条件确认后再启用。
@@ -51,7 +51,7 @@
 - `request_refund`: orderId。真实退款 API 与 merchant idempotency key 已编码；实际执行会转移资金，须由合法有权 operator 在已配置商户操作。本轮没有运行此操作到真实服务。
 - `close_expired_checkout`: orderId。只有 merchant query 已确认 expired + unpaid 才释放该订单；不能把仍可能到账的延迟付款人工标失败来重复收钱。
 
-询盘 notification job `/api/internal/notifications` 需要私有 Bearer job secret，逐批10项，SKIP LOCKED + lease。只有确认 provider 支持去重的品牌可以自动重试；其他提供者只自动尝试一次，失败/未知转人工复核，provider accepted不等于最终送达。[scheduled 包装](C_NOTIFICATION_SCHEDULED.md) 已编码并保留OpenNext导出，当前无真实cron、调度开关false，不发送真实邮件。
+询盘 notification job `/api/internal/notifications` 需要私有 Bearer job secret，逐批10项，SKIP LOCKED + lease。只有确认 provider 支持去重的品牌可以自动重试；原生与SMTP无提供者幂等，其他提供者只自动尝试一次，失败/未知转人工复核，provider accepted不等于最终送达。[scheduled 包装](C_NOTIFICATION_SCHEDULED.md) 已编码并保留OpenNext导出，当前无真实cron、调度开关false，不发送真实邮件。
 
 ## 尚未编码与外部依赖
 
@@ -59,7 +59,7 @@
 - 真实付费余额充值、预付义务会计、游戏 merchant/发行平台接入、gift 有效期业务配置、服务间签名与退款/兑换合同、经营者 campaign 编辑 UI。内部原语的 funding / rules / campaign 只供未来验证适配器使用；普通作品订单不会隐式生成余额，internal point quantity cap 不等于 KRU/SOL/现金/内容履约经济预算。
 - KRU campaign 管理、并发数量/SOL/现金/履约预算预留、受控 signer、链上支付报价/收款/奖励确认/重试及退款政策。当前只做禁用资格门和独立状态记录结构，不存在可用发币或收款执行器。
 - 历史数字站账户、订单和权益的可验证导出及真实身份迁移；没有进行同名账户合并，也没有从外平台推断本站权益。
-- 大于32MiB的运营者私有文件上传、多角色 staff 权限维护界面、完整财务历史导出/分页及退款部分金额 UI；现有小文件上传已实现，目前适用人工授权的最小规模运营。
+- 大于90MiB的multipart私有文件上传、多角色 staff 权限维护界面、完整财务历史导出/分页及退款部分金额 UI；现有小文件上传已实现，目前适用人工授权的最小规模运营。
 - 公司法律/税务批准、真实商户 sandbox/live 参数、私有对象服务、验证邮件 relay、真实母文件及分销权，均由相应经营者/服务所有者提供和核验。
 
 ## 备份与回退
@@ -76,5 +76,5 @@
 - Workers 每次 query / transaction 在当前请求内新建 `pg.Client`，完成后关闭；完整事务维持同一个 Client、现有 user → order 锁顺序，底层池交给 Hyperdrive。普通 Node 本地 / 测试保留现 Pool，不能把它跨请求带进 Workers。[官方 pg 指南](https://developers.cloudflare.com/hyperdrive/examples/connect-to-postgres/postgres-drivers-and-libraries/node-postgres/)，[OpenNext 数据库指导](https://opennext.js.org/cloudflare/howtos/db)。
 - Stripe 使用 `Stripe.createFetchHttpClient()`，webhook raw body 仍原样进入 `constructEventAsync`，显式 SubtleCrypto provider，签名时间容忍/模式/订单/金额/地区/幂等/live 四门不变。[OpenNext Stripe 指导](https://opennext.js.org/cloudflare/howtos/stripeAPI)。async cookies 支持当前 Next.js；未从客户端返回页记账。
 - hash / HMAC / scrypt / random / timingSafeEqual 仍用 Node crypto。[Cloudflare crypto 支持](https://developers.cloudflare.com/workers/runtime-apis/nodejs/crypto/) 覆盖这些 API，但真实 CPU / memory（尤其并发密码计算）须在 workerd 与该账户实际 plan 下测量；不能为追求免费 plan 降低密码安全参数。本轮没有变更账户 plan 或创建付费资源。
-- 私有内容支持原HTTPS relay及新原生 `KARUU_PRIVATE_MEDIA` R2绑定，后者核真实存储checksum与条件etag，拒绝错误/缺失digest并支持单Range。原生上传/读取已有本地真实Miniflare R2验证，但远程R2订阅/绑定仍待配置；未把母文件放入ASSETS。邮件支持各品牌独立relay或原生EmailService绑定，见 [邮件说明](C_MAIL_PROVIDER.md)。
+- 私有内容支持原HTTPS relay及新原生 `KARUU_PRIVATE_MEDIA` R2绑定，后者核真实存储checksum与条件etag，拒绝错误/缺失digest并支持单Range。原生上传/读取已有本地真实Miniflare R2验证，但R2订阅、EU私有桶和2本正式EPUB已实际核验，当前review绑定状态见最新回执；未把母文件放入ASSETS。邮件支持各品牌独立relay或原生EmailService绑定，见 [邮件说明](C_MAIL_PROVIDER.md)。
 - 自动测试新增 Worker 生命周期的隔离适配测试：每操作 Client 关闭、同事务单 Client、异常回滚关闭、未核 cache/runtime 不回 Node。此测试仍是绑定/Client fixture，不是现账户 Hyperdrive 联调，也不能替代实际 workerd + provider 验收。无 routes 的 review 配置、构建、本地预览由主任务处理；本 backend 子任务没有部署、域名变更或读取浏览器凭据。
