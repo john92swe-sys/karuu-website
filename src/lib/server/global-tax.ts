@@ -23,10 +23,20 @@ export const digitalTaxCodeCandidates = [
 ] as const;
 const supportedCode = (code: string) => digitalTaxCodeCandidates.some(candidate => candidate.code === code);
 type Review = { reviewedAt: string | null; evidenceReference: string | null };
+type SwedishPlaceOfSupplyScheme = 'inbound_goods' | 'small_seller' | 'standard';
+type SwedishSmallSellerCoverage = {
+  establishedOnlyInSweden: boolean | null;
+  destinationCountryTaxElectionMade: boolean | null;
+  aggregationScope: 'eu_cross_border_b2c_tbe_and_sweden_dispatched_distance_goods_all_channels_karuu_as_supplier' | null;
+  currency: 'EUR' | 'SEK' | null;
+  currentCalendarYear: number | null; currentYearExVatSalesMinor: number | null;
+  previousCalendarYear: number | null; previousYearExVatSalesMinor: number | null;
+  review: Review;
+};
 export type AutomaticTaxPreparation = {
   version: 'karuu-automatic-tax-preparation-v1';
   components: { assetId: string; taxCode: string; review: Review }[];
-  jurisdictions: { country: string; state: string | null; registrationId: string; registrationCountry: string; registrationType: string; review: Review }[];
+  jurisdictions: { country: string; state: string | null; registrationId: string; registrationCountry: string; registrationType: string; placeOfSupplyScheme: SwedishPlaceOfSupplyScheme | null; smallSellerCoverage: SwedishSmallSellerCoverage | null; review: Review }[];
   pricing: { mode: 'checkout_automatic'; percentFee: number | null; fixedFeeMinor: number | null; inclusiveTaxRateCeiling: number | null; review: Review };
   sandboxReview: Review;
 };
@@ -51,7 +61,37 @@ function review(value: unknown): Review {
   if (reviewedAt && (!Number.isFinite(Date.parse(reviewedAt)) || Date.parse(reviewedAt) > Date.now())) fail(400, 'invalid_tax_review', 'A tax review must have a valid completed date.');
   return { reviewedAt, evidenceReference };
 }
-const reviewed = (value: Review) => Boolean(value.reviewedAt && value.evidenceReference);
+const reviewed = (value: Review | null | undefined) => Boolean(value?.reviewedAt && value.evidenceReference);
+// Membership is only a branch selector, not VAT-territory or sale approval.
+// The actual address's EU VAT territory still needs a pre-capture integration.
+const euMemberCountries = new Set('AT BE BG HR CY CZ DK EE FI FR DE GR HU IE IT LV LT LU MT NL PL PT RO SK SI ES SE'.split(' '));
+const smallSellerAggregationScope = 'eu_cross_border_b2c_tbe_and_sweden_dispatched_distance_goods_all_channels_karuu_as_supplier';
+const swedishCalendarYear = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm', year: 'numeric', calendar: 'gregory', numberingSystem: 'latn' });
+function nullableBoolean(value: unknown): boolean | null {
+  if (value == null) return null;
+  if (typeof value !== 'boolean') fail(400, 'invalid_small_seller_evidence', 'Use an explicit reviewed fact or leave it unknown.');
+  return value;
+}
+function calendarYear(value: unknown): number | null {
+  if (value == null) return null;
+  if (!Number.isSafeInteger(value) || (value as number) < 2000 || (value as number) > 9999) fail(400, 'invalid_small_seller_evidence', 'Record the actual calendar year for each threshold total.');
+  return value as number;
+}
+function normalizeSmallSellerCoverage(value: unknown): SwedishSmallSellerCoverage | null {
+  if (value == null) return null;
+  const input = object(value), currency = boundedText(input.currency, 3).toUpperCase() || null, aggregationScope = boundedText(input.aggregationScope, 140) || null;
+  if (currency != null && currency !== 'EUR' && currency !== 'SEK' || aggregationScope != null && aggregationScope !== smallSellerAggregationScope) fail(400, 'invalid_small_seller_evidence', 'Use the reviewed VAT-exclusive combined cross-channel scope and its EUR or fixed SEK threshold currency.');
+  return { establishedOnlyInSweden: nullableBoolean(input.establishedOnlyInSweden), destinationCountryTaxElectionMade: nullableBoolean(input.destinationCountryTaxElectionMade), aggregationScope: aggregationScope as SwedishSmallSellerCoverage['aggregationScope'], currency: currency as SwedishSmallSellerCoverage['currency'], currentCalendarYear: calendarYear(input.currentCalendarYear), currentYearExVatSalesMinor: amount(input.currentYearExVatSalesMinor, true), previousCalendarYear: calendarYear(input.previousCalendarYear), previousYearExVatSalesMinor: amount(input.previousYearExVatSalesMinor, true), review: review(input.review) };
+}
+function smallSellerCoverageConfirmed(value: SwedishSmallSellerCoverage | null | undefined, nowSeconds = Math.floor(Date.now() / 1000)): boolean {
+  if (!value || value.establishedOnlyInSweden !== true || value.destinationCountryTaxElectionMade !== false || value.aggregationScope !== smallSellerAggregationScope || !reviewed(value.review)) return false;
+  const reviewedAt = Date.parse(value.review.reviewedAt!);
+  if (!Number.isFinite(nowSeconds) || !Number.isFinite(reviewedAt)) return false;
+  const year = Number(swedishCalendarYear.format(new Date(nowSeconds * 1000))), threshold = value.currency === 'EUR' ? 1_000_000 : value.currency === 'SEK' ? 9_968_000 : null;
+  // Both years include relevant supplies in other channels where KARUU is the
+  // supplier. Zero local orders or Stripe revenue is not this combined total.
+  return threshold != null && value.currentCalendarYear === year && value.previousCalendarYear === year - 1 && Number.isSafeInteger(value.currentYearExVatSalesMinor) && Number.isSafeInteger(value.previousYearExVatSalesMinor) && value.currentYearExVatSalesMinor! >= 0 && value.previousYearExVatSalesMinor! >= 0 && value.currentYearExVatSalesMinor! <= threshold && value.previousYearExVatSalesMinor! <= threshold && Number(swedishCalendarYear.format(new Date(reviewedAt))) === year && reviewedAt <= nowSeconds * 1000;
+}
 function ratio(value: unknown): number | null {
   if (value == null) return null;
   if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || value >= 1) fail(400, 'invalid_tax_budget', 'Tax and fee ratios must be verified decimal values below one.');
@@ -76,7 +116,9 @@ export function normalizeAutomaticTaxPreparation(value: unknown, assetIds: strin
   const jurisdictions = jurisdictionValues.map(value => {
     const jurisdiction = object(value), registrationId = boundedText(jurisdiction.registrationId, 100), registrationType = boundedText(jurisdiction.registrationType, 80);
     if (!/^taxreg_[a-zA-Z0-9]+$/.test(registrationId) || !registrationType) fail(400, 'registration_evidence_required', 'Record an existing registration identity, scheme and its reviewed coverage.');
-    return { country: country(jurisdiction.country), state: boundedText(jurisdiction.state, 80).toUpperCase() || null, registrationId, registrationCountry: country(jurisdiction.registrationCountry), registrationType, review: review(jurisdiction.review) };
+    const placeOfSupplyScheme = boundedText(jurisdiction.placeOfSupplyScheme, 30) || null;
+    if (placeOfSupplyScheme != null && !['inbound_goods','small_seller','standard'].includes(placeOfSupplyScheme)) fail(400, 'invalid_place_of_supply_scheme', 'Record an exact Swedish place-of-supply scheme; missing evidence does not select small seller.');
+    return { country: country(jurisdiction.country), state: boundedText(jurisdiction.state, 80).toUpperCase() || null, registrationId, registrationCountry: country(jurisdiction.registrationCountry), registrationType, placeOfSupplyScheme: placeOfSupplyScheme as SwedishPlaceOfSupplyScheme | null, smallSellerCoverage: normalizeSmallSellerCoverage(jurisdiction.smallSellerCoverage), review: review(jurisdiction.review) };
   });
   if (new Set(jurisdictions.map(value => `${value.country}:${value.state ?? ''}`)).size !== jurisdictions.length) fail(400, 'invalid_tax_preparation', 'Each exact jurisdiction may have only one coverage review.');
   const pricing = object(input.pricing ?? {});
@@ -87,6 +129,8 @@ export function automaticTaxPreparationGaps(preparation: AutomaticTaxPreparation
   const gaps: string[] = [];
   if (!assetIds.length || assetIds.some(id => !preparation.components.some(component => component.assetId === id && reviewed(component.review)))) gaps.push('component_tax_classification');
   if (!preparation.jurisdictions.length || preparation.jurisdictions.some(jurisdiction => !reviewed(jurisdiction.review))) gaps.push('actual_registration_and_jurisdiction_coverage');
+  if (preparation.jurisdictions.some(value => value.registrationCountry === 'SE' && value.registrationType === 'standard' && !value.placeOfSupplyScheme)) gaps.push('swedish_place_of_supply_scheme');
+  if (preparation.jurisdictions.some(value => value.registrationCountry === 'SE' && value.registrationType === 'standard' && value.country !== 'SE' && (!euMemberCountries.has(value.country) || value.placeOfSupplyScheme !== 'small_seller' || !smallSellerCoverageConfirmed(value.smallSellerCoverage)))) gaps.push('swedish_cross_border_small_seller_evidence');
   if (preparation.pricing.percentFee == null || preparation.pricing.fixedFeeMinor == null || preparation.pricing.inclusiveTaxRateCeiling == null || !reviewed(preparation.pricing.review)) gaps.push('tax_service_cost_and_before_payment_budget');
   if (!reviewed(preparation.sandboxReview)) gaps.push('separate_sandbox_verification');
   return gaps;
@@ -98,13 +142,20 @@ export function verifyAutomaticTaxAccountEvidence(preparation: AutomaticTaxPrepa
   const jurisdiction = preparation.jurisdictions.find(value => value.country === address.country && value.state === address.state) ?? preparation.jurisdictions.find(value => value.country === address.country && value.state === null && !['US', 'CA', 'IN'].includes(value.country));
   if (!jurisdiction || !reviewed(jurisdiction.review)) fail(503, 'tax_jurisdiction_unreviewed', 'This exact billing jurisdiction has no reviewed registration coverage.');
   const registration = evidence.registrations.data.find(value => value.id === jurisdiction.registrationId);
-  const options = registration?.country_options as Record<string, { type?: string; state?: string; province_standard?: { province?: string } }> | undefined;
+  const options = registration?.country_options as Record<string, { type?: string; state?: string; standard?: { place_of_supply_scheme?: string }; province_standard?: { province?: string } }> | undefined;
   const setting = options?.[jurisdiction.registrationCountry.toLowerCase()];
   if (!registration || registration.country !== jurisdiction.registrationCountry || registration.livemode !== live || registration.status !== 'active' || registration.active_from > nowSeconds || registration.expires_at != null && registration.expires_at <= nowSeconds || setting?.type !== jurisdiction.registrationType || registration.country === 'US' && setting.state !== address.state || registration.country === 'CA' && setting?.type === 'province_standard' && setting.province_standard?.province !== address.state) fail(503, 'tax_registration_unconfirmed', 'The current merchant registration does not match the reviewed identity, scheme, dates and coverage.');
+  if (registration.country === 'SE' && setting.type === 'standard') {
+    if (!jurisdiction.placeOfSupplyScheme || !['inbound_goods','small_seller','standard'].includes(jurisdiction.placeOfSupplyScheme) || setting.standard?.place_of_supply_scheme !== jurisdiction.placeOfSupplyScheme) fail(503, 'swedish_place_of_supply_scheme_unconfirmed', 'The exact reviewed Swedish place-of-supply scheme must match the actual merchant registration. No scheme is assumed.');
+    if (address.country !== 'SE') {
+      if (!euMemberCountries.has(address.country) || jurisdiction.placeOfSupplyScheme !== 'small_seller') fail(503, 'swedish_registration_scope_unconfirmed', 'A Swedish standard registration alone does not confirm this foreign destination.');
+      if (evidence.settings.head_office.address.country !== 'SE' || !smallSellerCoverageConfirmed(jurisdiction.smallSellerCoverage, nowSeconds)) fail(503, 'small_seller_coverage_unconfirmed', 'Cross-border small-seller treatment needs actual Swedish-only establishment, both calendar-year VAT-exclusive combined threshold totals and confirmation that destination taxation was not elected.');
+    }
+  }
   // A cross-country OSS review remains an accounting assertion, not an automatic
   // deduction from a VAT number or origin-country registration. The final Stripe
   // tax reason must independently confirm actual supported tax treatment.
-  return { registrationId: registration.id, registrationCountry: registration.country, registrationType: jurisdiction.registrationType, coverageReview: jurisdiction.review, settingsCountry: evidence.settings.head_office.address.country };
+  return { registrationId: registration.id, registrationCountry: registration.country, registrationType: jurisdiction.registrationType, placeOfSupplyScheme: jurisdiction.placeOfSupplyScheme ?? null, smallSellerCoverage: jurisdiction.smallSellerCoverage ?? null, coverageReview: jurisdiction.review, settingsCountry: evidence.settings.head_office.address.country };
 }
 export type AutomaticTaxQuote = {
   orderId: string; userId: string; email: string; currency: string; totalMinor: number;

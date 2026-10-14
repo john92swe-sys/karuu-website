@@ -72,7 +72,7 @@ const copy = value => JSON.parse(JSON.stringify(value));
 const review = { reviewedAt: '2020-01-01T00:00:00Z', evidenceReference: 'isolated-fixture-evidence-not-a-business-fact' };
 const costs = Object.fromEntries(core.costFields.map(key => [key, key === 'vatRate' ? null : 0]));
 function preparation(assetIds = ['ebook-one']) {
-  return tax.normalizeAutomaticTaxPreparation({ version: 'karuu-automatic-tax-preparation-v1', components: assetIds.map(assetId => ({ assetId, taxCode: 'txcd_10302000', review })), jurisdictions: [{ country: 'SE', state: null, registrationId: 'taxreg_fixture', registrationCountry: 'SE', registrationType: 'standard', review }], pricing: { mode: 'checkout_automatic', percentFee: 0.005, fixedFeeMinor: 0, inclusiveTaxRateCeiling: 0.3, review }, sandboxReview: review }, assetIds);
+  return tax.normalizeAutomaticTaxPreparation({ version: 'karuu-automatic-tax-preparation-v1', components: assetIds.map(assetId => ({ assetId, taxCode: 'txcd_10302000', review })), jurisdictions: [{ country: 'SE', state: null, registrationId: 'taxreg_fixture', registrationCountry: 'SE', registrationType: 'standard', placeOfSupplyScheme: 'standard', review }], pricing: { mode: 'checkout_automatic', percentFee: 0.005, fixedFeeMinor: 0, inclusiveTaxRateCeiling: 0.3, review }, sandboxReview: review }, assetIds);
 }
 const address = tax.normalizeBillingTaxAddress({ country: 'SE', line1: 'Fixture Street 1', city: 'Fixture City', postalCode: '12345' });
 function quoteFor(prep = preparation(), amounts = [199]) {
@@ -119,7 +119,7 @@ try {
     assert.throws(() => tax.automaticTaxBudget(199, costs, partial), code('tax_costs_unconfirmed'));
   });
   await test('actual account evidence needs active, same-mode registrations and exact provincial scope', () => {
-    const prep = preparation(), evidence = { settings: { status: 'active', livemode: false, head_office: { address: { country: 'SE' } } }, registrations: { has_more: false, data: [{ id: 'taxreg_fixture', country: 'SE', livemode: false, status: 'active', active_from: 1, expires_at: null, country_options: { se: { type: 'standard' } } }] } };
+    const prep = preparation(), evidence = { settings: { status: 'active', livemode: false, head_office: { address: { country: 'SE' } } }, registrations: { has_more: false, data: [{ id: 'taxreg_fixture', country: 'SE', livemode: false, status: 'active', active_from: 1, expires_at: null, country_options: { se: { type: 'standard', standard: { place_of_supply_scheme: 'standard' } } } }] } };
     assert.equal(tax.verifyAutomaticTaxAccountEvidence(prep, address, evidence, false).registrationId, 'taxreg_fixture');
     for (const altered of [{ ...evidence, settings: { ...evidence.settings, status: 'pending' } }, { ...evidence, registrations: { ...evidence.registrations, has_more: true } }, { ...evidence, registrations: { data: [], has_more: false } }]) assert.throws(() => tax.verifyAutomaticTaxAccountEvidence(prep, address, altered, false));
     assert.throws(() => tax.verifyAutomaticTaxAccountEvidence(prep, address, evidence, true), code('tax_account_evidence_incomplete'));
@@ -129,6 +129,74 @@ try {
     assert.throws(() => tax.verifyAutomaticTaxAccountEvidence(ca, caAddress, caEvidence, false), code('tax_registration_unconfirmed'));
     caEvidence.registrations.data[0].country_options.ca.province_standard.province = 'ON';
     assert.equal(tax.verifyAutomaticTaxAccountEvidence(ca, caAddress, caEvidence, false).registrationCountry, 'CA');
+  });
+  await test('Swedish standard registration requires the exact explicit API place-of-supply scheme; none is defaulted', () => {
+    const prep = preparation(), evidence = { settings: { status: 'active', livemode: false, head_office: { address: { country: 'SE' } } }, registrations: { has_more: false, data: [{ id: 'taxreg_fixture', country: 'SE', livemode: false, status: 'active', active_from: 1, expires_at: null, country_options: { se: { type: 'standard', standard: { place_of_supply_scheme: 'standard' } } } }] } };
+    const missing = copy(prep); delete missing.jurisdictions[0].placeOfSupplyScheme;
+    const normalized = tax.normalizeAutomaticTaxPreparation(missing, ['ebook-one']);
+    assert.equal(normalized.jurisdictions[0].placeOfSupplyScheme, null);
+    assert.ok(tax.automaticTaxPreparationGaps(normalized, ['ebook-one']).includes('swedish_place_of_supply_scheme'));
+    assert.throws(() => tax.verifyAutomaticTaxAccountEvidence(normalized, address, evidence, false), code('swedish_place_of_supply_scheme_unconfirmed'));
+    const actualMissing = copy(evidence); delete actualMissing.registrations.data[0].country_options.se.standard;
+    assert.throws(() => tax.verifyAutomaticTaxAccountEvidence(prep, address, actualMissing, false), code('swedish_place_of_supply_scheme_unconfirmed'));
+    const mismatched = copy(evidence); mismatched.registrations.data[0].country_options.se.standard.place_of_supply_scheme = 'small_seller';
+    assert.throws(() => tax.verifyAutomaticTaxAccountEvidence(prep, address, mismatched, false), code('swedish_place_of_supply_scheme_unconfirmed'));
+    const unknown = copy(prep), unknownActual = copy(evidence); unknown.jurisdictions[0].placeOfSupplyScheme = 'future_unknown'; unknownActual.registrations.data[0].country_options.se.standard.place_of_supply_scheme = 'future_unknown';
+    assert.throws(() => tax.verifyAutomaticTaxAccountEvidence(unknown, address, unknownActual, false), code('swedish_place_of_supply_scheme_unconfirmed'));
+    for (const scheme of ['standard', 'small_seller', 'inbound_goods']) {
+      const prepared = copy(prep), actual = copy(evidence); prepared.jurisdictions[0].placeOfSupplyScheme = scheme; actual.registrations.data[0].country_options.se.standard.place_of_supply_scheme = scheme;
+      assert.equal(tax.verifyAutomaticTaxAccountEvidence(prepared, address, actual, false).placeOfSupplyScheme, scheme);
+      assert.throws(() => tax.assertManualCheckout('stripe_automatic'), code('automatic_tax_checkout_pending'));
+    }
+  });
+  await test('Swedish ordinary standard or inbound-goods schemes do not gain cross-EU digital coverage from a review flag', () => {
+    const prep = preparation(), foreignAddress = tax.normalizeBillingTaxAddress({ country: 'DE', line1: 'Fixture 1', city: 'Fixture', postalCode: '10115' });
+    prep.jurisdictions[0].country = 'DE';
+    const evidence = { settings: { status: 'active', livemode: false, head_office: { address: { country: 'SE' } } }, registrations: { has_more: false, data: [{ id: 'taxreg_fixture', country: 'SE', livemode: false, status: 'active', active_from: 1, expires_at: null, country_options: { se: { type: 'standard', standard: { place_of_supply_scheme: 'standard' } } } }] } };
+    for (const scheme of ['standard', 'inbound_goods']) {
+      prep.jurisdictions[0].placeOfSupplyScheme = scheme; evidence.registrations.data[0].country_options.se.standard.place_of_supply_scheme = scheme;
+      assert.throws(() => tax.verifyAutomaticTaxAccountEvidence(prep, foreignAddress, evidence, false), code('swedish_registration_scope_unconfirmed'));
+      assert.ok(tax.automaticTaxPreparationGaps(prep, ['ebook-one']).includes('swedish_cross_border_small_seller_evidence'));
+    }
+  });
+  await test('cross-EU Swedish small-seller preparation needs explicit establishment, both combined years and no destination-tax election', () => {
+    const nowSeconds = Math.floor(Date.now() / 1000), year = Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm', year: 'numeric', calendar: 'gregory', numberingSystem: 'latn' }).format(new Date(nowSeconds * 1000))), currentReview = { ...review, reviewedAt: new Date(nowSeconds * 1000).toISOString() };
+    const prep = preparation(), foreignAddress = tax.normalizeBillingTaxAddress({ country: 'DE', line1: 'Fixture 1', city: 'Fixture', postalCode: '10115' });
+    Object.assign(prep.jurisdictions[0], { country: 'DE', placeOfSupplyScheme: 'small_seller' });
+    const evidence = { settings: { status: 'active', livemode: false, head_office: { address: { country: 'SE' } } }, registrations: { has_more: false, data: [{ id: 'taxreg_fixture', country: 'SE', livemode: false, status: 'active', active_from: 1, expires_at: null, country_options: { se: { type: 'standard', standard: { place_of_supply_scheme: 'small_seller' } } } }] } };
+    assert.throws(() => tax.verifyAutomaticTaxAccountEvidence(prep, foreignAddress, evidence, false, nowSeconds), code('small_seller_coverage_unconfirmed'));
+    const coverage = { establishedOnlyInSweden: true, destinationCountryTaxElectionMade: false, aggregationScope: 'eu_cross_border_b2c_tbe_and_sweden_dispatched_distance_goods_all_channels_karuu_as_supplier', currency: 'EUR', currentCalendarYear: year, currentYearExVatSalesMinor: 1_000_000, previousCalendarYear: year - 1, previousYearExVatSalesMinor: 900_000, review: currentReview };
+    prep.jurisdictions[0].smallSellerCoverage = coverage;
+    assert.equal(tax.verifyAutomaticTaxAccountEvidence(prep, foreignAddress, evidence, false, nowSeconds).placeOfSupplyScheme, 'small_seller');
+    for (const [field, value] of [['establishedOnlyInSweden', null], ['establishedOnlyInSweden', false], ['destinationCountryTaxElectionMade', null], ['destinationCountryTaxElectionMade', true], ['aggregationScope', null], ['currency', null], ['currentYearExVatSalesMinor', null], ['previousYearExVatSalesMinor', null], ['currentYearExVatSalesMinor', 1_000_001], ['previousYearExVatSalesMinor', 1_000_001], ['currentCalendarYear', year - 1], ['previousCalendarYear', year - 2]]) {
+      const invalid = copy(prep); invalid.jurisdictions[0].smallSellerCoverage[field] = value;
+      assert.throws(() => tax.verifyAutomaticTaxAccountEvidence(invalid, foreignAddress, evidence, false, nowSeconds), code('small_seller_coverage_unconfirmed'));
+    }
+    const outdated = copy(prep); outdated.jurisdictions[0].smallSellerCoverage.review = review;
+    assert.throws(() => tax.verifyAutomaticTaxAccountEvidence(outdated, foreignAddress, evidence, false, nowSeconds), code('small_seller_coverage_unconfirmed'));
+    const nextYear = Date.UTC(year + 1, 0, 1) / 1000;
+    assert.throws(() => tax.verifyAutomaticTaxAccountEvidence(prep, foreignAddress, evidence, false, nextYear), code('small_seller_coverage_unconfirmed'));
+    const sek = copy(prep); Object.assign(sek.jurisdictions[0].smallSellerCoverage, { currency: 'SEK', currentYearExVatSalesMinor: 9_968_000, previousYearExVatSalesMinor: 9_968_000 });
+    assert.equal(tax.verifyAutomaticTaxAccountEvidence(sek, foreignAddress, evidence, false, nowSeconds).placeOfSupplyScheme, 'small_seller');
+    sek.jurisdictions[0].smallSellerCoverage.previousYearExVatSalesMinor++;
+    assert.throws(() => tax.verifyAutomaticTaxAccountEvidence(sek, foreignAddress, evidence, false, nowSeconds), code('small_seller_coverage_unconfirmed'));
+    const unknown = copy(prep); unknown.jurisdictions[0].smallSellerCoverage = {};
+    const normalized = tax.normalizeAutomaticTaxPreparation(unknown, ['ebook-one']);
+    assert.equal(normalized.jurisdictions[0].smallSellerCoverage.currentYearExVatSalesMinor, null);
+    assert.equal(normalized.jurisdictions[0].smallSellerCoverage.destinationCountryTaxElectionMade, null);
+    assert.ok(tax.automaticTaxPreparationGaps(normalized, ['ebook-one']).includes('swedish_cross_border_small_seller_evidence'));
+    assert.throws(() => tax.verifyAutomaticTaxAccountEvidence(normalized, foreignAddress, evidence, false, nowSeconds), code('small_seller_coverage_unconfirmed'));
+    assert.throws(() => tax.assertManualCheckout('stripe_automatic'), code('automatic_tax_checkout_pending'));
+  });
+  await test('Swedish small-seller calendar years roll at Stockholm midnight, not the later UTC year boundary', () => {
+    const prep = preparation(), foreignAddress = tax.normalizeBillingTaxAddress({ country: 'DE', line1: 'Fixture 1', city: 'Fixture', postalCode: '10115' });
+    const coverage = { establishedOnlyInSweden: true, destinationCountryTaxElectionMade: false, aggregationScope: 'eu_cross_border_b2c_tbe_and_sweden_dispatched_distance_goods_all_channels_karuu_as_supplier', currency: 'EUR', currentCalendarYear: 2026, currentYearExVatSalesMinor: 100, previousCalendarYear: 2025, previousYearExVatSalesMinor: 100, review: { ...review, reviewedAt: '2026-12-31T22:30:00Z' } };
+    Object.assign(prep.jurisdictions[0], { country: 'DE', placeOfSupplyScheme: 'small_seller', smallSellerCoverage: coverage });
+    const evidence = { settings: { status: 'active', livemode: false, head_office: { address: { country: 'SE' } } }, registrations: { has_more: false, data: [{ id: 'taxreg_fixture', country: 'SE', livemode: false, status: 'active', active_from: 1, expires_at: null, country_options: { se: { type: 'standard', standard: { place_of_supply_scheme: 'small_seller' } } } }] } };
+    assert.equal(tax.verifyAutomaticTaxAccountEvidence(prep, foreignAddress, evidence, false, Date.parse('2026-12-31T22:59:59Z') / 1000).placeOfSupplyScheme, 'small_seller');
+    assert.throws(() => tax.verifyAutomaticTaxAccountEvidence(prep, foreignAddress, evidence, false, Date.parse('2026-12-31T23:00:00Z') / 1000), code('small_seller_coverage_unconfirmed'));
+    Object.assign(coverage, { currentCalendarYear: 2027, previousCalendarYear: 2026, review: { ...review, reviewedAt: '2026-12-31T23:00:00Z' } });
+    assert.equal(tax.verifyAutomaticTaxAccountEvidence(prep, foreignAddress, evidence, false, Date.parse('2026-12-31T23:00:01Z') / 1000).placeOfSupplyScheme, 'small_seller');
   });
   await test('prepared Checkout retains exact inclusive allocations and never mixes manual rates or executes the provider', () => {
     const prep = preparation(), quote = quoteFor(prep), before = merchantCreateCalls;

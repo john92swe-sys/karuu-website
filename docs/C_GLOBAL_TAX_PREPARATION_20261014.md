@@ -5,6 +5,11 @@ That commercial direction does not supply the actual tax-registration schemes,
 jurisdiction coverage, processor fees or cost approvals. This change prepares
 the integration without enabling international automatic-tax checkout.
 
+The user has since confirmed only a Swedish VAT registration, no OSS or other
+registrations, a USD 1.99 price and a confirmed private management surplus target.
+These are planning facts; no cost record, registration or payment setting has
+been written from them. No small-seller scheme or sales totals have been assumed.
+
 ## Implemented and independently reviewable
 
 - Existing `manual_verified` products keep their manual inclusive rate flow.
@@ -27,6 +32,13 @@ the integration without enabling international automatic-tax checkout.
   US state and Canadian provincial registration scope must match. Cross-country
   OSS coverage needs its explicit accounting review; no scheme is inferred from
   the existing Swedish VAT number.
+- A Swedish `country_options.se.type=standard` record must additionally match an
+  explicitly reviewed `standard.place_of_supply_scheme` (`standard`,
+  `small_seller` or `inbound_goods`). Missing fields do not default to small seller.
+  An ordinary Swedish standard or inbound-goods scheme cannot establish foreign
+  EU digital coverage merely because a generic jurisdiction review was filled.
+  A matching small-seller scheme also needs its separate factual threshold and
+  establishment evidence; this does not remove the implementation lock.
 - A pure Checkout parameter builder sets `automatic_tax.enabled`, per-component
   confirmed `product_data.tax_code` and `tax_behavior: inclusive`. It never sends
   manual `tax_rates`, enables adaptive pricing or calls a provider API.
@@ -68,6 +80,51 @@ The preparation helpers are not a live payment implementation. In particular:
 5. No real registrations, fees, taxes, SKU prices or approvals were configured.
    No new service subscription, key, charge, refund, email or production release
    is part of this change. Existing runtime payment approval flags stay false.
+6. The current preparation represents registered jurisdictions. A separate,
+   legally verified `no-registration-required` evidence model is still needed
+   for a genuine exemption or an applicable local threshold not yet reached.
+   Do not manufacture a `taxreg_` for that branch and do not automatically treat
+   Stripe's `not_collecting` as permission to sell without tax.
+
+## Possible Swedish small-seller branch — evidence still missing
+
+The preparation can record, and independently require, all of these reviewed
+facts for the Swedish small-seller branch:
+
+- The business is established only in Sweden, with no other establishment.
+- The current and preceding calendar years each stay at or below the applicable
+  EUR 10,000 / fixed SEK 99,680 combined VAT-exclusive threshold. The record must
+  name both years and currency explicitly; the EUR limit is 1,000,000 minor units,
+  and the Swedish SEK limit is 9,968,000 minor units. No current FX conversion is
+  substituted for the fixed Swedish threshold.
+- The combined scope covers cross-border EU B2C telecommunications, broadcasting
+  and electronically supplied services, together with relevant goods dispatched
+  from Sweden to consumers in other EU countries. It covers every channel where
+  KARUU is the supplier. Domestic Swedish sales, B2B and non-EU destinations are
+  outside this threshold scope. Platform turnover must first distinguish who was
+  the VAT supplier; mechanically adding every KDP/platform consumer checkout is
+  not a verified calculation.
+- Destination-country taxation has not been elected. Not having OSS does not
+  prove this fact; a voluntary destination-tax election has a two-calendar-year
+  commitment, which needs the actual accounting record.
+- The actual active Stripe Swedish registration returns `type=standard` and
+  `standard.place_of_supply_scheme=small_seller`, exactly matching the reviewed
+  preparation. A different or missing API scheme fails closed.
+
+All unknown facts normalize to null; missing or exceeded totals and the wrong
+calendar years reject the coverage evidence. Year boundaries and review years
+use the Swedish `Europe/Stockholm` calendar, including its midnight before the
+UTC year changes. The evidence is a reviewed snapshot,
+not an implemented turnover monitor. Cross-channel aggregation, updates as new
+orders arrive, remaining threshold headroom and the transition starting with the
+threshold-crossing sale still need a pre-payment implementation. Zero website
+orders or a zero Stripe balance cannot stand in for the combined sales totals.
+
+EU member-country syntax is only a branch selector. It does not establish that
+the actual buyer address is in the EU VAT territory: for example, Åland and the
+Canary Islands have special treatment. Address-level VAT-territory resolution
+before capture remains a release dependency. A completed fixture or small-seller
+evidence record alone is not approval to accept international customer money.
 
 ## Accounting facts still needed
 
@@ -91,6 +148,10 @@ generic electronic-service or nontaxable code is substituted for an unknown fact
 - [Canonical product tax codes](https://docs.stripe.com/tax/tax-codes)
 - [Tax behavior and product classification](https://docs.stripe.com/tax/products-prices-tax-codes-tax-behavior)
 - [Registration records and schemes](https://docs.stripe.com/api/tax/registrations)
+- [Swedish registration fields](https://docs.stripe.com/api/tax/registrations/create?query=country_options.se)
+- [Swedish Tax Agency OSS and the fixed threshold](https://www.skatteverket.se/foretag/moms/deklareramoms/ossredovisningavmomsenligtdesarskildaordningarna.4.5b35a6251761e691420b58e.html)
+- [European Commission OSS threshold explanation, section 9](https://vat-one-stop-shop.ec.europa.eu/one-stop-shop_en)
+- [EU VAT territorial scope](https://taxation-customs.ec.europa.eu/taxation/vat/vat-directive/how-does-vat-work/territorial-scope_en)
 - [Zero-tax reasons and unsupported territories](https://docs.stripe.com/tax/zero-tax)
 - [Current tax-country coverage](https://docs.stripe.com/tax/supported-countries)
 - [Stripe high-risk jurisdictions and persons](https://stripe.com/legal/restricted-businesses#high-risk-jurisdictions-and-persons)
