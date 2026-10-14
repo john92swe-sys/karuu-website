@@ -18,7 +18,9 @@ function WorkRow({ work, tab }: { work: Creation; tab: TabId }) {
   const kindle = work.links.find((link) => /amazon\.[^/]+\/dp\//.test(link.url));
   const audio = work.links.find((link) => /audio/i.test(link.format));
   const music = work.links.find((link) => /youtube\.com\/watch/.test(link.url));
-  const external = tab === 'audio' ? audio : tab === 'music' ? music : kindle;
+  const ebook = kindle || work.links.find((link) => link.format === 'Ebook');
+  const external = tab === 'audio' ? audio : tab === 'music' ? music : ebook;
+  const externalLabel = tab === 'audio' ? 'Audio edition' : tab === 'music' ? 'Listen on YouTube' : kindle ? 'View on Kindle' : ebook?.url.includes('play.google.com/') ? 'View on Google Play' : ebook?.label;
   const image = work.cover || (tab === 'music' ? '/images/lifestyle/c-music-landscape.webp' : null);
   return <article className={`hc-work-row hc-work-row-${tab}`}>
     <Link className="hc-work-thumbnail" href={`/creations/${work.slug}`} aria-label={`Explore ${work.title}`}>
@@ -27,7 +29,7 @@ function WorkRow({ work, tab }: { work: Creation; tab: TabId }) {
     <div className="hc-work-row-copy">
       <h3><Link href={`/creations/${work.slug}`}>{work.title}</Link></h3>
       <p>{tab === 'audio' ? work.formats.find((format) => /audio/i.test(format.label))?.note || 'Explore this work’s reading and listening options.' : work.summary || (work.author ? `By ${work.author}` : work.development?.status || 'Explore this creation.')}</p>
-      <div className="hc-work-row-actions"><Link href={`/creations/${work.slug}`} className="hc-button hc-button-small">{tab === 'games' ? 'View project' : tab === 'music' ? 'Explore track' : 'Explore book'} <ArrowRight size={13} aria-hidden="true" /></Link>{external && <a href={external.url} className="hc-platform-link" target="_blank" rel="noopener noreferrer">{tab === 'audio' ? 'Audio edition' : tab === 'music' ? 'Listen on YouTube' : 'View on Kindle'}<span className="sr-only"> (opens a new tab)</span></a>}</div>
+      <div className="hc-work-row-actions"><Link href={`/creations/${work.slug}`} className="hc-button hc-button-small">{tab === 'games' ? 'View project' : tab === 'music' ? 'Explore track' : 'Explore book'} <ArrowRight size={13} aria-hidden="true" /></Link>{external && <a href={external.url} className="hc-platform-link" target="_blank" rel="noopener noreferrer">{externalLabel}<span className="sr-only"> (opens a new tab)</span></a>}</div>
     </div>
   </article>;
 }

@@ -16,7 +16,7 @@ function fixture(){
   let response=new Response(JSON.stringify({processed:0,providerAccepted:0,failed:0,needsReview:0}),{status:200}),failure=null;
   const binding={fetch:async request=>{calls.push(request);if(failure)throw failure;return response;}};
   const env={KARUU_NOTIFICATIONS_SCHEDULED_ENABLED:'true',KARUU_NOTIFICATION_JOB_SECRET:fixtureSecret,WORKER_SELF_REFERENCE:binding};
-  const context=vm.createContext({module,exports:module.exports,require:name=>{assert.equal(name,'../.open-next/worker.js');return generated;},Request,Response,AbortSignal,
+  const context=vm.createContext({module,exports:module.exports,require:name=>{assert.equal(name,'../.open-next/worker.js');return generated;},Request,Response,AbortSignal,URL,
     fetch:()=>{throw new Error('External fetch forbidden');},console:new Proxy({},{get:(_,name)=>(...args)=>logs.push({name,args})}),
   });
   // A virtual .ts filename requests CommonJS for the isolated VM; .mjs would force ESM.
@@ -38,11 +38,11 @@ await test('actual isolated review target enables five-minute scheduling while a
   for(const gate of ['KARUU_PAYMENTS_ENABLED','KARUU_LIVE_COMMERCE_APPROVED','KARUU_TAX_CONFIG_APPROVED','KARUU_DISTRIBUTION_APPROVED','KARUU_LEGAL_APPROVED'])assert.equal(config.vars[gate],'false');
   assert.equal(config.services.find(s=>s.binding==='WORKER_SELF_REFERENCE').service,config.name);
 });
-await test('generated fetch, default handlers and all named Durable Object exports are retained',async()=>{
-  const f=fixture();assert.equal(f.worker.fetch,f.generated.default.fetch);assert.equal(f.worker.queue,f.generated.default.queue);
+await test('generated fetch behavior, default handlers and all named Durable Object exports are retained',async()=>{
+  const f=fixture();assert.equal(typeof f.worker.fetch,'function');assert.equal(f.worker.queue,f.generated.default.queue);
   for(const name of ['DOQueueHandler','DOShardedTagCache','BucketCachePurge'])assert.equal(f.exports[name],f.generated[name]);
   const request=new Request('https://karuu.example.test/creations');const response=await f.worker.fetch(request,f.env,f.ctx);
-  assert.equal(await response.text(),'OpenNext fixture');assert.equal(f.fetchCalls[0][0],request);assert.equal(f.fetchCalls[0][1],f.env);assert.equal(f.calls.length,0);
+  assert.equal(await response.text(),'OpenNext fixture');assert.equal(f.fetchCalls[0][0],request);assert.equal(f.fetchCalls[0][1],f.env);assert.equal(f.fetchCalls[0][2],f.ctx);assert.equal(f.fetchCalls.length,1);assert.equal(f.calls.length,0);
 });
 await test('explicit schedule enablement is required before any private job call',async()=>{
   for(const flag of [undefined,'false',true,'TRUE','']){

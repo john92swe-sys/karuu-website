@@ -33,7 +33,12 @@ export default async function HomePage() {
   const books = allCreations.filter((work) => work.featured && work.categories.includes('ebooks')).slice(0, 2);
   return <div className="hc-home">
     <section className="hc-hero" aria-labelledby="home-title">
-      <div className="hc-hero-scene" aria-hidden="true" />
+      <picture className="hc-hero-scene">
+        <source media="(max-width: 700px)" srcSet="/images/lifestyle/c-lakeside-hero-mobile.webp" />
+        {/* Art direction uses the separate approved phone asset. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/images/lifestyle/c-lakeside-hero-desktop.webp" alt="" fetchPriority="high" decoding="async" />
+      </picture>
       <div className="hc-hero-copy">
         <h1 id="home-title">Products for life.<br />Stories to explore.</h1>
         <p>Physical products and original digital creations from KARUU.</p>
@@ -69,7 +74,7 @@ export default async function HomePage() {
         </section>
 
         <section className="hc-business hc-digital" aria-labelledby="digital-title">
-          <header className="hc-business-heading"><div><h2 id="digital-title">Digital creations</h2><p>Original stories, music and games for curious minds.</p></div><Link href="/creations" className="hc-all-books">Explore all books <ArrowRight size={14} aria-hidden="true" /></Link><Link href="/creations" className="hc-mobile-section-link" aria-label="Explore digital creations"><ChevronRight size={22} aria-hidden="true" /></Link></header>
+          <header className="hc-business-heading"><div><h2 id="digital-title">Digital creations</h2><p>Original stories, music and games for curious minds.</p></div><Link href="/creations?category=ebooks" className="hc-all-books">All books <ArrowRight size={14} aria-hidden="true" /></Link><Link href="/creations" className="hc-mobile-section-link" aria-label="Explore digital creations"><ChevronRight size={22} aria-hidden="true" /></Link></header>
           {!availability.publicCatalogAvailable && <p className="hc-service-notice" role="status">Digital creation information is temporarily unavailable. Please try again later.</p>}
           <div className="hc-digital-grid">
             {books.map((book) => <FeaturedBook key={book.slug} book={book} />)}

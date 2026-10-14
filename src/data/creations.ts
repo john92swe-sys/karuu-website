@@ -23,6 +23,17 @@ export type Creation = {
 // platform edition does not grant KARUU a direct-sale SKU or delivery rights.
 export const creations: Creation[] = [
   {
+    id: 'weight-empty-rooms', slug: 'the-weight-of-empty-rooms',
+    title: 'The Weight of Empty Rooms', author: 'J.KARUU', publisher: null,
+    language: 'English', summary: 'An English thriller by J.KARUU. Explore the published ebook on Google Play Books.',
+    cover: '/images/creations/weight-empty-rooms-cover.webp',
+    coverAlt: 'The Weight of Empty Rooms — current Google Play publication cover',
+    categories: ['ebooks'], featured: false,
+    formats: [{ label: 'Ebook', status: 'published-externally', note: 'Published on Google Play Books. Availability and purchase terms are managed by the platform.' }],
+    links: [{ label: 'Ebook on Google Play', format: 'Ebook', url: 'https://play.google.com/store/books/details?id=KeAaEgAAQBAJ', sourceUrl: 'https://play.google.com/store/books/details?id=KeAaEgAAQBAJ', verifiedAt: '2026-10-14T12:25:55.702Z' }],
+    evidence: ['Original Google Play Books partner LIVE receipt, 14 October 2026; GGKEY:8R6FZDQKWYP', 'Current published cover-v2 source SHA256 8b4633f177352555322e8f7c7b9047cc05eff880eb7c73386142c40f443fa401'],
+  },
+  {
     id: 'key', slug: 'the-key-returned-at-low-tide',
     title: 'The Key Returned at Low Tide', author: 'K. R. Gannet',
     publisher: 'KARUU AB', language: 'English', summary: 'Nell Calder returns to a coastal town to settle her aunt’s repair shop. An old key draws her into a murder investigation. The first Gannetwick mystery.', cover: '/images/creations/low-tide-cover.webp',
