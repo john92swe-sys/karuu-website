@@ -15,14 +15,15 @@ export function StoreShell({ children, crumbs = [] }: { children: React.ReactNod
 
 export function CreationCover({ creation, detail = false }: { creation: Creation; detail?: boolean }) {
   return <div className={detail ? styles.detailCover : styles.coverArea}>
-    {creation.cover ? <Image src={creation.cover} alt={creation.coverAlt} className={styles.cover} priority={detail} sizes={detail ? '(max-width: 600px) 80vw, 360px' : '(max-width: 600px) 70vw, 240px'} width={creation.categories.includes('games') ? 1280 : 320} height={creation.categories.includes('games') ? 720 : 480} /> : <div className={styles.missingCover}>{creation.categories.includes('music') ? <Music2 size={36} strokeWidth={1} aria-hidden="true" /> : creation.categories.includes('games') ? <Gamepad2 size={36} strokeWidth={1} aria-hidden="true" /> : <BookOpen size={36} strokeWidth={1} aria-hidden="true" />}<span>{creation.title}</span><small>{creation.author || 'KARUU digital creations'}</small></div>}
+    {creation.cover ? <Image src={creation.cover} alt={creation.coverAlt} className={styles.cover} priority={detail} sizes={detail ? '(max-width: 600px) 80vw, 360px' : '(max-width: 600px) 70vw, 240px'} width={creation.id === 'xiaoju-fish-match' ? 390 : creation.categories.includes('games') ? 1280 : 320} height={creation.id === 'xiaoju-fish-match' ? 844 : creation.categories.includes('games') ? 720 : 480} /> : <div className={styles.missingCover}>{creation.categories.includes('music') ? <Music2 size={36} strokeWidth={1} aria-hidden="true" /> : creation.categories.includes('games') ? <Gamepad2 size={36} strokeWidth={1} aria-hidden="true" /> : <BookOpen size={36} strokeWidth={1} aria-hidden="true" />}<span>{creation.title}</span><small>{creation.author || 'KARUU digital creations'}</small></div>}
   </div>;
 }
 
 export function CreationCard({ creation }: { creation: Creation }) {
+  const hasFreeDemo = creation.formats.some((format) => format.label === 'Free browser demo' && format.status === 'published-externally') && creation.links.some((link) => link.format === 'Free browser demo');
   return <article className={`c-creation-card ${styles.card}`}>
     <Link href={`/creations/${creation.slug}`} aria-label={`Explore ${creation.title}`}><CreationCover creation={creation} /></Link>
-    <div className={styles.cardBody}><div className={styles.tags}>{creation.featured && <span className={`${styles.tag} ${styles.tagPurple}`}>Featured story</span>}<span className={styles.tag}>{creation.categories.includes('music') ? 'Music' : creation.development ? creation.development.status : 'Ebook'}</span>{creation.categories.includes('audiobooks') && <span className={styles.tag}>Audio edition</span>}</div>
+    <div className={styles.cardBody}><div className={styles.tags}>{creation.featured && <span className={`${styles.tag} ${styles.tagPurple}`}>Featured story</span>}<span className={styles.tag}>{creation.categories.includes('music') ? 'Music' : creation.development ? creation.development.status : hasFreeDemo ? 'Free browser demo' : creation.categories.includes('games') ? 'Game project' : 'Ebook'}</span>{creation.categories.includes('audiobooks') && <span className={styles.tag}>Audio edition</span>}</div>
       <h2 className={styles.cardTitle}><Link href={`/creations/${creation.slug}`}>{creation.title}</Link></h2>
       {creation.author && <p className={styles.muted}>{creation.author}</p>}
       {creation.development?.imageCaption && <p className={styles.compact}>{creation.development.imageCaption}</p>}

@@ -18,9 +18,10 @@ function WorkRow({ work, tab }: { work: Creation; tab: TabId }) {
   const kindle = work.links.find((link) => /amazon\.[^/]+\/dp\//.test(link.url));
   const audio = work.links.find((link) => /audio/i.test(link.format));
   const music = work.links.find((link) => /youtube\.com\/watch/.test(link.url));
+  const demo = work.formats.some((format) => format.label === 'Free browser demo' && format.status === 'published-externally') ? work.links.find((link) => link.format === 'Free browser demo') : undefined;
   const ebook = kindle || work.links.find((link) => link.format === 'Ebook');
-  const external = tab === 'audio' ? audio : tab === 'music' ? music : ebook;
-  const externalLabel = tab === 'audio' ? 'Audio edition' : tab === 'music' ? 'Listen on YouTube' : kindle ? 'View on Kindle' : ebook?.url.includes('play.google.com/') ? 'View on Google Play' : ebook?.label;
+  const external = tab === 'audio' ? audio : tab === 'music' ? music : tab === 'games' ? demo : ebook;
+  const externalLabel = tab === 'audio' ? 'Audio edition' : tab === 'music' ? 'Listen on YouTube' : tab === 'games' ? 'Play free demo' : kindle ? 'View on Kindle' : ebook?.url.includes('play.google.com/') ? 'View on Google Play' : ebook?.label;
   const image = work.cover || (tab === 'music' ? '/images/lifestyle/c-music-landscape.webp' : null);
   return <article className={`hc-work-row hc-work-row-${tab}`}>
     <Link className="hc-work-thumbnail" href={`/creations/${work.slug}`} aria-label={`Explore ${work.title}`}>
@@ -45,7 +46,10 @@ export function HomeExplore({ creations, available }: { creations: Creation[]; a
   }).slice(0, 2);
   const music = creations.find((work) => work.slug === 'kitchen-floor-gravity') || creations.find((work) => work.categories.includes('music') && work.links.length > 0);
   const musicUrl = music?.links.find((link) => /youtube\.com\/watch/.test(link.url))?.url;
-  const game = creations.find((work) => work.slug === 'nordic-rush-aurora-relay');
+  const playableGame = creations.find((work) => work.categories.includes('games') && work.formats.some((format) => format.label === 'Free browser demo' && format.status === 'published-externally') && work.links.some((link) => link.format === 'Free browser demo'));
+  const game = playableGame || creations.find((work) => work.slug === 'nordic-rush-aurora-relay');
+  const gameDemoUrl = playableGame?.links.find((link) => link.format === 'Free browser demo')?.url;
+  const gameHref = gameDemoUrl || (game ? `/creations/${game.slug}` : '/creations?category=games');
   function moveTab(event: KeyboardEvent<HTMLButtonElement>, index: number) {
     let next = index;
     if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
@@ -65,8 +69,8 @@ export function HomeExplore({ creations, available }: { creations: Creation[]; a
           <div className="hc-media-copy"><h3>Music</h3><p>{music ? 'Official audio from JKARUU Music.' : 'Explore listening and release information.'}</p><Link href="/creations?category=music">Explore music <ArrowRight size={13} aria-hidden="true" /></Link></div>
         </article>
         <article className="hc-media-card">
-          <Link className="hc-media-image hc-game-image" href={game ? `/creations/${game.slug}` : '/creations?category=games'} aria-label={game ? `View ${game.title} project` : 'Explore game projects'}>{game?.cover ? <Image src={game.cover} alt={game.coverAlt} fill sizes="(max-width: 700px) 46vw, 220px" /> : <span className="hc-game-image-empty"><Gamepad2 size={32} strokeWidth={1.4} aria-hidden="true" />Game projects</span>}{game?.development?.version && <span className="hc-media-image-note">Actual prototype · {game.development.version}</span>}</Link>
-          <div className="hc-media-copy"><h3>Games in development</h3><p>{game ? game.title : 'Explore our current game projects.'}</p><Link href={game ? `/creations/${game.slug}` : '/creations?category=games'}>Learn more <ArrowRight size={13} aria-hidden="true" /></Link></div>
+          <Link className={`hc-media-image hc-game-image${gameDemoUrl ? ' hc-game-demo' : ''}`} href={gameHref} target={gameDemoUrl ? '_blank' : undefined} rel={gameDemoUrl ? 'noopener noreferrer' : undefined} aria-label={gameDemoUrl ? `Play ${game?.title} free demo (opens a new tab)` : game ? `View ${game.title} project` : 'Explore game projects'}>{game?.cover ? <Image src={game.cover} alt={game.coverAlt} fill sizes="(max-width: 700px) 46vw, 220px" /> : <span className="hc-game-image-empty"><Gamepad2 size={32} strokeWidth={1.4} aria-hidden="true" />Game projects</span>}{gameDemoUrl ? <span className="hc-media-image-note">Actual browser game · Free demo</span> : game?.development?.version && <span className="hc-media-image-note">Actual prototype · {game.development.version}</span>}</Link>
+          <div className="hc-media-copy"><h3>{gameDemoUrl ? game?.title : 'Games in development'}</h3><p>{gameDemoUrl ? 'A cozy match-three game. 12 levels to explore.' : game ? game.title : 'Explore our current game projects.'}</p><Link href={gameHref} target={gameDemoUrl ? '_blank' : undefined} rel={gameDemoUrl ? 'noopener noreferrer' : undefined}>{gameDemoUrl ? 'Play free demo' : 'Learn more'} <ArrowRight size={13} aria-hidden="true" />{gameDemoUrl && <span className="sr-only"> (opens a new tab)</span>}</Link></div>
         </article>
       </div>
     </div>

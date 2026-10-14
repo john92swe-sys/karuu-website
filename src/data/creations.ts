@@ -23,6 +23,16 @@ export type Creation = {
 // platform edition does not grant KARUU a direct-sale SKU or delivery rights.
 export const creations: Creation[] = [
   {
+    id: 'xiaoju-fish-match', slug: 'xiaoju-fish-match', title: 'Xiaoju Fish Match',
+    author: null, publisher: 'KARUU', language: 'Chinese',
+    summary: 'A cozy 12-level match-three game. Collect treats, yarn and toys with Xiaoju, and make a little house feel like home.',
+    cover: '/images/creations/xiaoju-fish-match-menu.png', coverAlt: 'Xiaoju Fish Match — actual browser menu screenshot showing Xiaoju and the free demo entrance',
+    categories: ['games'], featured: false,
+    formats: [{ label: 'Free browser demo', status: 'published-externally', note: '12 levels, playable free in your browser. Progress is saved in the browser on the game’s own website.' }],
+    links: [{ label: 'Play the free browser demo', format: 'Free browser demo', url: 'https://karuu-xiaoju-fish-match.john92swe.workers.dev/games/fish-match/', sourceUrl: 'https://karuu-xiaoju-fish-match.john92swe.workers.dev/games/fish-match/' }],
+    evidence: ['Xiaoju-Web-Games WEBSITE_HANDOFF.md; source 4dd6f7b8da6db121d3b04263db9a25bb2e67a47a; published Worker 07d03f17-af8f-42f9-a2ce-d9601ef5a282', 'Actual Edge menu screenshot and independently read HTTP200 by coordinator, 14 October 2026'],
+  },
+  {
     id: 'weight-empty-rooms', slug: 'the-weight-of-empty-rooms',
     title: 'The Weight of Empty Rooms', author: 'J.KARUU', publisher: null,
     language: 'English', summary: 'An English thriller by J.KARUU. Explore the published ebook on Google Play Books.',
