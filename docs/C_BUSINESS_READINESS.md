@@ -24,18 +24,18 @@
 
 ### 本轮代码发现与修复状态
 
-1. **暂停新收费同时阻断既有支付收尾。** 原 `stripeClient()` 要求完整 `paymentsConfigured()`，signed webhook 和管理员退款也调用它，关闭新单门禁会令已付订单确认与退款返回 `503`。现已在工作区提供 `stripeClient({existingPayments:true})`，仅要求准确 test/live 模式及对应 key；默认调用仍要求原 checkout 门禁。付款 agent 正在接入 webhook/退款及处理退款乱序与竞争，完整结果以其测试报告为准；该工具分离本身没有启用 live 或创建付款。
+1. **暂停新收费同时阻断既有支付收尾。** 原 `stripeClient()` 要求完整 `paymentsConfigured()`，signed webhook 和管理员退款也调用它，关闭新单门禁会令已付订单确认与退款返回 `503`。现已在工作区提供 `stripeClient({existingPayments:true})`，仅要求准确 test/live 模式及对应 key；默认调用仍要求原 checkout 门禁。付款通知/退款乱序与竞争处理已完成并通过17项隔离回归，已部署审查站；新收款仍关闭，没有真实交易。
 2. **首次结账失败的 pending 订单缺少安全恢复。** 原实现先提交 pending，再查 tax-rate / 建 session；失败可能留下无 session ID 的订单，而客户端刷新会丢掉内存 key。现已修改 `commerce.ts` / `bag-content.tsx`：同账号、完全相同请求 hash 的 pending 始终复用原订单及 `checkout-${order.id}` provider key，购物袋在可用 localStorage 中保存请求 key。创建前重核当前权利、文件、成本和商业快照，变化即停止；无绑定 session 超过 23h 停自动重建，交经营者核原记录，绝不按 TTL 放开重单。已有 session ID、URL 缺失时只 retrieve 原 ID。创建结果须模式/用户/订单/金额/币种吻合，经 user→order 锁绑定，已收尾状态或不同 session 不覆盖。
 
-`node --test scripts/test-checkout-recovery.mjs` **19/19 通过**，使用实际应用模块与 SQL、内存 PGlite 及完全隔离的 provider fixture：覆盖 tax 失败、provider 创建前/后超时、绑定保存 rollback、并发新 key、账号隔离、请求变更、23h 窗口、已绑 session 恢复、权利撤回、报价变化、merchant 对象 mismatch、结算竞争及真实 bag handler 的刷新/存储失效/已收尾 key 清除。未连接真实 Stripe/PostgreSQL/Worker，不等于多连接并发、真实支付或线上浏览器验收。typecheck 与这两个文件的 targeted ESLint 已通过；后续共享文件最终验证由 ROOT 执行。
+`node --test scripts/test-checkout-recovery.mjs` **21/21 通过**，使用实际应用模块与 SQL、内存 PGlite 及完全隔离的 provider fixture：覆盖 tax 失败、provider 创建前/后超时、绑定保存 rollback、并发新 key、账号隔离、请求变更、23h 窗口、已绑 session 恢复、权利撤回、报价变化、merchant 对象 mismatch、结算竞争及真实 bag handler 的刷新/存储失效/已收尾 key 清除。未连接真实 Stripe/PostgreSQL/Worker，不等于多连接并发、真实支付或线上浏览器验收。typecheck 与这两个文件的 targeted ESLint 已通过；共享业务代码已通过ROOT的131项完整隔离回归。
 
-23h 是针对 [Stripe API v1 的幂等 key 可在至少 24h 后被移除](https://docs.stripe.com/api/idempotent_requests)而保留的实现余量。官方 CLI 的本次公开页读取失败后，由官方文档页面核实此合同；没有运行 login/账号 API 或更改凭据。超过窗口仍保留 pending 及重单保护，不能把“本地无 session ID”当成“商户没有创建过 session”。这些改动尚未发布；原生产与 review runtime 身份见下节。
+23h 是针对 [Stripe API v1 的幂等 key 可在至少 24h 后被移除](https://docs.stripe.com/api/idempotent_requests)而保留的实现余量。官方 CLI 的本次公开页读取失败后，由官方文档页面核实此合同；没有运行 login/账号 API 或更改凭据。超过窗口仍保留 pending 及重单保护，不能把“本地无 session ID”当成“商户没有创建过 session”。这些业务代码已经部署审查站；正式生产尚未切换，当前读回见下节。
 
 ### 正式生产切换与既有授权
 
 09:26–09:36 UTC 的[官方只读资源记录](../work/c-business-continuation-audit/audit.json)确认：现有 Wrangler OAuth 已具 `workers_scripts(write)`，Worker 元数据/活动部署读取成功，未扩大权限。官网实施请求和本次明确的 live 收款目标已经存在，不把同一意图重复列为待确认事项；技术 write scope 本身仍不证明某次生产切换已执行。
 
-最新可定位的生产读回仍为 `karuu-production` 部署 `8b611224-1961-40d1-9726-b6cda2e4fe74` → 版本 `5abbde92-a504-4a86-9d6a-34d0689a2b88`（`2026-09-17T20:42:35.821555Z`，100% 流量）；C review 为 `10b5ed26-6f51-4082-bf2b-a26e8cd3e936`。生产有 JS fetch handler、`/api/*` Worker-first 与 ASSETS，不能当纯静态站。原 production 模块/资产尚无可核 SHA 的完整恢复备份；候选旧 Git `5994198…` 未证明对应此版本。具体读回及恢复边界见[资源审查](../work/c-business-continuation-audit/RESOURCE_AUDIT.zh.md)。
+最新可定位的生产读回仍为 `karuu-production` 部署 `8b611224-1961-40d1-9726-b6cda2e4fe74` → 版本 `5abbde92-a504-4a86-9d6a-34d0689a2b88`（`2026-09-17T20:42:35.821555Z`，100% 流量）；C review已部署数据库及两项支付Secret，当前精确版本见最新回执与官方部署读回。生产有 JS fetch handler、`/api/*` Worker-first 与 ASSETS，不能当纯静态站。原 production 模块/资产尚无可核 SHA 的完整恢复备份；候选旧 Git `5994198…` 未证明对应此版本。具体读回及恢复边界见[资源审查](../work/c-business-continuation-audit/RESOURCE_AUDIT.zh.md)。
 
 可以在当前上线目标内准备**保留现有域名/routes 的生产 release 配置、原 API 行为兼容与业务资源绑定验证**；当前唯一部署 helper 只允许 review，尚未形成该生产工件。本次没有改域名、routes、生产 Worker 或 Stripe 商户，也未执行正式回滚。既有 `codex/karuu-c-before-visual-correction-20261013` 是源码恢复分支，旧 `acc84001…` 是 review 回滚候选，都不替代原生产模块备份。
 
@@ -150,7 +150,7 @@ P3：原可听音乐 URL `https://www.youtube.com/watch?v=i6mns_U5nxE` / `https:
 1. **先用真实候选资产准备私有交付**：F1–F5 可保持原文件/hash 逐件入内部资产盘点；以语言/版本/hash 新建唯一资产，验证授权访问和禁止公开下载。中文全本 F6 可技术准备，同时保留“未人审/未批准发行”。不用重写已恢复书籍或重新制作原平台音频。
 2. **补每个候选作品的发行依据与价格源**：由经营者/媒体负责人对照现行发行版、平台排他状态、音频/生成服务许可及官网销售范围确认；已有平台 SEK 数据可作真实对照，不自动写入售价。配置正式正常价、需要时的活动价/窗口、组合价、升级价和目标市场。
 3. **补完整成本/税务并再决定销售开关**：真实支付账户费、下载/邮件/支持、版权分成、内容制作分摊、固定运营分摊、获客、退款及奖励成本均有依据后，才判断完整管理结余与最低价；不开默认奖励，无活动时的实际 0 也须与“未知”区分。混合组合逐组件处理税务/费用分摊。
-4. **资源/管理员/测试交易由本次主任务继续核实**：数据库、账户邮件、支付 test/live、私有媒体和 webhook 的实际状态在独立 provider/admin 工作流确认。本文仅源码表明相关接口已实现，未验实际配置、未创建管理员、未提交测试订单。资源接通与 SKU 条件落实后，使用唯一测试订单验证付款服务器确认、精确权益、授权下载、重试/退款/撤销；不能拿页面或代码夹具通过替代这条链路。
+4. **资源/管理员/测试交易由本次主任务继续核实**：数据库、账户邮件、支付 test/live、私有媒体和 webhook 的实际状态在独立 provider/admin 工作流确认。10月14日已验真实受限数据库/Hyperdrive配置、Stripe凭据及签名入口；账户邮件、私有文件仍未接通，未创建管理员或提交测试订单。资源接通与 SKU 条件落实后，使用唯一测试订单验证付款服务器确认、精确权益、授权下载、重试/退款/撤销；不能拿页面或代码夹具通过替代这条链路。
 5. **游戏和 KRU 不拖住可完成的普通交易**：待各实际服务提供合同/生产 endpoint 和市场规则，再验证唯一订单、签名、幂等发放、查询/补发/退款。无生产游戏服务/预算/受控 signer 的项目继续如实禁用。
 
-商品盘点阶段完成的是以上文件、来源、成本假设和接入证据核对，没有将新的库存/平台条目自行公开。之后真实收款续接已在工作区修复 checkout 恢复与购物袋 key，并新增独立测试，具体状态见本文开头；没有修改价格、生产发布或进行 commit。数据库、商户及真实业务最终验收由继续实施的主任务报告。
+商品盘点阶段完成的是以上文件、来源、成本假设和接入证据核对，没有将新的库存/平台条目自行公开。之后真实收款续接已在工作区修复 checkout 恢复与购物袋 key，并新增独立测试，具体状态见本文开头；没有修改价格或正式生产流量。ROOT已提交并发布审查站续作，当前数据库、商户及业务验收结果见最新回执。

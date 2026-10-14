@@ -48,9 +48,9 @@ PGlite适配器按单引擎串行排队；测试验证实际SQL/事务结果并�
 | 领域 | 从代码到真实服务的缺口 |
 | --- | --- |
 | 数据库/身份 | 用户已选择gngdffjluzcsouzpvquq，ROOT恢复后官方status=ACTIVE_HEALTHY；官网专用karuu_commerce第一阶段迁移已由ROOT官方应用并确认22RLS、version1、公开角色零权限；既有public/private业务不变。10月14日已接通独立受限登录/Hyperdrive并验收缓存关闭、身份/RLS和13项拒绝；backup恢复仍待核验。邮箱验证链路应先工作，bootstrap只能授予既有verified账号 |
-| 邮件/询盘通知 | 当前抽象HTTPS relay需要真实provider鉴权/发送域名及指定测试邮箱；队列job只有受保护的HTTP入口，尚未建立私有scheduler/失败监控，provider accepted不等于送达。ROOT正在适配provider，此工具不重写邮件代码 |
-| 私有文件 | 已有账户授权/短时grant/range读取，但operator上传、真实R2私有对象/版本/哈希、权利与实际故障恢复联调仍需落实。ROOT负责R2适配；不得把公开书页或封面当母音频/完整文件 |
-| 商户/商品 | Stripe连接恢复、独立test mode真实交易/webhook/退款；逐SKU母文件/发行权/KDP Select/价格/市场/税/成本及四项live批准；已有fixture不替代provider验收 |
+| 邮件/询盘通知 | 当前抽象HTTPS relay需要真实provider鉴权/发送域名及指定测试邮箱；私有self-binding的scheduled包装和provider适配已发布，实际发件绑定、job Secret/cron和失败监控仍未配置；provider accepted不等于送达。此工具不重写邮件代码 |
+| 私有文件 | 已有账户授权/短时grant/range读取，32MiB内operator上传代码已发布，但真实R2私有对象/版本/哈希、权利与故障恢复联调仍需落实。ROOT负责R2适配；不得把公开书页或封面当母音频/完整文件 |
+| 商户/商品 | 正式商户、受限live key/签名及暂停的接收端已配置；独立测试环境真实交易/webhook/退款仍待验收；逐SKU母文件/发行权/KDP Select/价格/市场/税/成本及四项live批准；已有fixture不替代provider验收 |
 | 后台持续运维 | 首位admin本轮已可审计授权；后续staff角色维护、全量分页财务导出/退款部分金额、通知scheduler与持续备份恢复仍未由本工具实现 |
 | 游戏/KRU | 真实服务器grant/refund合同、签名治理、适用资格及数量/SOL/现金/履约预算；当前资格门与内部点数原语不代表实际发行/兑换器，继续关闭 |
 

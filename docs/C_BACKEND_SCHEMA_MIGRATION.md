@@ -14,7 +14,7 @@
 
 没有读取业务行值、账号密码或连接密钥。列表的rows=0属于数据库估计，不能据此断言不存在客户记录。`private`属于已有Reflex20业务，不复用。其schema当前允许anon/authenticated USAGE；public默认ACL有6条，均限定public、来自postgres/supabase_admin的表/序列/函数权限，未检出全局default ACL条目。这些现有对象、ACL及默认权限不在官网迁移的改动范围。
 
-现有API exposed schemas配置、备份恢复保障、Worker适用连接方式/最小权限角色及凭据仍未核实；metadata健康不等于官网数据库已接通。
+此段记录初始迁移前的核验边界；10月14日已完成受限角色凭据与Worker Hyperdrive接通。专用schema仍不开放给公共API，备份恢复保障尚待演练；实际连接证据见下文。
 
 ## 可审阅的实际SQL
 
