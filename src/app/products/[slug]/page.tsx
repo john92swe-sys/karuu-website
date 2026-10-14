@@ -19,17 +19,18 @@ import { HYDRATION_PUBLICLY_DISCOVERABLE } from '@/config/catalog';
 import { ACTIVEWEAR_MOQ_STATEMENT } from '@/config/mixed-style-moq';
 
 interface PageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
-const siteUrl = 'https://karuu.net';
+const siteUrl = 'https://www.karuu.net';
 
 export function generateStaticParams() {
   return getAllProducts().map((product) => ({ slug: product.slug }));
 }
 
-export function generateMetadata({ params }: PageProps): Metadata {
-  const product = getProductBySlug(params.slug);
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const product = getProductBySlug(slug);
   if (!product) return { title: { absolute: 'Product Not Found | KARUU' } };
 
   const mainImage = product.gallery[0];
@@ -156,8 +157,9 @@ function ProductDetails({ product }: { product: Product }) {
   );
 }
 
-export default function ProductDetailPage({ params }: PageProps) {
-  const product = getProductBySlug(params.slug);
+export default async function ProductDetailPage({ params }: PageProps) {
+  const { slug } = await params;
+  const product = getProductBySlug(slug);
   if (!product) notFound();
 
   const whatsappMessage = encodeURIComponent(

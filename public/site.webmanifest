@@ -1,11 +1,11 @@
 {
-  "name": "KARUU — B2B Activewear Sourcing",
+  "name": "KARUU — Products for life. Stories to explore.",
   "short_name": "KARUU",
-  "description": "Swedish B2B activewear sourcing, product development, OEM/ODM coordination, and international service.",
+  "description": "Physical products and original digital creations from KARUU AB, Sweden.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#1A3A5C",
+  "background_color": "#F2F8FC",
+  "theme_color": "#F2F8FC",
   "icons": [
     {
       "src": "/favicon.svg",

@@ -12,12 +12,19 @@ __pycache__/
 *.egg-info/
 /.env
 .env
+.env.*
+!.env.example
+work/
 
 # JS/TS bundlers & build outputs
 .next
 .nuxt
 .turbo
 .vercel
+.open-next/
+.wrangler/
+.dev.vars
+.dev.vars.*
 .parcel-cache
 .cache
 coverage
@@ -25,7 +32,6 @@ storybook-static
 
 # Package manager artifacts
 pnpm-lock.yaml
-package-lock.json
 yarn.lock
 .pnp*
 .npm

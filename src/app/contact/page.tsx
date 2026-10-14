@@ -121,8 +121,8 @@ export default function ContactPage() {
           <div className="p-8 rounded-2xl bg-white border border-stone-lighter">
             <h2 className="text-2xl font-bold text-primary mb-2">Request a Mixed-Style Collection Plan</h2>
             <p className="text-stone-light mb-6 text-sm">
-              Start with the essentials, then add optional planning details when ready. Submitting
-              prepares an email draft; KARUU does not receive an inquiry until you send that email.
+              Start with the essentials, then add optional planning details when ready. A saved
+              request returns a reference number for your follow-up.
             </p>
             <ContactForm />
           </div>

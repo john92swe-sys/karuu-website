@@ -1,4 +1,5 @@
 import type { Product } from '@/lib/products';
+import { InquiryFormShell } from './inquiry-form-shell';
 
 interface ProductInquiryFormProps {
   product: Product;
@@ -9,7 +10,7 @@ const inputClassName =
 
 export function ProductInquiryForm({ product }: ProductInquiryFormProps) {
   return (
-    <form action="/api/inquiry-mailto" method="post" className="space-y-7">
+    <InquiryFormShell className="space-y-7">
       <div className="rounded-2xl border border-secondary/20 bg-white p-5 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-secondary">
           Your selected product
@@ -211,13 +212,13 @@ export function ProductInquiryForm({ product }: ProductInquiryFormProps) {
           type="submit"
           className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-primary px-8 py-3.5 font-semibold text-white transition-colors hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 sm:w-auto"
         >
-          Prepare Quote Request
+          Submit Quote Request
         </button>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-stone-600">
-          This prepares an email draft addressed to KARUU for your review and sending. No price
-          is generated automatically, and no inquiry is recorded until you send the email.
+          A saved request returns a reference number. Pricing, order structure and delivery
+          terms are confirmed after review; no quotation is generated automatically.
         </p>
       </div>
-    </form>
+    </InquiryFormShell>
   );
 }
