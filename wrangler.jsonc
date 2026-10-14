@@ -16,6 +16,12 @@
       "service": "karuu-c-review-20261013"
     }
   ],
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE_COMMERCE",
+      "id": "dc1f294919fa401db0a5ff90d969eb04"
+    }
+  ],
   "vars": {
     "KARUU_RUNTIME": "cloudflare",
     "KARUU_DATABASE_SCHEMA": "karuu_commerce",
@@ -26,7 +32,7 @@
     "KARUU_TAX_CONFIG_APPROVED": "false",
     "KARUU_DISTRIBUTION_APPROVED": "false",
     "KARUU_LEGAL_APPROVED": "false",
-    "KARUU_HYPERDRIVE_CACHING_DISABLED": "false",
+    "KARUU_HYPERDRIVE_CACHING_DISABLED": "true",
     "KARUU_NOTIFICATIONS_SCHEDULED_ENABLED": "false"
   }
 }

@@ -1,8 +1,8 @@
 # 官网服务器专用PostgreSQL角色准备
 
-2026-10-13。用户已批准在选定Supabase项目 `gngdffjluzcsouzpvquq` 的新 `karuu_commerce` schema建立受限server账号并配置Cloudflare review资源。ROOT已实际应用第一阶段私有schema并回读22表/22RLS/version1、公开API角色零表权限、零策略；既有public四表/private一表不变。
+2026-10-14更新。用户已批准在选定Supabase项目 `gngdffjluzcsouzpvquq` 的新 `karuu_commerce` schema建立受限server账号并配置Cloudflare review资源。初始阶段22表/22RLS/version1及公开API角色零权限已核验；第二阶段增加56条server-only策略，既有public四表/private一表不变。
 
-角色阶段已由ROOT通过官方迁移 `karuu_private_runtime_role_v1_20261013` 实际应用。fresh JSON回读确认22表/22RLS、56条策略仅TO karuu_web，NOLOGIN/NOBYPASSRLS/NOINHERIT及其余限制、target外既有业务权限0、可执行definer0、runtime outbound组0、anon/authenticated USAGE=false；回执 `work/supabase/karuu-runtime-role-applied.json`。**角色资源已建立，口令/LOGIN/Worker连接仍待受控配置**。本文作者没有执行真实角色mutation。生成器没有数据库客户端、URL或密码参数；不改变商用批准false或其他schema ACL。
+角色阶段已由ROOT通过官方迁移 `karuu_private_runtime_role_v1_20261013` 实际应用。原karuu_web持权角色保持NOLOGIN/NOBYPASSRLS/NOINHERIT、无外部业务权限、outbound组0；56策略仅TO该角色。10月14日增加独立LOGIN成员karuu_worker_login，继承=true、SET/ADMIN=false，所有五项安全GUC及连接上限10在登录角色单独设置。没有复制/放宽56策略。生成器仍仅用于首次创建，不回放既有角色。
 
 ## 实际文件与最小权限
 
@@ -50,8 +50,10 @@ PostgreSQL16+非superuser CREATEROLE操作者会取得新角色的ADMIN edge。R
 
 `node --test scripts/test-commerce-runtime-role.mjs` **9/9通过**：固定参数/不含凭据、56精准角色策略/属性/权限图/无所有权、真实account upsert/验证/session/catalog/inquiry/order/entitlement/audit SQL、管理员列与财务记录篡改拒绝、funding lock与不可写、最小campaign/KRU列、role/membership碰撞与baseline漂移拒绝/实际失败rollback、外部表/列/sequence/CREATE/definer/defaults（含pgmq）拒绝、未来表无自动权限、非superuser CREATEROLE治理、同名统计伪装拒绝。数据库为D工作区临时PGlite PostgreSQL-WASM，已删除本次创建的精确目录。这9项隔离用例不连接Supabase；真实角色资源已由ROOT另外应用和回读，但真实Postgres密码认证、Hyperdrive、pg_stat_statements C运行/redaction及多连接压力仍未在这些用例中实测。
 
-ROOT已经完成**NOLOGIN**阶段。下一步受控operator使用[官方psql安全密码输入](https://www.postgresql.org/docs/current/app-psql.html)的 `\password karuu_web` /SCRAM流程，不把明文ALTER ROLE PASSWORD、DSN或secret写进migration、命令参数、history、日志、repo或输出文件；再由operator启用LOGIN。首次凭据输入与Cloudflare绑定由ROOT实操，本脚本不收集/生成/打印凭据。
+10月14日官方迁移 `karuu_private_worker_login_v1_20261014`（源码 `db/002-review-worker-login.sql`）实际完成新登录身份。数据库内生成256位随机密码、SCRAM存储，通过已存在的Supabase Vault临时加密保存，使用不回显的内存通道传给用户已确认的Cloudflare Hyperdrive。迁移文本、命令参数、源码、本地文件与回执没有凭据值；保存成功并验证数据库后，仅删除本次专名Vault bootstrap副本。原karuu_web没有改为LOGIN。
 
-真实Worker使用该角色的直接安全连接/Hyperdrive并独立检查cache disabled、`KARUU_DATABASE_SCHEMA=karuu_commerce`和连接身份；不能拿owner DSN通过SET ROLE冒充受限登录。建立实际verified账号后，首次管理员CLI仍走单独operator授权、精确UUID和审计，不由runtime角色提升。账户系统没有与Supabase Auth/外平台身份合并。
+已建立Hyperdrive dc1f294919fa401db0a5ff90d969eb04并绑定HYPERDRIVE_COMMERCE，查询缓存关闭、软池上限5；默认require TLS由Cloudflare验证服务器证书。[Cloudflare TLS说明](https://developers.cloudflare.com/hyperdrive/reference/supported-databases-and-features/)。真实远程Worker同一事务确认database=postgres、session_user=current_user=karuu_worker_login、五项GUC、RLS及继承/SET/ADMIN=true/false/false；读取schema version1成功。SET ROLE父角色/owner、其他public/private表/Vault读取、管理员列修改、订单/事件删除、audit修改、建表、关闭RLS、建角色、授父角色共13项全部42501拒绝，并回滚。证据 `work/hyperdrive-runtime-identity-proof.json`，测试预览进程已停止；没有持久测试账号、订单或其他项目行。
+
+本机严格TLS直连未通过，不计入成功；已验证的是Cloudflare边缘实际Hyperdrive连接。统计C函数运行/redaction、压力及备份恢复仍待另行验收。建立真实verified账号后，首管理员仍需精确UUID和审计，不由runtime提权。账户系统没有与Supabase Auth/外平台身份合并。
 
 参考[PG角色创建](https://www.postgresql.org/docs/current/sql-createrole.html)、[PG权限](https://www.postgresql.org/docs/current/ddl-priv.html)、[PG createrole_self_grant](https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-CREATEROLE-SELF-GRANT)、[Supabase角色](https://supabase.com/docs/guides/database/postgres/roles)。数据库登录/邮件/文件/支付联调及现有商用条件仍分别核验，支付批准false与游戏/KRU关闭状态不变。

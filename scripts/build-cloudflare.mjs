@@ -1,5 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
+import { reviewCloudflarePackagingEnv } from './lib/review-cloudflare-packaging-env.mjs';
 
 // The checked-in target is an isolated review Worker, never the production name.
 const target = JSON.parse(readFileSync('wrangler.jsonc', 'utf8'));
@@ -10,7 +11,7 @@ const result = spawnSync(process.execPath, [
   'node_modules/@opennextjs/cloudflare/dist/cli/index.js', 'build',
 ], {
   stdio: 'inherit',
-  env: { ...process.env, KARUU_DEPLOYMENT_ENV: 'preview', WRANGLER_SEND_METRICS: 'false' },
+  env: reviewCloudflarePackagingEnv(target, { ...process.env, KARUU_DEPLOYMENT_ENV: 'preview' }),
 });
 if (result.error) throw result.error;
 process.exit(result.status ?? 1);

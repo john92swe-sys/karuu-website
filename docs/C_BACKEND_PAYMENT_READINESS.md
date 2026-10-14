@@ -29,6 +29,6 @@ Stripe官方说明退款可能pending、requires_action或失败，成功的退�
 
 ## 尚待实际运行验证
 
-主任务已经在选定Supabase真实项目建立22表私有schema与受限NOLOGIN角色，见 [schema说明](C_BACKEND_SCHEMA_MIGRATION.md) 和 [runtime角色说明](C_BACKEND_RUNTIME_ROLE.md)。这不等于Worker身份登录、Hyperdrive缓存、商户或媒体链路接通。
+主任务已经在选定Supabase真实项目建立22表私有schema与56策略。10月14日保留原karuu_web NOLOGIN持权角色，另建karuu_worker_login受限登录，实际建立并绑定缓存关闭的Hyperdrive；远程同一事务确认真实session_user/current_user及RLS，13个越权SQL拒绝。见 [schema说明](C_BACKEND_SCHEMA_MIGRATION.md) 和 [runtime角色说明](C_BACKEND_RUNTIME_ROLE.md)。这证明受限数据库连接，尚不证明付款和媒体履约完成。
 
-商户能力、受限Stripe服务器凭据和签名接收端已经配置；仍须完成数据库受限登录/Hyperdrive与文件/发件绑定、启用已暂停接收端、测试环境实际交易/退款；逐商品核价格、完整成本、发行权/版次/真实母文件SHA、私有交付与税务。法律、税务、发行与新销售开关保持既有核验要求。签名检查使用本地签署的未订阅检查事件，正确签名200并忽略、错误签名400，未产生商户订单或资金流；不作为Stripe官方交付或业务数据库验收。
+商户能力、受限Stripe服务器凭据、签名接收端及数据库连接已经配置；仍须完成文件/发件绑定、启用已暂停接收端、测试环境实际交易/退款；逐商品核价格、完整成本、发行权/版次/真实母文件SHA、私有交付与税务。法律、税务、发行与新销售开关保持既有核验要求。签名检查使用本地签署的未订阅检查事件，正确签名200并忽略、错误签名400，未产生商户订单或资金流；不作为Stripe官方交付或业务数据库验收。

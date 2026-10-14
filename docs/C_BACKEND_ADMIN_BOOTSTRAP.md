@@ -47,11 +47,13 @@ PGlite适配器按单引擎串行排队；测试验证实际SQL/事务结果并�
 
 | 领域 | 从代码到真实服务的缺口 |
 | --- | --- |
-| 数据库/身份 | 用户已选择gngdffjluzcsouzpvquq，ROOT恢复后官方status=ACTIVE_HEALTHY；官网专用karuu_commerce第一阶段迁移已由ROOT官方应用并确认22RLS、version1、公开角色零权限；既有public/private业务不变。仍需backup恢复核验、服务器专用role/安全凭据、Worker Hyperdrive绑定及cache-disabled核验。邮箱验证链路应先工作，bootstrap只能授予既有verified账号 |
+| 数据库/身份 | 用户已选择gngdffjluzcsouzpvquq，ROOT恢复后官方status=ACTIVE_HEALTHY；官网专用karuu_commerce第一阶段迁移已由ROOT官方应用并确认22RLS、version1、公开角色零权限；既有public/private业务不变。10月14日已接通独立受限登录/Hyperdrive并验收缓存关闭、身份/RLS和13项拒绝；backup恢复仍待核验。邮箱验证链路应先工作，bootstrap只能授予既有verified账号 |
 | 邮件/询盘通知 | 当前抽象HTTPS relay需要真实provider鉴权/发送域名及指定测试邮箱；队列job只有受保护的HTTP入口，尚未建立私有scheduler/失败监控，provider accepted不等于送达。ROOT正在适配provider，此工具不重写邮件代码 |
 | 私有文件 | 已有账户授权/短时grant/range读取，但operator上传、真实R2私有对象/版本/哈希、权利与实际故障恢复联调仍需落实。ROOT负责R2适配；不得把公开书页或封面当母音频/完整文件 |
 | 商户/商品 | Stripe连接恢复、独立test mode真实交易/webhook/退款；逐SKU母文件/发行权/KDP Select/价格/市场/税/成本及四项live批准；已有fixture不替代provider验收 |
 | 后台持续运维 | 首位admin本轮已可审计授权；后续staff角色维护、全量分页财务导出/退款部分金额、通知scheduler与持续备份恢复仍未由本工具实现 |
 | 游戏/KRU | 真实服务器grant/refund合同、签名治理、适用资格及数量/SOL/现金/履约预算；当前资格门与内部点数原语不代表实际发行/兑换器，继续关闭 |
 
-09:26 UTC本轮官方资源审查表明当前review版本仅有ASSETS、self-reference及公开门禁vars，没有已绑定Hyperdrive/R2/mail/queue/secret。当前OAuth对相关资源list返回API10000，不能据此说账号内资源不存在；需适当权限的拥有者确认可复用资源。这里只记录已核绑定与调用边界，不创建账户/资源或扩大权限。
+10月13日09:26 UTC的历史官方资源审查表明当时review版本仅有ASSETS、self-reference及公开门禁vars，没有已绑定Hyperdrive/R2/mail/queue/secret。当前OAuth对相关资源list返回API10000，不能据此说账号内资源不存在；需适当权限的拥有者确认可复用资源。这里只记录已核绑定与调用边界，不创建账户/资源或扩大权限。
+
+10月14日当前审查Worker已绑定HYPERDRIVE_COMMERCE及两项Stripe Secret，数据库可用；R2/mail仍未绑定，尚无真实verified用户或管理员。历史绑定检查不得作为当前未接数据库的依据。

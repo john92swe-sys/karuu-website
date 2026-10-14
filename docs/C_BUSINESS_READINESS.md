@@ -1,23 +1,23 @@
 # C 方案真实商品与业务链路准备表
 
-核对日期：2026-10-13（Europe/Berlin）。本文记录实际商品与服务证据，区分用户已授权的目标、已落地服务和仍未完成的配置。核对范围为原交接 ZIP、提取成本表、既有数字站资料、媒体项目交付目录、三个指定游戏工程、KRU 专项的非秘密事实文件及当前官网服务端源码。没有读取客户订单/收款账户明细、修改媒体队列、申请服务、发邮件、签名、转币或重新发布。本文不改变已确认的 C 设计。
+核对日期：2026-10-14（Europe/Berlin）；媒体与成本来源保留10月13日核验时间。本文区分用户已授权的目标、已落地服务及仍未完成的配置，不改变已确认C设计，不把授权或fixture当真实交易。
 
-## 2026-10-13 真实收款状态
+## 2026-10-14 接通状态
 
 业务只读检查截点：`2026-10-13 11:10 UTC` / 柏林 `13:10`；随后补入 ROOT 的真实商户/运行角色回读和本节恢复修复。用户最新明确要求“直接开始真实收款吧”，**live 收款意图已经授权**，不再作为待许可项，也不重复请求测试保存许可。该指令没有补出具体作品的完整成本、现行发行权、本站售价、已接通的私有文件或商户 live 配置；下表只列本次能定位到的实际缺口，不替经营者填写身份或商户声明。
 
-此次代码检查基于源码 HEAD `ada2b5173fee8c3f3bc4d3d89ad0669bf98e3430` 及正在继续实施的工作区；**未提交的邮件、私有媒体、数据库角色和管理工具不属于已部署 runtime**。已发布 C review 的 runtime 仍为 `72634a8fa6064e1e7e0f4a7d104e1a3691b11b1a`。尚不能将当前收费状态写成已开通或已完成订单端到端验收。
+业务代码的完整131项回归与五尺寸视觉证据保留原核验版本。10月14日已发布两项正式服务器Secret和受限Hyperdrive绑定；实际连接证据与当前版本以最新回执/交付校验为准。尚未启用真实新收款或完成订单交付。
 
 | 项目 | 已核事实 | 真实收费前尚未完成的具体事项 |
 | --- | --- | --- |
-| 收款开关与运行环境 | 本地 `wrangler.jsonc` 目标为独立 `karuu-c-review-20261013`；`KARUU_PAYMENT_MODE=test`，支付及四项 live 门禁均为 `false`。`scripts/deploy-cloudflare-review.mjs` 硬性要求预览、无生产 routes、商业开关关闭 | 准备精确目标的 live 配置与发布工件；用户 live 意图已经满足，但税务、发行权、实际条款对应的配置仍须有以下业务证据。不能把这份闭门 review 发布脚本直接当 live 发布流程 |
-| 商户与支付服务 | ROOT 已在 IAB 从 sandbox `acct_1UDS1VFPGMfxkdtc` 实际切换到父 merchant `acct_1UDS18JtfLuLpt8R`；account/onboarding 显示尚需激活，继续设置到 `/test/welcome` 第 1 步 / 共 6 步，瑞典，企业名称尚未填。原 WebMCP onboarding 读回 `livemode=false`，连接器仍 `UNAUTHORIZED`。源码已区分 test/live key/session/event，已有 mock/签名夹具 | 父 merchant 尚未激活，live key 未配置；尚无 live endpoint 签名配置、事件订阅和真实 tax-rate 对象的读回。没有替经营者填写商户声明。此处账号/UI 事实来源于 ROOT 实际操作，本子任务未读取商户或密钥；不能将 sandbox 身份或模式切换当 live 收费完成 |
+| 收款开关与运行环境 | 独立审查Worker已部署匹配正式凭据的live模式，支付及四项批准门禁均false；无生产routes | 完成实际商品/文件/邮件/税务/条款与交易验收后再开新销售，用户live意图不需重复确认 |
+| 商户与支付服务 | 正式acct_1UDS18JtfLuLpt8R已由用户完成开户及本人验证；10月13日15:31UTC API确认charges/payouts/details=true。7权限受限live key及签名Secret已保存，两者审查站激活、正式Worker仅暂存。8事件Snapshot接收端已建且暂停 | 待文件/邮件/商品履约接通、测试环境真实交易/退款及启用接收端；不能把签名入口检查当订单验收 |
 | 正式本站价与成本 | 下表有平台 SEK 价格来源；原测算表 `49 SEK`、示例 VAT/支付费及组合价格只是演算。`costResult()` 与 checkout 拒绝未完整输入或未达到实际目标的成本记录 | 尚未在本次范围找到已核实的本站正常价、需要时的活动价及窗口、组合/升级价和完整成本配置。逐个真实 SKU 以现有作品/发行资料决定，不自动复制平台价或把未知成本填 `0`。首个单书交易不必等所有组合或 KRU 完成 |
 | 发行权与实际交付版 | F1–F5 完整 EPUB 已恢复并核对身份/hash；Witness 的原文件不是缺失。平台音频、音乐与草稿的状态分别见商品矩阵 | 首批销售必须将母文件与现行版、语言、署名及本站分销依据对应；已有 Kindle 商品的 KDP Select/排他状态尚未核实。Google AI 有声条目不等于已经取得可站外交付的全本音频与许可。未具备文件/权利的格式继续保留平台入口 |
-| 数据库 | 所选 Supabase 项目已读回 `ACTIVE_HEALTHY`；ROOT 已正式应用 `karuu_commerce` 第一阶段和 `karuu_private_runtime_role_v1_20261013`：22 RLS 表、version1、56 个仅 TO `karuu_web` 的 policy；角色为 NOLOGIN、无继承/旁路/超管/建库/建角色，既有应用权限及可执行 definer 均为 0。原 public/private 业务不变；[正式角色回执](../work/supabase/karuu-runtime-role-applied.json)、[迁移说明](C_BACKEND_SCHEMA_MIGRATION.md) | 运行角色的 DDL 已完成，尚未配置真实登录凭据或 Worker 连接；回执 `credentialsReadOrSet=false`、`workerConnected=false`、`businessRowsCreated=false`。Hyperdrive/安全直连及 cache-disabled 仍未验收；尚无真实商品、价格、成本或管理员记录的应用/回读证据 |
+| 数据库 | 选定Free项目gngdffjluzcsouzpvquq：22表RLS、version1、56策略。原karuu_web NOLOGIN保留；新增karuu_worker_login仅INHERIT该角色，SET/ADMIN=false。实际Hyperdrive已绑定、缓存关闭、软池上限5；真实同一事务身份/RLS与13项越权拒绝通过 | 尚无真实verified账号、管理员、本站SKU/价格/成本数据；备份恢复和压力验收仍待完成。公开内容库零行保留12项静态作品，不伪造商品或核验时间 |
 | 账户与管理员 | 邮箱验证、登录、重置、管理员最小授权工具已实现；[管理员准备工具](C_BACKEND_ADMIN_BOOTSTRAP.md)的 8 项测试只在本地隔离 PostgreSQL-WASM 中执行 | 尚无真实验证邮箱链路、既有 verified 用户及精确 UUID 的首位管理员授权证据。后台 UI 出现或工具测试通过不能代替线上角色。外平台订单不会自动迁入 |
-| 邮件与询盘 | 新增品牌隔离的 relay / Cloudflare 原生邮件适配；16 项 mock 测试验证配置、品牌隔离与 accepted 回执；[邮件说明](C_MAIL_PROVIDER.md)。[scheduled 包装](C_NOTIFICATION_SCHEDULED.md)已接入本地 Worker main，10 项隔离测试通过，明确开关为 false 且没有 cron | 未配置真实 KARUU 发件通道或 sender-only binding；Cloudflare 向任意客户发件需核现有 Workers Paid 与 verified domain。JKJ 需自身通道，不借用 KARUU。accepted 不等于送达，持久化询盘、通知调度/失败回执仍要实际接通验证；本地包装不等于线上 scheduler 已启用 |
-| 私有文件 | R2/relay 适配、SHA 版本约束、授权短时下载/Range 和受保护上传正在工作区实现；完整付费文件没有放入 public | 最新已部署 review 的 Worker 绑定没有私有媒体、交付签名 secret 或业务数据库。当前首批文件尚无已上传私有对象/元数据/hash、真实授权读取及故障恢复的线上证据。资源 list 权限不足不能推断账号内资源不存在 |
+| 邮件与询盘 | 品牌独立relay/EmailService、幂等outbox和关闭的scheduled包装已实现；数据库接通后inquiries=true，账户邮件仍false；[邮件说明](C_MAIL_PROVIDER.md) | 尚需真实KARUU/JKJ发件通道、送达与询盘通知验收、通知Secret/cron及失败监控；没有向客户发信或提交测试询盘 |
+| 私有文件 | 私有R2读取/32MiB内上传、SHA/版次/短时授权/Range代码已部署；付费文件未放public | R2订阅计费确认待用户办理，未建私有桶、绑定或上传母文件；大于32MiB全本音频上传尚待实现与验证 |
 | 购买条款与运营资料 | 当前 `/terms` 和 `/privacy` 仍明确标注准备/审查状态；购买同意记录有 `KARUU_TERMS_VERSION`，按组件含税金额建立不可变订单 | 当前文件尚未包含实际启用市场/作品的最终许可、退款联系与流程、账户/存储 provider、保留期限等运行资料。需把已选实际服务填入现有页面及版本记录；本次不代填经营者声明 |
 | 真实业务验收 | 已有线上 20 个 GET 页面、4 个目录/账户交互、5 个匿名 API 检查；未提交业务 form，未产生真实付款或邮件 | 接通上述条件后，验证服务端确认为同一订单、精确权益、私有下载、失败恢复、重复事件和退款撤销。页面验收、匿名关闭状态或 fixture 通过不算 live 收费成功 |
 | 游戏与 KRU | 原有身份和资格门沿用，KRU 实际执行始终关闭；未改游戏服务和 eligibility。普通数字作品法币支付不依赖 KRU | 缺真实游戏 API、受控 signer/预算及具体资格的服务继续关闭，不阻断已经具备上述条件的单书收费，也不随 live 开关自动发奖 |

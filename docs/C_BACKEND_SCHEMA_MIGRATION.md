@@ -1,6 +1,6 @@
 # 已选 Supabase 项目的官网专用 schema 预演
 
-2026-10-13。用户已明确选择 `john92swe@gmail.com's Project`（`gngdffjluzcsouzpvquq`）。ROOT通过已有官方连接恢复该Free项目，未升级计划。第一阶段已由ROOT通过官方 `supabase_apply_migration` 应用 `karuu_private_commerce_v1_20261013` 并回读验证成功。本文区分迁移前核验、实际上云结果和仍未连接Worker的事项；本文作者仅做只读核验及本地准备，没有执行真实授权/口令操作。
+2026-10-13。用户已明确选择 `john92swe@gmail.com's Project`（`gngdffjluzcsouzpvquq`）。ROOT通过已有官方连接恢复该Free项目，未升级计划。第一阶段已由ROOT通过官方 `supabase_apply_migration` 应用 `karuu_private_commerce_v1_20261013` 并回读验证成功。本文保留初始迁移核验，10月14日ROOT已追加实际受限登录和Hyperdrive接通结果。
 
 ## 实际读取结果
 
@@ -46,10 +46,10 @@ PostgreSQL有内建的全局PUBLIC函数EXECUTE默认值，**单schema default R
 
 ## ROOT可继续的步骤与仍关闭的范围
 
-第一阶段已经应用并回读。第二阶段ROOT也已通过官方 `karuu_private_runtime_role_v1_20261013` 建立受限NOLOGIN角色并回读56条仅TO karuu_web策略、22RLS、外部既有业务权限0及匿名schema拒绝，见[专用服务器角色说明](C_BACKEND_RUNTIME_ROLE.md)。凭据/LOGIN与Cloudflare绑定仍走受控操作者流程，尚不能据此声称Worker已连接。专用schema保持不暴露给public Data API，备份恢复和实际服务连接仍需分别核验。
+第一阶段已经应用并回读。第二阶段ROOT也已通过官方 `karuu_private_runtime_role_v1_20261013` 建立受限NOLOGIN角色并回读56条仅TO karuu_web策略、22RLS、外部既有业务权限0及匿名schema拒绝，见[专用服务器角色说明](C_BACKEND_RUNTIME_ROLE.md)。10月14日新增独立karuu_worker_login受限成员，原角色NOLOGIN保留，已实际建立缓存关闭的Hyperdrive并绑定审查Worker；同一远程事务身份/RLS和13项越权拒绝通过。专用schema保持不暴露给public Data API，备份恢复仍待核验。
 
-运行配置应显式 `KARUU_DATABASE_SCHEMA=karuu_commerce`。真实Worker使用已建立的专用karuu_web角色及安全连接，不能使用schema owner/postgres的高权限DSN。56条server-only命令策略与列级权限已由ROOT实际应用；9/9本地隔离测试与ROOT fresh元数据回读均通过。口令/LOGIN/Worker绑定仍未由本轮作者配置。第一阶段SQL本身不给运行角色权限，第二阶段才增加受限服务权限。现有自建邮箱密码账户仍是独立账户系统，没有与Supabase Auth、平台或外站身份合并。
+运行配置应显式 `KARUU_DATABASE_SCHEMA=karuu_commerce`。真实Worker使用独立karuu_worker_login密码登录并继承karuu_web，仅INHERIT=true，SET/ADMIN=false；不是schema owner/postgres连接后SET ROLE。56条server-only命令策略与列级权限已由ROOT实际应用；9/9本地隔离测试与ROOT fresh元数据回读均通过。登录与绑定的当前事实以10月14日ROOT回执为准。第一阶段SQL本身不给运行角色权限，第二阶段才增加受限服务权限。现有自建邮箱密码账户仍是独立账户系统，没有与Supabase Auth、平台或外站身份合并。
 
-真实DB绑定、邮件验证/通知、私有文件、SKU权利/价格/完整成本/税、真实Stripe沙盒交易/webhook/退款及既有live批准条件继续分别验证。商业批准false、游戏充值与KRU实际执行均未由这次迁移准备开启。
+真实DB绑定已验收；邮件验证/通知、私有文件、SKU权利/价格/完整成本/税、真实Stripe沙盒交易/webhook/退款及既有live批准条件继续分别验证。商业批准false、游戏充值与KRU实际执行均未由这次迁移准备开启。
 
 已读本轮[Supabase changelog](https://supabase.com/changelog)、[Securing your API](https://supabase.com/docs/guides/api/securing-your-api)、[RLS官方说明](https://supabase.com/docs/guides/database/postgres/row-level-security)及[PostgreSQL default privileges说明](https://www.postgresql.org/docs/current/sql-alterdefaultprivileges.html)。2026-10-12 changelog中的HTTP TLS CBC cipher退役不改变该DDL合同；实际服务连接仍需独立验证。
