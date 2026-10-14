@@ -9,6 +9,10 @@ The user has since confirmed only a Swedish VAT registration, no OSS or other
 registrations, a USD 1.99 price and a confirmed private management surplus target.
 These are planning facts; no cost record, registration or payment setting has
 been written from them. No small-seller scheme or sales totals have been assumed.
+The separate establishment, threshold and destination-election replies have now
+been received. Their private handoff record distinguishes human statements from
+unverified government decisions and unknown exact turnover amounts; those
+replies do not themselves create an OSS registration or activate checkout.
 
 ## Implemented and independently reviewable
 
@@ -106,7 +110,10 @@ facts for the Swedish small-seller branch:
   not a verified calculation.
 - Destination-country taxation has not been elected. Not having OSS does not
   prove this fact; a voluntary destination-tax election has a two-calendar-year
-  commitment, which needs the actual accounting record.
+  commitment, which needs the actual accounting record. This is not automatic
+  expiry after two years: the Swedish Tax Agency states that the requested
+  destination-tax decision continues until changed. Verify the actual decision
+  and its effective status; never silently revoke it to enable the threshold.
 - The actual active Stripe Swedish registration returns `type=standard` and
   `standard.place_of_supply_scheme=small_seller`, exactly matching the reviewed
   preparation. A different or missing API scheme fails closed.
@@ -151,6 +158,7 @@ generic electronic-service or nontaxable code is substituted for an unknown fact
 - [Swedish registration fields](https://docs.stripe.com/api/tax/registrations/create?query=country_options.se)
 - [Swedish Tax Agency OSS and the fixed threshold](https://www.skatteverket.se/foretag/moms/deklareramoms/ossredovisningavmomsenligtdesarskildaordningarna.4.5b35a6251761e691420b58e.html)
 - [European Commission OSS threshold explanation, section 9](https://vat-one-stop-shop.ec.europa.eu/one-stop-shop_en)
+- [Swedish destination-tax election and continuing decision](https://www.skatteverket.se/foretag/moms/sarskildamomsregler/handelmedandralander/troskelvardevidforsaljningtillickebeskattningsbarapersoneriandraeulander.4.18e1b10334ebe8bc80005545.html)
 - [EU VAT territorial scope](https://taxation-customs.ec.europa.eu/taxation/vat/vat-directive/how-does-vat-work/territorial-scope_en)
 - [Zero-tax reasons and unsupported territories](https://docs.stripe.com/tax/zero-tax)
 - [Current tax-country coverage](https://docs.stripe.com/tax/supported-countries)
